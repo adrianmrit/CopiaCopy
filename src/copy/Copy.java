@@ -157,6 +157,7 @@ public class Copy extends Thread{
 		// TODO: if folder exist, rename, merge (copy content and ask if content exist), or skip (cancel copy)
 		// TODO: if file exists, skip, or rename
 		// TODO: handle copy in same path, should duplicate file with a "(copy)" at the end,
+		// TODO: Avoid copy folder into itself
 		// before file extension.
 		for (int i=0; i<this.origPaths.length; i++) {
 			Path origPath = (Path) this.origPaths[i];
