@@ -32,7 +32,7 @@ public class LongProgressBar extends JProgressBar{
 		this.value = newVal;
 		int percent = this.longPercent();
 		if (percent != this.getValue()) {
-			this.setValue(this.longPercent()); // avoid unnecesary updates
+			this.setValue(this.longPercent()); // avoid unnecessary updates
 		}
 	}
 	
