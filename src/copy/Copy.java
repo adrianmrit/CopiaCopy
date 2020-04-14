@@ -139,10 +139,15 @@ public class Copy extends Thread{
 	 * @throws IOException if fails
 	 */
 	public void copy() throws IOException {
+		// TODO: if folder exist, rename, merge (copy content and ask if content exist), or skip (cancel copy)
+		// TODO: if file exists, skip, or rename
+		// TODO: handle copy in same path, should duplicate file with a "(copy)" at the end,
+		// before file extension.
 		for (int i=0; i<this.origPaths.length; i++) {
 			Path origPath = (Path) this.origPaths[i];
 			Path destPath = this.resolveDest(origPath);
 			if (origPath.toFile().isFile()) {
+				// TODO: handle file exists
 				this.copyFile(origPath, destPath);
 			} else {
 				destPath.toFile().mkdirs();
@@ -182,6 +187,7 @@ public class Copy extends Thread{
 		}
 		
 		try {
+			// do the copy
 			byte[] buf = new byte[this.bufferSize]; // TODO: Find optimal chunk size
 			int bytesRead;
 			
