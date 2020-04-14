@@ -8,13 +8,23 @@ import java.awt.event.*;
 import java.io.IOException;
 
 public class CopyGUI{
+	private static boolean DEBUG = false;
+	
 	private static final Insets insets = new Insets(3,3,3,3);
+	
 	private static void addComponent(Container container, Component component,
 			int gridx, int gridy, int gridwidth, int gridheight, int anchor,
 			int fill) {
 			GridBagConstraints gbc = new GridBagConstraints(gridx, gridy,
 			gridwidth, gridheight, 1.0, 1.0, anchor, fill, insets, 0, 0);
 			container.add(component, gbc);
+	}
+	
+	/** Sets the debug status
+	 * @param debug status
+	 */
+	public static void setDebug(boolean debug) {
+		CopyGUI.DEBUG = debug;
 	}
 	
 	public static void main(String args[]) {

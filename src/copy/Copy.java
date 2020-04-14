@@ -1,24 +1,20 @@
 package copy;
 
-import java.awt.EventQueue;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.Date;
-
-import javax.swing.JProgressBar;
 
 import gui.UIElementsHolder;
 
 public class Copy extends Thread{
+	private static boolean DEBUG = false;
+	
 	private final File orig;
 	private final File dest;
 	
@@ -81,6 +77,13 @@ public class Copy extends Thread{
 		this(orig, dest, null);
 	}
 	
+	/** Sets the debug status
+	 * @param debug status
+	 */
+	public static void setDebug(boolean debug) {
+		DEBUG = debug;
+	}
+	
 	/** Resolves the <i>path</i> where path will be copied.
 	 * @param path origin path
 	 * @return destination path
@@ -125,13 +128,25 @@ public class Copy extends Thread{
 	 *
 	 */
 	public void run() {
+		int exitStatus = 0;
 		try {
+			long took = System.currentTimeMillis();
+			
 			this.copy();
-//			System.exit(0);  // uncomment on deploy
+			
+			took = System.currentTimeMillis() - took;
+			
+			if(DEBUG) {
+				System.out.println("Took: " + took + "ms");
+			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-//			System.exit(1);  // uncomment on deploy
+			exitStatus = 1;
+		}
+		
+		if(!DEBUG) {
+			System.exit(exitStatus);
 		}
 	}
 	
