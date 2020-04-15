@@ -27,12 +27,24 @@ public class CopyGUI{
 		CopyGUI.DEBUG = debug;
 	}
 	
+	public static void setTheme(JFrame frame, String theme) {
+		try {
+			UIManager.setLookAndFeel(theme);
+			SwingUtilities.updateComponentTreeUI(frame);
+		} catch (Exception exception) {
+			JOptionPane.showMessageDialog (
+			frame, "Can't change look and feel",
+			"Invalid PLAF", JOptionPane.ERROR_MESSAGE);
+		}
+	}
+	
 	public static void main(String args[]) {
 		Runnable runner = new Runnable() {
 			public void run() {
 				final JFrame frame = new JFrame("Copy Sample");
 				frame.setLayout(new GridBagLayout());
 				frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+				setTheme(frame, "com.sun.java.swing.plaf.gtk.GTKLookAndFeel");
 				JButton button = new JButton("Select Me");
 				JLabel fromLabel = new JLabel("Origin: " + args[0], SwingConstants.LEFT);
 				JLabel currentLabel = new JLabel("", SwingConstants.LEFT);
