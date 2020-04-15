@@ -1,7 +1,9 @@
 package gui;
 import javax.swing.*;
+import javax.swing.event.ChangeListener;
 
 import copy.Copy;
+import listeners.LongProgressBarListener;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -51,24 +53,27 @@ public class CopyGUI implements Runnable{
 		frame.setLayout(new GridBagLayout());
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setTheme(frame, "com.sun.java.swing.plaf.gtk.GTKLookAndFeel");
-		JButton button = new JButton("Select Me");
 		JLabel fromLabel = new JLabel("Origin: " + this.orig, SwingConstants.LEFT);
 		JLabel currentLabel = new JLabel("", SwingConstants.LEFT);
+		LongProgressBarModel fileProgressModel = new LongProgressBarModel();
+		LongProgressBarModel totalProgressModel = new LongProgressBarModel();
 		
-		LongProgressBar fileCopyProgressBar = new LongProgressBar();
+		
+		JProgressBar fileCopyProgressBar = new JProgressBar(fileProgressModel);
+		ChangeListener fileProgressListener = new LongProgressBarListener(fileCopyProgressBar);
+		fileProgressModel.addChangeListener(fileProgressListener);
+
 		currentLabel.setLabelFor(fileCopyProgressBar);
-		LongProgressBar totalCopyProgressBar = new LongProgressBar();
+		
+		JProgressBar totalCopyProgressBar = new JProgressBar(totalProgressModel);
+		ChangeListener totalProgressListener = new LongProgressBarListener(totalCopyProgressBar);
+		fileProgressModel.addChangeListener(totalProgressListener);
+		
 		fromLabel.setLabelFor(totalCopyProgressBar);
+
 		fileCopyProgressBar.setStringPainted(true);
 		totalCopyProgressBar.setStringPainted(true);
-		// Define ActionListener
-		ActionListener actionListener = new ActionListener() {
-			public void actionPerformed(ActionEvent actionEvent) {
-				System.out.println("I was selected.");
-			}
-		};
-		// Attach listeners
-		button.addActionListener(actionListener);
+		
 		addComponent(frame, fromLabel, 0, 0, 1, 1, GridBagConstraints.WEST, GridBagConstraints.CENTER);
 		addComponent(frame, totalCopyProgressBar, 0, 1, 1, 1, GridBagConstraints.CENTER, GridBagConstraints.BOTH);
 		
@@ -81,9 +86,14 @@ public class CopyGUI implements Runnable{
 		
 //		Thread copyThread = new CopyThread(copyProgressBar, copy);
 		Copy copyThread;
-		UIElementsHolder holder = new UIElementsHolder(fileCopyProgressBar, totalCopyProgressBar, currentLabel);
+//		UIElementsHolder holder = new UIElementsHolder(fileProgressModel, totalProgressModel, currentLabel);
 		try {
-			copyThread = new Copy(this.orig, this.dest, holder);
+			copyThread = new Copy(this.orig, this.dest);
+			copyThread.setFileProgressModel(fileProgressModel);
+			copyThread.setTotalProgressModel(totalProgressModel);
+			copyThread.setCurrentLabel(currentLabel);
+			copyThread.setHasGUI(true);
+			
 			copyThread.start();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block

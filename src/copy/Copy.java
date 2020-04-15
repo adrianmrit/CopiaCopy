@@ -10,6 +10,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import javax.swing.JLabel;
+
+import gui.LongProgressBarModel;
 import gui.UIElementsHolder;
 
 public class Copy extends Thread{
@@ -21,8 +24,6 @@ public class Copy extends Thread{
 	private final Object[] origPaths;  // TODO: change to Path[]
 	private final long totalSize;
 	
-	private final UIElementsHolder UIELEMENTS;
-	
 	private static final int DEFAULT_BUFFER_SIZE = 1024; // 8kb
 	private static final long MAX_BUFFER_SIZE = 1048576; // 1mb
 	
@@ -31,12 +32,18 @@ public class Copy extends Thread{
 	private static final short NUMBER_STEPS = 10;
 	private short operationCounter;  // counter, should reset when equals NUMBER_STEPS
 	
-	public Copy(String orig, String dest, UIElementsHolder UIELEMENTS) throws IOException{
+	// GUI elements
+	
+	private LongProgressBarModel fileProgressModel;
+	private LongProgressBarModel totalProgressModel;
+	private JLabel currentLabel;
+	private boolean hasGUI = false;
+	
+	
+	public Copy(String orig, String dest) throws IOException{
 		this.orig = new File(orig);
 		this.dest = new File(dest);
 		this.bufferSize = DEFAULT_BUFFER_SIZE;
-		
-		this.UIELEMENTS = UIELEMENTS;
 		
 		if (this.orig.isFile()) {
 			// if file there is only one path to be copied
@@ -47,35 +54,33 @@ public class Copy extends Thread{
 		}
 		
 		this.totalSize = Copy.getFolderArraySize(this.origPaths);
-		
-		// Initialize the total progress bar
-		if (this.UIELEMENTS != null) {
-			// avoid overriding the folder progress bar when passed to new Copy objects;
-			this.UIELEMENTS.totalProgressBar.setMaximum(this.totalSize);
-			this.UIELEMENTS.totalProgressBar.setMinimum(0);
-			this.UIELEMENTS.totalProgressBar.setValue(0);
-		}
-	}
-	
-	public Copy(File orig, File dest, UIElementsHolder UIELEMENTS) throws IOException {
-		this(orig.getAbsolutePath(), dest.getAbsolutePath(), UIELEMENTS);
-	}
-	
-	public Copy(Path orig, Path dest, UIElementsHolder UIELEMENTS) throws IOException {
-		this(orig.toString(), dest.toString(), UIELEMENTS);
-	}
-	
-	public Copy(String orig, String dest) throws IOException {
-		this(orig, dest, null);
 	}
 	
 	public Copy(File orig, File dest) throws IOException {
-		this(orig, dest, null);
+		this(orig.getAbsolutePath(), dest.getAbsolutePath());
 	}
 	
 	public Copy(Path orig, Path dest) throws IOException {
-		this(orig, dest, null);
+		this(orig.toString(), dest.toString());
 	}
+	
+	public void setFileProgressModel(LongProgressBarModel fileProgressModel) {
+		this.fileProgressModel = fileProgressModel;
+	}
+	
+	public void setTotalProgressModel(LongProgressBarModel totalProgressModel) {
+		this.totalProgressModel = totalProgressModel;
+		this.totalProgressModel.setLongMaximum(this.totalSize);
+	}
+	
+	public void setCurrentLabel(JLabel currentLabel) {
+		this.currentLabel = currentLabel;
+	}
+	
+	public void setHasGUI(boolean b) {
+		this.hasGUI = b;
+	}
+	
 	
 	/** Sets the debug status
 	 * @param debug status
@@ -175,9 +180,9 @@ public class Copy extends Thread{
 	 * @param bytesRead last number of bytes read
 	 */
 	private void updateProgressBars(long bytesRead) {
-		if (this.UIELEMENTS != null) {
-			this.UIELEMENTS.fileProgressBar.addValue(bytesRead);
-			this.UIELEMENTS.totalProgressBar.addValue(bytesRead);
+		if (this.hasGUI) {
+			this.fileProgressModel.addLongValue(bytesRead);
+			this.totalProgressModel.addLongValue(bytesRead);
 		}
 	}
 	
@@ -194,12 +199,11 @@ public class Copy extends Thread{
 		InputStream is = new FileInputStream(origF);;
 		OutputStream os = new FileOutputStream(destF);
 		
-		if (this.UIELEMENTS != null) {
-			this.UIELEMENTS.fileProgressBar.setMaximum(origF.length()); // resets the fileProgressBar
-			this.UIELEMENTS.fileProgressBar.setMinimum(0);
-			this.UIELEMENTS.fileProgressBar.setValue(0L);
-			
-			this.UIELEMENTS.currentLabel.setText("Current: " + orig.toString());
+		if (this.hasGUI) {
+			this.fileProgressModel.setLongMaximum(origF.length()); // resets the fileProgressBar
+			this.fileProgressModel.setLongValue(0); // resets the fileProgressBar
+	
+			this.currentLabel.setText("Current: " + orig.toString());
 		}
 		
 		try {
