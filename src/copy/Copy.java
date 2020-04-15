@@ -24,7 +24,7 @@ public class Copy extends Thread{
 	private final Object[] origPaths;  // TODO: change to Path[]
 	private final long totalSize;
 	
-	private static final int DEFAULT_BUFFER_SIZE = 1024; // 8kb
+	private static final int DEFAULT_BUFFER_SIZE = 8192; // 8kb
 	private static final long MAX_BUFFER_SIZE = 1048576; // 1mb
 	
 	private int bufferSize; // current choosed buffer size
