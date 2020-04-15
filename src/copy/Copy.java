@@ -174,7 +174,7 @@ public class Copy extends Thread{
 	/** Updates the progress bars if they exist
 	 * @param bytesRead last number of bytes read
 	 */
-	public void updateProgressBars(long bytesRead) {
+	private void updateProgressBars(long bytesRead) {
 		if (this.UIELEMENTS != null) {
 			this.UIELEMENTS.fileProgressBar.addValue(bytesRead);
 			this.UIELEMENTS.totalProgressBar.addValue(bytesRead);
