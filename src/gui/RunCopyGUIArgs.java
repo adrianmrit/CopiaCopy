@@ -11,7 +11,8 @@ public class RunCopyGUIArgs {
 		Path dest = Paths.get("TestDest/").toAbsolutePath();
 		
 		CopyGUI.setDebug(true);
+		CopyGUI copy = new CopyGUI(src.toString(), dest.toString());
 		Copy.setDebug(true);
-		CopyGUI.main(new String[] {src.toString(), dest.toString()});
+		copy.run();
 	}
 }
