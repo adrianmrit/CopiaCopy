@@ -13,7 +13,6 @@ import java.nio.file.Paths;
 import javax.swing.JLabel;
 
 import gui.LongProgressBarModel;
-import gui.UIElementsHolder;
 
 public class Copy extends Thread{
 	private static boolean DEBUG = false;
