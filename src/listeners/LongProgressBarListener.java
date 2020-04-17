@@ -20,7 +20,6 @@ public class LongProgressBarListener implements ChangeListener{
 			LongProgressBarModel progressBarModel = (LongProgressBarModel)source;
 			if (!progressBarModel.getValueIsAdjusting()) {
 				progressBar.setValue(progressBarModel.getValue());
-				System.out.println ("Changed: " + progressBarModel.getValue());
 			}
 		}
 	}
