@@ -92,6 +92,7 @@ public class CopyGUI implements Runnable{
 			copyThread.setFileProgressModel(fileProgressModel);
 			copyThread.setTotalProgressModel(totalProgressModel);
 			copyThread.setCurrentLabel(currentLabel);
+			copyThread.setFrame(frame);
 			copyThread.setHasGUI(true);
 			
 			copyThread.start();

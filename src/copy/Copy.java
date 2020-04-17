@@ -1,17 +1,30 @@
 package copy;
 
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.EventQueue;
+import java.awt.GridBagConstraints;
+import java.awt.Insets;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import javax.swing.Box;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.text.BadLocationException;
 
+import gui.FileExistsDialog;
 import gui.LongProgressBarModel;
 
 public class Copy extends Thread{
@@ -36,6 +49,7 @@ public class Copy extends Thread{
 	private LongProgressBarModel fileProgressModel;
 	private LongProgressBarModel totalProgressModel;
 	private JLabel currentLabel;
+	private JFrame frame; // used to create windows
 	private boolean hasGUI = false;
 	
 	
@@ -61,6 +75,10 @@ public class Copy extends Thread{
 	
 	public Copy(Path orig, Path dest) throws IOException {
 		this(orig.toString(), dest.toString());
+	}
+	
+	public void setFrame(JFrame frame) {
+		this.frame = frame;
 	}
 	
 	public void setFileProgressModel(LongProgressBarModel fileProgressModel) {
@@ -133,9 +151,10 @@ public class Copy extends Thread{
 	 */
 	public void run() {
 		int exitStatus = 0;
+		launchWindowsTest();
 		try {
 			long took = System.currentTimeMillis();
-			
+//			System.out.println(launchWindowsTest());
 			this.copy();
 			
 			took = System.currentTimeMillis() - took;
@@ -151,6 +170,26 @@ public class Copy extends Thread{
 		
 		if(!DEBUG) {
 			System.exit(exitStatus);
+		}
+	}
+	
+	private static GridBagConstraints getConstraints(int gridx, int gridy, int gridwidth, int gridheight, int anchor,
+			int fill) {
+			Insets insets = new Insets(3,3,3,3);
+			GridBagConstraints gbc = new GridBagConstraints(gridx, gridy,
+			gridwidth, gridheight, 1.0, 1.0, anchor, fill, insets, 0, 0);
+			return gbc;
+	}
+	
+	public void launchWindowsTest() {
+		FileExistsDialog dialog = new FileExistsDialog(this.frame, "example");
+		dialog.run();
+		System.out.println(dialog.getAction());
+		try {
+			System.out.println(dialog.getInputValue());
+		} catch (BadLocationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 	
@@ -212,7 +251,7 @@ public class Copy extends Thread{
 			
 			while ((bytesRead = is.read(buf)) > 0) {
 				os.write(buf, 0, bytesRead);
-				this.updateProgressBars(bytesRead);
+				updateProgressBars(bytesRead);
 			}
 
 		} finally {
