@@ -12,8 +12,11 @@ import java.awt.Insets;
 import java.awt.Window.Type;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Date;
+
 import javax.swing.plaf.basic.BasicIconFactory;
 
 import javax.swing.Box;
@@ -39,6 +42,7 @@ import javax.swing.text.DocumentFilter;
 import components.BigButton;
 import components.UnstyledButton;
 import copy.Copy;
+import copy.SizeRep;
 import icons.ArrowIconBottom;
 import icons.ArrowIconRight;
 import icons.ArrowIconUp;
@@ -49,12 +53,14 @@ public class FileExistsDialog{
 	private String actionPerformed;
 	private Document renamedTextDocument;
 	private JDialog frame;
-	private String name;
+	private File orig;
+	private File dest;
 	private final Insets buttonInsets =  new Insets(5, 5, 5, 5);
 	
-	public FileExistsDialog(JFrame parent, String name){
+	public FileExistsDialog(JFrame parent, File orig, File dest){
 		this.parent = parent;
-		this.name = name;
+		this.orig = orig;
+		this.dest = dest;
 	}
 	
 	ActionListener actionListener = new ActionListener() {
@@ -63,6 +69,25 @@ public class FileExistsDialog{
 		frame.setVisible(false);
 		}
 	};
+	
+	public Box getFileBox(File f, String label) {
+		double fileSize = SizeRep.readableVal(f.length());
+		String fileSizeRep = SizeRep.readableRep(f.length());
+		Date lastMod = new Date(f.lastModified());
+		JLabel origLabel = new JLabel(label);
+		JLabel origSizeLabel = new JLabel(String.format("Size: %.2f%s", fileSize, fileSizeRep));
+		JLabel lastModLabel = new JLabel("Last modified:");
+		JLabel origModLabel = new JLabel(String.format("%1$tF %1$tr", lastMod));
+		
+		// Origin file container
+		Box fielBox = Box.createVerticalBox();
+		fielBox.add(origLabel, BorderLayout.CENTER);
+		fielBox.add(origSizeLabel, BorderLayout.CENTER);
+		fielBox.add(lastModLabel, BorderLayout.CENTER);
+		fielBox.add(origModLabel, BorderLayout.CENTER);
+		
+		return fielBox;
+	}
 	
 	public void run() {
 		this.parent.setEnabled(false);
@@ -75,7 +100,7 @@ public class FileExistsDialog{
 		 * Message Section
 		 ************************************/
 		
-		JLabel messageLabel = new JLabel("Replace file \"" + this.name + "\"?");
+		JLabel messageLabel = new JLabel("Replace file \"" + this.dest.getName() + "\"?");
 		JLabel informationLabel = new JLabel(
 				"<HTML><b>Anoter file with the same name already exists. " + ""
 				+ "Replacing will overwrite its content</b></HTML>"
@@ -91,33 +116,16 @@ public class FileExistsDialog{
 		 * Files Section
 		 ************************************/
 		
-		// Origin labels
-		JLabel origLabel = new JLabel("Original file");
-		JLabel origSizeLabel = new JLabel("Size: 10MB");
-		JLabel origModLabel = new JLabel("Last modified: 8 Apr");
-		
-		// Origin file container
-		Box origBox = Box.createVerticalBox();
-		origBox.add(origLabel, BorderLayout.CENTER);
-		origBox.add(origSizeLabel, BorderLayout.CENTER);
-		origBox.add(origModLabel, BorderLayout.CENTER);
-		
-		// Replace labels
-		JLabel replaceLabel = new JLabel("Replace with");
-		JLabel replaceSizeLabel = new JLabel("Size: 10MB");
-		JLabel replaceModLabel = new JLabel("Last modified: 8 Apr");
-		
-		// Replace file container
-		Box replaceBox = Box.createVerticalBox();
-		replaceBox.add(replaceLabel, BorderLayout.CENTER);
-		replaceBox.add(replaceSizeLabel, BorderLayout.CENTER);
-		replaceBox.add(replaceModLabel, BorderLayout.CENTER);
+		Box replaceBox = getFileBox(this.dest, "Replace with");
+		Box origBox = getFileBox(this.orig, "Original file");
 		
 		// Files boxes container
 		Box filesBox = Box.createHorizontalBox();
+		filesBox.add(Box.createHorizontalGlue(), BorderLayout.CENTER);
 		filesBox.add(origBox, BorderLayout.CENTER);
 		filesBox.add(Box.createHorizontalGlue(), BorderLayout.CENTER);
 		filesBox.add(replaceBox, BorderLayout.CENTER);
+		filesBox.add(Box.createHorizontalGlue(), BorderLayout.CENTER);
 		
 		/*************************************
 		 * End Files Section
@@ -135,10 +143,11 @@ public class FileExistsDialog{
 		
 		Icon icoActive = new ArrowIconBottom(new Color(0, 0, 0), icoHeight, icoWidth);  // exchange sizes
 		
-		JTextField renameField = new JTextField(this.name);
+		JTextField renameField = new JTextField(this.orig.getName());
 		BigButton renameButton = new BigButton("Rename");
 		renameButton.setEnabled(false);
 		JLabel renameErrorLabel = new JLabel("");
+		renameErrorLabel.setVisible(false);
 		
 		renameButton.setMargin(new Insets(0,0,0,0));
 		renameField.setMargin(new Insets(0,0,0,0));
@@ -165,7 +174,7 @@ public class FileExistsDialog{
 		renameButton.setActionCommand("RENAME");
 
 		this.renamedTextDocument = renameField.getDocument();
-		DocumentFilter fileNameFilter = new FileNameInputFilter(renameErrorLabel, renameButton, this.name);
+		DocumentFilter fileNameFilter = new FileNameInputFilter(renameErrorLabel, renameButton, this.orig.getName());
 		((AbstractDocument)renamedTextDocument).setDocumentFilter(fileNameFilter);
 		/*************************************
 		 * End Rename Section
@@ -211,7 +220,7 @@ public class FileExistsDialog{
 
 		
 //		frame.setSize();
-		frame.setMinimumSize(new Dimension(400, 300));
+		frame.setMinimumSize(new Dimension(600, 300));
 //		frame.setResizable(true);
 		frame.setVisible(true);
 	}

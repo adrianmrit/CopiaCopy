@@ -74,10 +74,11 @@ public class FileNameInputFilter extends DocumentFilter {
 		
 		if (invalid) {
 			this.errorLabel.setText(this.invalidCharacters[invalidChar] + " is not a valid character.");
+			this.errorLabel.setVisible(true);
 			this.submitButton.setEnabled(false);
 //			throw new BadLocationException(proposedValue, offset);
 		} else {
-			this.errorLabel.setText("");
+			this.errorLabel.setVisible(false);
 			if (proposedValue.equals(initialValue)) {
 				this.submitButton.setEnabled(false);
 			} else {
