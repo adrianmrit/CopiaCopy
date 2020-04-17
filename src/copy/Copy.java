@@ -9,6 +9,7 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
@@ -16,6 +17,7 @@ import java.util.Set;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 
+import gui.FileExistsDialog;
 import gui.LongProgressBarModel;
 
 public class Copy extends Thread{
@@ -25,11 +27,16 @@ public class Copy extends Thread{
 	private final File dest;
 	
 //	private final Object[] origPaths;  // TODO: change to Path[]
-	private final long totalSize;
+	private long totalSize = 0;
 	
 	private static final int DEFAULT_BUFFER_SIZE = 8192; // 8kb
 	
 	private HashMap<Path, Path> origDestMap;
+	
+	// Must be emptied after used. 
+	// Useful to avoid ConcurrentModificationException
+	private HashMap<Path, Path> toRename;  // set of files to be renamed.
+	private ArrayList<Path> toRemove;
 	
 	// GUI elements
 	
@@ -52,8 +59,6 @@ public class Copy extends Thread{
 			Iterator<Path> iter = Copy.getPathsIterator(this.orig.toPath());
 			setOrigDestMap(iter);
 		}
-		
-		this.totalSize = Copy.getFolderArraySize(this.origDestMap.keySet());
 	}
 	
 	public Copy(File orig, File dest) throws IOException {
@@ -74,7 +79,6 @@ public class Copy extends Thread{
 	
 	public void setTotalProgressModel(LongProgressBarModel totalProgressModel) {
 		this.totalProgressModel = totalProgressModel;
-		this.totalProgressModel.setLongMaximum(this.totalSize);
 	}
 	
 	public void setCurrentLabel(JLabel currentLabel) {
@@ -91,6 +95,46 @@ public class Copy extends Thread{
 			Path originPath = originPaths.next();
 			Path destPath = resolveDest(originPath);
 			this.origDestMap.put(originPath, destPath);
+		}
+	}
+	
+	public void resolveExistingFiles() {
+		Iterator<Path> originIterator = this.origDestMap.keySet().iterator();
+		this.toRename = new HashMap<>();
+		this.toRemove = new ArrayList<>();
+		while (originIterator.hasNext()) {
+			File origin = originIterator.next().toFile();
+			File dest = this.origDestMap.get(origin.toPath()).toFile();
+			if (dest.exists() && dest.isFile()) {
+				FileExistsDialog dialog = new FileExistsDialog(this.frame, origin, dest);
+				dialog.run();
+				String action = dialog.getAction();
+				switch (action) {
+					case FileExistsDialog.CANCEL:
+						System.exit(0);  // exit copy
+					case FileExistsDialog.SKIP:
+//						this.toRemove.add
+//						this.origDestMap.remove(origin.toPath());
+						this.toRemove.add(origin.toPath());
+					case FileExistsDialog.RENAME:
+						Path newDest = Paths.get(dest.getParent(), dialog.getInputValue());
+//						this.origDestMap.replace(origin.toPath(), newDest);
+						this.toRename.put(origin.toPath(), newDest);
+					case FileExistsDialog.REPLACE:
+						//do nothing, copy will replace it authomatically
+				}
+			}
+		}
+		Iterator<Path> toRenameIterator = this.toRename.keySet().iterator();
+		while (toRenameIterator.hasNext()) {
+			Path origin = toRenameIterator.next();
+			this.origDestMap.replace(origin, this.toRename.get(origin));
+		}
+		
+		Iterator<Path> toRemoveIterator = toRemove.iterator();
+		while (toRemoveIterator.hasNext()) {
+			Path origin = toRemoveIterator.next();
+			this.origDestMap.remove(origin);
 		}
 	}
 	
@@ -141,14 +185,26 @@ public class Copy extends Thread{
 	public void run() {
 		int exitStatus = 0;
 		try {
-			long took = System.currentTimeMillis();
-//			System.out.println(launchWindowsTest());
-			this.copy();
+			long tookAll = System.currentTimeMillis();
+			resolveExistingFiles();
+			long tookResolve = System.currentTimeMillis() - tookAll;
 			
-			took = System.currentTimeMillis() - took;
+			long tookGetSize = System.currentTimeMillis();
+			this.totalSize = Copy.getFolderArraySize(this.origDestMap.keySet());
+			this.totalProgressModel.setLongMaximum(this.totalSize);
+			tookGetSize = System.currentTimeMillis() - tookGetSize;
+			
+			long tookCopy = System.currentTimeMillis();
+			this.copy();
+			tookCopy = System.currentTimeMillis() - tookCopy;
+			
+			tookAll = System.currentTimeMillis() - tookCopy;
 			
 			if(DEBUG) {
-				System.out.println("Took: " + took + "ms");
+				System.out.println("Took (all): " + tookAll + "ms");
+				System.out.println("Took (copy): " + tookCopy + "ms");
+				System.out.println("Took (resolve files): " + tookResolve + "ms");
+				System.out.println("Took (get size): " + tookGetSize + "ms");
 			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -166,7 +222,6 @@ public class Copy extends Thread{
 	 */
 	public void copy() throws IOException {
 		// TODO: if folder exist, rename, merge (copy content and ask if content exist), or skip (cancel copy)
-		// TODO: if file exists, skip, or rename
 		// TODO: handle copy in same path, should duplicate file with a "(copy)" at the end,
 		// TODO: Avoid copy folder into itself
 		// before file extension.

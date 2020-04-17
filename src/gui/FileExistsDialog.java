@@ -57,6 +57,11 @@ public class FileExistsDialog{
 	private File dest;
 	private final Insets buttonInsets =  new Insets(5, 5, 5, 5);
 	
+	public static final String CANCEL = "Cancel";
+	public static final String SKIP = "Skip";
+	public static final String RENAME = "Rename";
+	public static final String REPLACE = "Replace";
+	
 	public FileExistsDialog(JFrame parent, File orig, File dest){
 		this.parent = parent;
 		this.orig = orig;
@@ -171,7 +176,7 @@ public class FileExistsDialog{
 		renameToggleButton.addActionListener(toggleRenameListener);
 		
 		renameButton.addActionListener(actionListener);
-		renameButton.setActionCommand("RENAME");
+		renameButton.setActionCommand(RENAME);
 
 		this.renamedTextDocument = renameField.getDocument();
 		DocumentFilter fileNameFilter = new FileNameInputFilter(renameErrorLabel, renameButton, this.orig.getName());
@@ -193,9 +198,9 @@ public class FileExistsDialog{
 		buttonsBox.add(skipButton, BorderLayout.CENTER);
 		buttonsBox.add(replaceButton, BorderLayout.CENTER);
 
-		skipButton.setActionCommand("SKIP");
-		replaceButton.setActionCommand("REPLACE");
-		cancelButton.setActionCommand("CANCEL");
+		skipButton.setActionCommand(SKIP);
+		replaceButton.setActionCommand(REPLACE);
+		cancelButton.setActionCommand(CANCEL);
 		
 		skipButton.addActionListener(actionListener);
 		replaceButton.addActionListener(actionListener);
@@ -229,8 +234,14 @@ public class FileExistsDialog{
 		return this.actionPerformed;
 	}
 	
-	public String getInputValue() throws BadLocationException {
-		return this.renamedTextDocument.getText(0, this.renamedTextDocument.getLength());
+	public String getInputValue() {
+		try {
+			return this.renamedTextDocument.getText(0, this.renamedTextDocument.getLength());
+		} catch (BadLocationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return "";
+		}
 	}
 	
 	
