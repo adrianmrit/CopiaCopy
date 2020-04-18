@@ -10,9 +10,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.TreeMap;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -31,11 +31,11 @@ public class Copy extends Thread{
 	
 	private static final int DEFAULT_BUFFER_SIZE = 8192; // 8kb
 	
-	private HashMap<Path, Path> origDestMap;
+	private TreeMap<Path, Path> origDestMap;  // ensures order 
 	
 	// Must be emptied after used. 
 	// Useful to avoid ConcurrentModificationException
-	private HashMap<Path, Path> toRename;  // set of files to be renamed.
+	private TreeMap<Path, Path> toRename;  // set of files to be renamed.
 	private ArrayList<Path> toRemove;
 	
 	// GUI elements
@@ -53,7 +53,7 @@ public class Copy extends Thread{
 		
 		if (this.orig.isFile()) {
 			
-			this.origDestMap = new HashMap<>();
+			this.origDestMap = new TreeMap<>();
 			this.origDestMap.put(this.orig.toPath(), resolveDest(this.orig.toPath()));
 		} else {
 			Iterator<Path> iter = Copy.getPathsIterator(this.orig.toPath());
@@ -90,7 +90,7 @@ public class Copy extends Thread{
 	}
 	
 	public void setOrigDestMap(Iterator<Path> originPaths) {
-		this.origDestMap = new HashMap<>();
+		this.origDestMap = new TreeMap<>();
 		while (originPaths.hasNext()) {
 			Path originPath = originPaths.next();
 			Path destPath = resolveDest(originPath);
@@ -117,7 +117,7 @@ public class Copy extends Thread{
 			this.copy();
 			tookCopy = System.currentTimeMillis() - tookCopy;
 			
-			tookAll = System.currentTimeMillis() - tookCopy;
+			tookAll = System.currentTimeMillis() - tookAll;
 			
 			if(DEBUG) {
 				System.out.println("Took (all): " + tookAll + "ms");
@@ -196,7 +196,7 @@ public class Copy extends Thread{
 	
 	private void resolveExistingFiles() {
 		Iterator<Path> originIterator = this.origDestMap.keySet().iterator();
-		this.toRename = new HashMap<>();
+		this.toRename = new TreeMap<>();
 		this.toRemove = new ArrayList<>();
 		while (originIterator.hasNext()) {
 			File origin = originIterator.next().toFile();
