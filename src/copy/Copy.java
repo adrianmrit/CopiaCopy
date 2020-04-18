@@ -98,87 +98,6 @@ public class Copy extends Thread{
 		}
 	}
 	
-	public void resolveExistingFiles() {
-		Iterator<Path> originIterator = this.origDestMap.keySet().iterator();
-		this.toRename = new HashMap<>();
-		this.toRemove = new ArrayList<>();
-		while (originIterator.hasNext()) {
-			File origin = originIterator.next().toFile();
-			File dest = this.origDestMap.get(origin.toPath()).toFile();
-			if (dest.exists() && dest.isFile()) {
-				FileExistsDialog dialog = new FileExistsDialog(this.frame, origin, dest);
-				dialog.run();
-				String action = dialog.getAction();
-				switch (action) {
-					case FileExistsDialog.CANCEL:
-						System.exit(0);  // exit copy
-					case FileExistsDialog.SKIP:
-//						this.toRemove.add
-//						this.origDestMap.remove(origin.toPath());
-						this.toRemove.add(origin.toPath());
-					case FileExistsDialog.RENAME:
-						Path newDest = Paths.get(dest.getParent(), dialog.getInputValue());
-//						this.origDestMap.replace(origin.toPath(), newDest);
-						this.toRename.put(origin.toPath(), newDest);
-					case FileExistsDialog.REPLACE:
-						//do nothing, copy will replace it authomatically
-				}
-			}
-		}
-		Iterator<Path> toRenameIterator = this.toRename.keySet().iterator();
-		while (toRenameIterator.hasNext()) {
-			Path origin = toRenameIterator.next();
-			this.origDestMap.replace(origin, this.toRename.get(origin));
-		}
-		
-		Iterator<Path> toRemoveIterator = toRemove.iterator();
-		while (toRemoveIterator.hasNext()) {
-			Path origin = toRemoveIterator.next();
-			this.origDestMap.remove(origin);
-		}
-	}
-	
-	/** Sets the debug status
-	 * @param debug status
-	 */
-	public static void setDebug(boolean debug) {
-		DEBUG = debug;
-	}
-	
-	/** Resolves the <i>path</i> where path will be copied.
-	 * @param path origin path
-	 * @return destination path
-	 */
-	public Path resolveDest(Path path) {
-		String pathRootParent = this.orig.getParent();
-		String subPath = path.toString().replaceFirst(pathRootParent, "");  // path - this.orig parent
-		Path resolved = Paths.get(this.dest.toString(), subPath);  // join both paths
-		
-		return resolved;
-	}
-	
-	public static Iterator<Path> getPathsIterator(Path path) throws IOException {
-		return Files.walk(path).iterator();
-	}
-	
-	/** Get the total size for all the paths between a Set,
-	 * if it is a file.
-	 * @param paths all the paths
-	 * @return long total size
-	 */
-	public static long getFolderArraySize(Set<Path> paths) {
-		long total = 0;
-		Iterator<Path> i = paths.iterator();
-		while(i.hasNext()) {
-			File path = i.next().toFile();
-			if (path.isFile()) {
-				total += path.length();
-			}
-		}
-		
-		return total;
-	}
-	
 	/** Used to run the copy in a thread
 	 *
 	 */
@@ -237,6 +156,98 @@ public class Copy extends Thread{
 				destPath.toFile().mkdirs();
 			}
 		}
+	}
+	
+	private void handleFileExistDialog(File origin, File dest) {
+		FileExistsDialog dialog = new FileExistsDialog(this.frame, origin, dest);
+		dialog.run();
+		String action = dialog.getAction();
+		switch (action) {
+			case FileExistsDialog.CANCEL:
+				System.exit(0);  // exit copy
+			case FileExistsDialog.SKIP:
+//				this.toRemove.add
+//				this.origDestMap.remove(origin.toPath());
+				this.toRemove.add(origin.toPath());
+			case FileExistsDialog.RENAME:
+				Path newDest = Paths.get(dest.getParent().toString(), dialog.getInputValue());
+//				this.origDestMap.replace(origin.toPath(), newDest);
+				this.toRename.put(origin.toPath(), newDest);
+			case FileExistsDialog.REPLACE:
+				//do nothing, copy will replace it automatically
+		}
+	}
+	
+	private void renameFilesInMap() {
+		Iterator<Path> toRenameIterator = this.toRename.keySet().iterator();
+		while (toRenameIterator.hasNext()) {
+			Path origin = toRenameIterator.next();
+			this.origDestMap.replace(origin, this.toRename.get(origin));
+		}
+	}
+	
+	private void removeFilesFromMap() {
+		Iterator<Path> toRemoveIterator = toRemove.iterator();
+		while (toRemoveIterator.hasNext()) {
+			Path origin = toRemoveIterator.next();
+			this.origDestMap.remove(origin);
+		}
+	}
+	
+	private void resolveExistingFiles() {
+		Iterator<Path> originIterator = this.origDestMap.keySet().iterator();
+		this.toRename = new HashMap<>();
+		this.toRemove = new ArrayList<>();
+		while (originIterator.hasNext()) {
+			File origin = originIterator.next().toFile();
+			File dest = this.origDestMap.get(origin.toPath()).toFile();
+			if (dest.exists() && dest.isFile()) {
+				handleFileExistDialog(origin, dest);
+			}
+		}
+		renameFilesInMap();
+		removeFilesFromMap();
+	}
+	
+	/** Sets the debug status
+	 * @param debug status
+	 */
+	public static void setDebug(boolean debug) {
+		DEBUG = debug;
+	}
+	
+	/** Resolves the <i>path</i> where path will be copied.
+	 * @param path origin path
+	 * @return destination path
+	 */
+	public Path resolveDest(Path path) {
+		String pathRootParent = this.orig.getParent();
+		String subPath = path.toString().replaceFirst(pathRootParent, "");  // path - this.orig parent
+		Path resolved = Paths.get(this.dest.toString(), subPath);  // join both paths
+		
+		return resolved;
+	}
+	
+	public static Iterator<Path> getPathsIterator(Path path) throws IOException {
+		return Files.walk(path).iterator();
+	}
+	
+	/** Get the total size for all the paths between a Set,
+	 * if it is a file.
+	 * @param paths all the paths
+	 * @return long total size
+	 */
+	public static long getFolderArraySize(Set<Path> paths) {
+		long total = 0;
+		Iterator<Path> i = paths.iterator();
+		while(i.hasNext()) {
+			File path = i.next().toFile();
+			if (path.isFile()) {
+				total += path.length();
+			}
+		}
+		
+		return total;
 	}
 
 	/** Updates the progress bars if they exist
