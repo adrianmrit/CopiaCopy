@@ -20,10 +20,12 @@ import javax.swing.JLabel;
 import gui.FileExistsDialog;
 import gui.LongProgressBarModel;
 
+
 public class Copy extends Thread{
 	private static boolean DEBUG = false;
 	
-	private final File orig;
+	
+	private final File origin;
 	private final File dest;
 	
 //	private final Object[] origPaths;  // TODO: change to Path[]
@@ -48,15 +50,15 @@ public class Copy extends Thread{
 	
 	
 	public Copy(String orig, String dest) throws IOException{
-		this.orig = new File(orig);
+		this.origin = new File(orig);
 		this.dest = new File(dest);
 		
-		if (this.orig.isFile()) {
+		if (this.origin.isFile()) {
 			
 			this.origDestMap = new TreeMap<>();
-			this.origDestMap.put(this.orig.toPath(), resolveDest(this.orig.toPath()));
+			this.origDestMap.put(this.origin.toPath(), resolveDest(this.origin.toPath()));
 		} else {
-			Iterator<Path> iter = Copy.getPathsIterator(this.orig.toPath());
+			Iterator<Path> iter = Copy.getPathsIterator(this.origin.toPath());
 			setOrigDestMap(iter);
 		}
 	}
@@ -98,8 +100,8 @@ public class Copy extends Thread{
 		}
 	}
 	
-	/** Used to run the copy in a thread
-	 *
+	/** 
+	 * Used to run the copy in a thread
 	 */
 	public void run() {
 		int exitStatus = 0;
@@ -158,26 +160,36 @@ public class Copy extends Thread{
 		}
 	}
 	
+	/**
+	 * Shows a dialog if the file already exists in the destination.
+	 * @param origin Origin path
+	 * @param dest Destination path
+	 */
 	private void handleFileExistDialog(File origin, File dest) {
-		FileExistsDialog dialog = new FileExistsDialog(this.frame, origin, dest);
-		dialog.run();
-		String action = dialog.getAction();
-		switch (action) {
-			case FileExistsDialog.CANCEL:
-				System.exit(0);  // exit copy
-			case FileExistsDialog.SKIP:
-//				this.toRemove.add
-//				this.origDestMap.remove(origin.toPath());
-				this.toRemove.add(origin.toPath());
-			case FileExistsDialog.RENAME:
-				Path newDest = Paths.get(dest.getParent().toString(), dialog.getInputValue());
-//				this.origDestMap.replace(origin.toPath(), newDest);
-				this.toRename.put(origin.toPath(), newDest);
-			case FileExistsDialog.REPLACE:
-				//do nothing, copy will replace it automatically
+		if (this.hasGUI) {
+			FileExistsDialog dialog = new FileExistsDialog(this.frame, origin, dest);
+			dialog.run();
+			String action = dialog.getAction();
+			switch (action) {
+				case FileExistsDialog.CANCEL:
+					System.exit(0);  // exit copy
+				
+				case FileExistsDialog.SKIP:
+					this.toRemove.add(origin.toPath());
+				
+				case FileExistsDialog.RENAME:
+					Path newDest = Paths.get(dest.getParent().toString(), dialog.getInputValue());
+					this.toRename.put(origin.toPath(), newDest);
+				
+				case FileExistsDialog.REPLACE:
+					//do nothing, copy will replace it automatically
+			}
 		}
 	}
 	
+	/**
+	 * Renames the files that where selected to be renamed with FileExistsDialog
+	 */
 	private void renameFilesInMap() {
 		Iterator<Path> toRenameIterator = this.toRename.keySet().iterator();
 		while (toRenameIterator.hasNext()) {
@@ -186,6 +198,9 @@ public class Copy extends Thread{
 		}
 	}
 	
+	/**
+	 * Removes the files that where selected to be removed with FileExistsDialog
+	 */
 	private void removeFilesFromMap() {
 		Iterator<Path> toRemoveIterator = toRemove.iterator();
 		while (toRemoveIterator.hasNext()) {
@@ -194,6 +209,10 @@ public class Copy extends Thread{
 		}
 	}
 	
+	/**
+	 * Check if there is any file in the copy that exists in the origin. If it does it will ask what to do with it.
+	 * Files will be renamed and removed after asking for all of them, to avoid concurrent operation errors.
+	 */
 	private void resolveExistingFiles() {
 		Iterator<Path> originIterator = this.origDestMap.keySet().iterator();
 		this.toRename = new TreeMap<>();
@@ -221,13 +240,18 @@ public class Copy extends Thread{
 	 * @return destination path
 	 */
 	public Path resolveDest(Path path) {
-		String pathRootParent = this.orig.getParent();
+		String pathRootParent = this.origin.getParent();
 		String subPath = path.toString().replaceFirst(pathRootParent, "");  // path - this.orig parent
 		Path resolved = Paths.get(this.dest.toString(), subPath);  // join both paths
 		
 		return resolved;
 	}
 	
+	/** Returns an Iterator for all the inner files and folder between a path.
+	 * @param path Path to be walked
+	 * @return Iterator<Path> with all the inner paths
+	 * @throws IOException
+	 */
 	public static Iterator<Path> getPathsIterator(Path path) throws IOException {
 		return Files.walk(path).iterator();
 	}
