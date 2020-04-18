@@ -2,38 +2,20 @@ package gui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.Cursor;
-import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.Window.Type;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Path;
 import java.util.Date;
 
-import javax.swing.plaf.basic.BasicIconFactory;
-
 import javax.swing.Box;
-import javax.swing.BoxLayout;
 import javax.swing.Icon;
-import javax.swing.JButton;
 import javax.swing.JDialog;
-import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JProgressBar;
 import javax.swing.JTextField;
-import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
-import javax.swing.event.ChangeListener;
 import javax.swing.text.AbstractDocument;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
@@ -41,12 +23,12 @@ import javax.swing.text.DocumentFilter;
 
 import components.BigButton;
 import components.UnstyledButton;
-import copy.Copy;
 import copy.SizeRep;
 import icons.ArrowIconBottom;
 import icons.ArrowIconRight;
-import icons.ArrowIconUp;
 import inputFilters.FileNameInputFilter;
+
+// TODO: CLEAN
 
 public class FileExistsDialog{
 	private JFrame parent;
@@ -224,9 +206,7 @@ public class FileExistsDialog{
 		GUIHelpers.addComponent(frame, buttonsBox, 0, 6, 1, 1, GridBagConstraints.CENTER, GridBagConstraints.BOTH, insets);
 
 		
-//		frame.setSize();
-		frame.setMinimumSize(new Dimension(600, 300));
-//		frame.setResizable(true);
+		frame.setSize(600, 300);
 		frame.setVisible(true);
 	}
 	
@@ -238,7 +218,6 @@ public class FileExistsDialog{
 		try {
 			return this.renamedTextDocument.getText(0, this.renamedTextDocument.getLength());
 		} catch (BadLocationException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return "";
 		}
