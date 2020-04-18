@@ -6,7 +6,6 @@ import copy.Copy;
 import listeners.LongProgressBarListener;
 
 import java.awt.*;
-import java.awt.event.*;
 import java.io.IOException;
 
 public class CopyGUI implements Runnable{

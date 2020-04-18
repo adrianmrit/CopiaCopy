@@ -1,8 +1,5 @@
 package inputFilters;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
-
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.text.AttributeSet;
@@ -38,10 +35,12 @@ public class FileNameInputFilter extends DocumentFilter {
 	throws BadLocationException {
 		Document doc = fb.getDocument();
 		int currentLength = doc.getLength();
+		
 		String currentContent = doc.getText(0, currentLength);
 		String before = currentContent.substring(0, offset);
 		String after = currentContent.substring(length+offset, currentLength);
 		String newValue = before + after;
+		
 		currentValue = checkInput(newValue, offset);
 		fb.remove(offset, length);
 	}
@@ -50,40 +49,49 @@ public class FileNameInputFilter extends DocumentFilter {
 			String text, AttributeSet attrs) throws BadLocationException {
 			Document doc = fb.getDocument();
 			int currentLength = doc.getLength();
+			
 			String currentContent = doc.getText(0, currentLength);
 			String before = currentContent.substring(0, offset);
 			String after = currentContent.substring(length+offset, currentLength);
 			String newValue = before + (text == null ? "" : text) + after;
+			
 			currentValue = checkInput(newValue, offset);
 			fb.replace(offset, length, text, attrs);
 	}
 	
-	private String checkInput(String proposedValue, int offset)
-		throws BadLocationException {
-		System.out.println(proposedValue);
-		// check if contains any non valid character
-		int invalidChar = 0;
+	private void handleInvalid(int invalidCharIndex) {
+		this.errorLabel.setText(invalidCharacters[invalidCharIndex] + " is not a valid character.");
+		this.errorLabel.setVisible(true);
+		this.submitButton.setEnabled(false);
+		
+		// do not throw, show information to user and disable buttons instead
+		// throw new BadLocationException(proposedValue, offset);
+	}
+	
+	private void handleValid(String proposedValue) {
+		this.errorLabel.setVisible(false);
+		if (proposedValue.equals(initialValue)) {
+			this.submitButton.setEnabled(false);
+		} else {
+			this.submitButton.setEnabled(true);
+		}
+	}
+	
+	private String checkInput(String proposedValue, int offset) {
+		int invalidChar = -1;
 		boolean invalid = false;
-		for (int i=0; i<this.invalidCharacters.length; i++) {
-			if (proposedValue.contains(this.invalidCharacters[i])) {
-//				throw new BadLocationException(proposedValue, offset);
+
+		for (int i=0; i<invalidCharacters.length; i++) {
+			if (proposedValue.contains(invalidCharacters[i])) {
 				invalid = true;
 				invalidChar = i;
 			}
 		}
 		
 		if (invalid) {
-			this.errorLabel.setText(this.invalidCharacters[invalidChar] + " is not a valid character.");
-			this.errorLabel.setVisible(true);
-			this.submitButton.setEnabled(false);
-//			throw new BadLocationException(proposedValue, offset);
+			handleInvalid(invalidChar);
 		} else {
-			this.errorLabel.setVisible(false);
-			if (proposedValue.equals(initialValue)) {
-				this.submitButton.setEnabled(false);
-			} else {
-				this.submitButton.setEnabled(true);
-			}
+			handleValid(proposedValue);
 		}
 		
 		return proposedValue;
