@@ -17,6 +17,8 @@ import java.util.TreeMap;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 
+import gui.ExistsDialog;
+import gui.ExistsDialogBuilder;
 import gui.FileExistsDialog;
 import gui.LongProgressBarModel;
 
@@ -28,7 +30,11 @@ public class Copy extends Thread{
 	private final File origin;
 	private final File dest;
 	
-	private long totalSize = 0;
+	// TODO: Add more files to copy dynamically.
+	// They will be added in another TreeMap that will be processed after the copy is done with the first one,
+	// otherwise the Iterator from the first one wont include those files
+	
+	private long totalSize = 0;  // TODO: Update final size dynamically as files are skipped or added
 	
 	private static final int DEFAULT_BUFFER_SIZE = 8192; // 8kb
 	
@@ -168,6 +174,10 @@ public class Copy extends Thread{
 		}
 	}
 	
+	public TreeMap<Path, Path> getOrigDestMap(){
+		return this.origDestMap;
+	}
+	
 	/** 
 	 * Used to run the copy in a thread
 	 */
@@ -298,8 +308,9 @@ public class Copy extends Thread{
 		while (originIterator.hasNext()) {
 			File origin = originIterator.next().toFile();
 			File dest = this.origDestMap.get(origin.toPath()).toFile();
-			if (dest.exists() && dest.isFile()) {
-				handleFileExistDialog(origin, dest);
+			if (dest.exists()) {
+				if (dest.isFile()) handleFileExistDialog(origin, dest);
+				else handleFolderExistDialog(origin, dest);
 			}
 		}
 		renameFilesInMap();
@@ -313,21 +324,48 @@ public class Copy extends Thread{
 	 */
 	private void handleFileExistDialog(File origin, File dest) {
 		if (this.hasGUI) {
-			FileExistsDialog dialog = new FileExistsDialog(this.frame, origin, dest);
-			dialog.run();
+			ExistsDialog dialog = ExistsDialogBuilder.getFileExistsDialog(this.frame, origin, dest);
+			dialog.show();
 			String action = dialog.getAction();
 			switch (action) {
-				case FileExistsDialog.CANCEL:
+				case ExistsDialogBuilder.CANCEL:
 					System.exit(0);  // exit copy// TODO: handle file exists
 				
-				case FileExistsDialog.SKIP:
+				case ExistsDialogBuilder.SKIP:
 					this.toRemove.add(origin.toPath());
 				
-				case FileExistsDialog.RENAME:
+				case ExistsDialogBuilder.RENAME:
 					Path newDest = Paths.get(dest.getParent().toString(), dialog.getInputValue());
 					this.toRename.put(origin.toPath(), newDest);
 				
-				case FileExistsDialog.REPLACE:
+				case ExistsDialogBuilder.REPLACE:
+					//do nothing, copy will replace it automatically
+			}
+		}
+	}
+	
+	/**
+	 * Shows a dialog if the folder already exists in the destination.
+	 * @param origin Origin path
+	 * @param dest Destination path
+	 */
+	private void handleFolderExistDialog(File origin, File dest) {
+		if (this.hasGUI) {
+			ExistsDialog dialog = ExistsDialogBuilder.getFolderExistsDialog(this.frame, origin, dest);
+			dialog.show();
+			String action = dialog.getAction();
+			switch (action) {
+				case ExistsDialogBuilder.CANCEL:
+					System.exit(0);  // exit copy// TODO: handle file exists
+				
+				case ExistsDialogBuilder.SKIP:
+					this.toRemove.add(origin.toPath());
+				
+				case ExistsDialogBuilder.RENAME:
+					Path newDest = Paths.get(dest.getParent().toString(), dialog.getInputValue());
+					this.toRename.put(origin.toPath(), newDest);
+				
+				case ExistsDialogBuilder.MERGE:
 					//do nothing, copy will replace it automatically
 			}
 		}

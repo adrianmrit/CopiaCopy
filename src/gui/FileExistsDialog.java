@@ -30,14 +30,11 @@ import inputFilters.FileNameInputFilter;
 
 // TODO: CLEAN
 
-public class FileExistsDialog{
-	private JFrame parent;
-	private String actionPerformed;
+public class FileExistsDialog extends AbstractDialog{
 	private Document renamedTextDocument;
 	private JDialog frame;
 	private File orig;
 	private File dest;
-	private final Insets buttonInsets =  new Insets(5, 5, 5, 5);
 	
 	public static final String CANCEL = "Cancel";
 	public static final String SKIP = "Skip";
@@ -45,17 +42,10 @@ public class FileExistsDialog{
 	public static final String REPLACE = "Replace";
 	
 	public FileExistsDialog(JFrame parent, File orig, File dest){
-		this.parent = parent;
+		super(parent);
 		this.orig = orig;
 		this.dest = dest;
 	}
-	
-	ActionListener actionListener = new ActionListener() {
-		public void actionPerformed(ActionEvent actionEvent) {
-		actionPerformed = actionEvent.getActionCommand();
-		frame.setVisible(false);
-		}
-	};
 	
 	public Box getFileBox(File f, String label) {
 		double fileSize = SizeRep.readableVal(f.length());
@@ -77,11 +67,10 @@ public class FileExistsDialog{
 	}
 	
 	public void run() {
-		this.parent.setEnabled(false);
-		this.frame = new JDialog(this.parent, "Copy Sample", true);
-//		this.frame.setUndecorated(true);
-		frame.setLayout(new GridBagLayout());
-		frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+		this.getParent().setEnabled(false);
+		this.frame = new JDialog(this.getParent(), "Copy Sample", true);
+		this.frame.setLayout(new GridBagLayout());
+		this.frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		
 		/*************************************
 		 * Message Section
@@ -157,8 +146,7 @@ public class FileExistsDialog{
 		
 		renameToggleButton.addActionListener(toggleRenameListener);
 		
-		renameButton.addActionListener(actionListener);
-		renameButton.setActionCommand(RENAME);
+		this.registerButton(renameButton, RENAME);
 
 		this.renamedTextDocument = renameField.getDocument();
 		DocumentFilter fileNameFilter = new FileNameInputFilter(renameErrorLabel, renameButton, this.orig.getName());
@@ -179,17 +167,11 @@ public class FileExistsDialog{
 		buttonsBox.add(Box.createHorizontalGlue(), BorderLayout.CENTER);
 		buttonsBox.add(skipButton, BorderLayout.CENTER);
 		buttonsBox.add(replaceButton, BorderLayout.CENTER);
-
-		skipButton.setActionCommand(SKIP);
-		replaceButton.setActionCommand(REPLACE);
-		cancelButton.setActionCommand(CANCEL);
 		
-		skipButton.addActionListener(actionListener);
-		replaceButton.addActionListener(actionListener);
-		cancelButton.addActionListener(actionListener);
-		skipButton.setMargin(buttonInsets);
-		replaceButton.setMargin(buttonInsets);
-		cancelButton.setMargin(buttonInsets);
+		this.registerButton(skipButton, SKIP);
+		this.registerButton(replaceButton, REPLACE);
+		this.registerButton(cancelButton, CANCEL);
+
 		/*************************************
 		 * End Buttons Section
 		 ************************************/
@@ -208,10 +190,6 @@ public class FileExistsDialog{
 		
 		frame.setSize(600, 300);
 		frame.setVisible(true);
-	}
-	
-	public String getAction() {
-		return this.actionPerformed;
 	}
 	
 	public String getInputValue() {
