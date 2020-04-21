@@ -3,6 +3,7 @@ import javax.swing.*;
 import javax.swing.event.ChangeListener;
 
 import copy.Copy;
+import copy.LinkedFileList;
 import listeners.LongProgressBarListener;
 
 import java.awt.*;
@@ -87,7 +88,8 @@ public class CopyGUI implements Runnable{
 		Copy copyThread;
 //		UIElementsHolder holder = new UIElementsHolder(fileProgressModel, totalProgressModel, currentLabel);
 		try {
-			copyThread = new Copy(this.orig, this.dest);
+			LinkedFileList linkedFileList = new LinkedFileList();
+			copyThread = new Copy(this.orig, this.dest, linkedFileList);
 			copyThread.setFileProgressModel(fileProgressModel);
 			copyThread.setTotalProgressModel(totalProgressModel);
 			copyThread.setCurrentLabel(currentLabel);

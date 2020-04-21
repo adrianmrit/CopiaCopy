@@ -163,10 +163,8 @@ public class ExistsDialog extends AbstractDialog{
 		
 		this.getParent().setEnabled(false);
 		this.setJDialog(new JDialog(this.getParent(), windowsTitle, true));
-//		LayoutManager2 layout = new BoxLayout (this.getJDialog(), BoxLayout.Y_AXIS);
 		this.getJDialog().setLayout(new GridBagLayout());
 		this.getJDialog().setResizable(false);
-//		this.getJDialog().setLayout(layout);
 		this.getJDialog().setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		
 		/*************************************
@@ -177,10 +175,8 @@ public class ExistsDialog extends AbstractDialog{
 		JLabel messageLabel = new JLabel(this.message);
 		
 		Box messagesBox = Box.createVerticalBox();
-//		messagesBox.add(Box.createHorizontalGlue(), BorderLayout.CENTER);
 		messagesBox.add(titleLabel, BorderLayout.CENTER);
 		messagesBox.add(messageLabel, BorderLayout.CENTER);
-//		messagesBox.add(Box.createHorizontalGlue(), BorderLayout.CENTER);
 		/*************************************
 		 * End Message Section
 		 ************************************/
