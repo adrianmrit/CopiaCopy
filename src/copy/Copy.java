@@ -19,7 +19,6 @@ import javax.swing.JLabel;
 
 import gui.ExistsDialog;
 import gui.ExistsDialogBuilder;
-import gui.FileExistsDialog;
 import gui.LongProgressBarModel;
 
 
@@ -141,14 +140,22 @@ public class Copy extends Thread{
 	}
 	
 	private void doTheCopy(LinkedFile lf) throws IOException {
-		if (lf.isFile()) {
-			this.copyFile(lf);
+		if (lf.destExists() && !lf.getOverwriteConfirmation()) {
+			if (lf.isFile()) {
+				handleFileExistDialog(lf);
+			} else {
+				handleFolderExistDialog(lf);
+			}
 		} else {
-			lf.getAbsoluteDest().mkdirs();
+			if (lf.isFile()) {
+				this.copyFile(lf);
+			} else {
+				lf.getAbsoluteDest().mkdirs();
+			}
+			
+			this.completeFileBar();
+			lf.setCopied();
 		}
-		
-		this.completeFileBar();
-		lf.setCopied();
 	}
 	
 	/** 
@@ -160,22 +167,12 @@ public class Copy extends Thread{
 		// TODO: handle copy in same path, should duplicate file with a "(copy)" at the end,
 		// TODO: Avoid copy folder into itself
 		// before file extension.
-		if (linkedFileList.hasNext()) {
+		while (linkedFileList.hasNext()) {
 			LinkedFile lf = linkedFileList.getNext();
-			if (lf.destExists() && !lf.getOverwriteConfirmation()) {
-				if (lf.isFile()) {
-					handleFileExistDialog(lf);
-				} else {
-					handleFolderExistDialog(lf);
-				}
-			} else {
-				doTheCopy(lf);
-			}
-			copy();
-		} else {
-			this.completeFileBar();
-			this.completeTotalBar();
+			doTheCopy(lf);
 		}
+		this.completeFileBar();
+		this.completeTotalBar();
 	}
 	
 	/** 
@@ -266,16 +263,20 @@ public class Copy extends Thread{
 			switch (action) {
 				case ExistsDialogBuilder.CANCEL:
 					System.exit(0);  // exit copy// TODO: handle file exists
+					break;
 				
 				case ExistsDialogBuilder.SKIP:
 					lf.skip();
 					this.totalProgressModel.setLongMaximum(linkedFileList.getTotalSize());
+					break;
 				
 				case ExistsDialogBuilder.RENAME:
 					lf.renameDest(dialog.getInputValue());
+					break;
 				
 				case ExistsDialogBuilder.REPLACE:
 					lf.setOverwrite();
+					break;
 			}
 		}
 		else {
@@ -296,16 +297,20 @@ public class Copy extends Thread{
 			switch (action) {
 				case ExistsDialogBuilder.CANCEL:
 					System.exit(0);  // exit copy// TODO: handle file exists
+					break;
 				
 				case ExistsDialogBuilder.SKIP:
 					lf.skip();
 					this.totalProgressModel.setLongMaximum(linkedFileList.getTotalSize());
+					break;
 				
 				case ExistsDialogBuilder.RENAME:
 					lf.renameDest(dialog.getInputValue());
+					break;
 				
 				case ExistsDialogBuilder.MERGE:
 					lf.setOverwrite();
+					break;
 			}
 		} else {
 			lf.setOverwrite();

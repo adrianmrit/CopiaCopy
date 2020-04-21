@@ -93,6 +93,7 @@ public class ExistsDialog extends AbstractDialog{
 	
 	public void setRenameButton(String name, String action) {
 		renameButton = new SmallButton(name);
+		renameButton.setEnabled(false);
 		registerButton(renameButton, action);
 	}
 	
@@ -212,7 +213,7 @@ public class ExistsDialog extends AbstractDialog{
 		
 		Icon icoActive = new ArrowIconBottom(new Color(0, 0, 0), icoHeight, icoWidth);  // exchange sizes
 		
-		JTextField renameField = new JTextField(this.origin.getName());
+		JTextField renameField = new JTextField(this.dest.getName());
 		JLabel renameErrorLabel = new JLabel("");
 		renameErrorLabel.setVisible(false);
 
@@ -240,7 +241,7 @@ public class ExistsDialog extends AbstractDialog{
 		renameToggleButton.addActionListener(toggleRenameListener);
 
 		this.renamedTextDocument = renameField.getDocument();
-		DocumentFilter fileNameFilter = new FileNameInputFilter(renameErrorLabel, renameButton, this.origin.getName());
+		DocumentFilter fileNameFilter = new FileNameInputFilter(renameErrorLabel, renameButton, renameField.getText());
 		((AbstractDocument)renamedTextDocument).setDocumentFilter(fileNameFilter);
 		/*************************************
 		 * End Rename Section

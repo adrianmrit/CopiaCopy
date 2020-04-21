@@ -13,6 +13,7 @@ public class LinkedFile implements Comparable<LinkedFile>{
 	private boolean overwrite = false;
 	private ArrayList<LinkedFile> childs;  // contains a reference to the childs, for easy child mutations
 	private LinkedFileList linkedFileList;
+	private int status;
 	
 	private Path rootOrigin;
 	private Path rootDest;
