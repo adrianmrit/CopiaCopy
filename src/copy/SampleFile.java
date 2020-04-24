@@ -10,6 +10,7 @@ public class SampleFile {
 	private final static int CHUNK_SIZE = 1073741824; //1Gb
 	private final static long FILE_SIZE = 1073741824; //1Gb
 	private final static File SAMPLE_FILE = new File("SampleFile.sample");
+	
 	public static void main(String args[]) throws IOException {
 		long size = 0;
 		byte[] chunk = new byte[CHUNK_SIZE];

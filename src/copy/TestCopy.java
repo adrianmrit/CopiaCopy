@@ -15,7 +15,10 @@ class TestCopy {
 		Path src = Paths.get("Sample/SampleFile.sample").toAbsolutePath();
 		Path dest = Paths.get("TestDest/").toAbsolutePath();
 		File expected = Paths.get("TestDest/SampleFile.sample").toAbsolutePath().toFile();
-		Copy c = new Copy(src, dest, new LinkedFileList());
+		CopiableList CL = new CopiableList();
+		DinamicBuffer DB = new DinamicBuffer();
+		SuperModel SM = new SuperModel(CL, DB);
+		Copy c = new Copy(src, dest, SM);
 		c.copy();
 		
 		assertTrue(expected.exists());
@@ -31,7 +34,10 @@ class TestCopy {
 		File expected = Paths.get("TestDest/Sample/SampleSubFolder").toAbsolutePath().toFile();
 		File expected2 = Paths.get("TestDest/Sample/SampleFile.sample").toAbsolutePath().toFile();
 		File expected3 = Paths.get("TestDest/Sample/SampleFile2.sample").toAbsolutePath().toFile();
-		Copy c = new Copy(src, dest, new LinkedFileList());
+		CopiableList CL = new CopiableList();
+		DinamicBuffer DB = new DinamicBuffer();
+		SuperModel SM = new SuperModel(CL, DB);
+		Copy c = new Copy(src, dest, SM);
 		c.copy();
 		
 		assertTrue(expected.exists());

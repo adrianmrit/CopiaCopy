@@ -2,6 +2,7 @@ package copy;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,78 +25,38 @@ import gui.LongProgressBarModel;
 
 public class Copy extends Thread{
 	private static boolean DEBUG = false;
-	private static final int DEFAULT_BUFFER_SIZE = 8192; // 8kb
 	
 	
 	private final File origin;
 	private final File dest;
-	private LinkedFileList linkedFileList;
+	private SuperModel SM;
 	
 	// TODO: 
 	
 //	private long totalSize = 0;  // TODO: Update final size dinamically
 	// GUI elements
 	
-	private LongProgressBarModel fileProgressModel;
-	private LongProgressBarModel totalProgressModel;
-	private JLabel currentLabel;
-	private JFrame frame; // used to create windows
-	private boolean hasGUI = false;
-	
-	public Copy(String orig, String dest, LinkedFileList linkedFileList) throws IOException{
+	public Copy(String orig, String dest, SuperModel SM) throws IOException{
 		this.origin = new File(orig);
 		this.dest = new File(dest);
-		this.linkedFileList = linkedFileList;
+		this.SM = SM;
 		
-		linkedFileList.load(this.origin, this.dest.toPath());
+		Copiable f;
+		
+		if (this.origin.isFile()) {
+			f = new LinkedFile(this.origin, origin.getParentFile().toPath(), this.dest.toPath(), SM);
+		} else {
+			f = new LinkedFolder(this.origin, origin.getParentFile().toPath(), this.dest.toPath(), SM);
+		}
+		f.register();
 	}
 	
-	public Copy(File orig, File dest, LinkedFileList linkedFileList) throws IOException {
-		this(orig.getAbsolutePath(), dest.getAbsolutePath(), linkedFileList);
+	public Copy(File orig, File dest, SuperModel SM) throws IOException {
+		this(orig.getAbsolutePath(), dest.getAbsolutePath(), SM);
 	}
 	
-	public Copy(Path orig, Path dest, LinkedFileList linkedFileList) throws IOException {
-		this(orig.toString(), dest.toString(), linkedFileList);
-	}
-	
-	/** 
-	 * Sets the frame. Useful for creating dialogs.
-	 * @param frame
-	 */
-	public void setFrame(JFrame frame) {
-		this.frame = frame;
-	}
-	
-	/** 
-	 * Sets the file progress model
-	 * @param fileProgressModel
-	 */
-	public void setFileProgressModel(LongProgressBarModel fileProgressModel) {
-		this.fileProgressModel = fileProgressModel;
-	}
-	
-	/**
-	 * Sets the totalProgressModel
-	 * @param totalProgressModel
-	 */
-	public void setTotalProgressModel(LongProgressBarModel totalProgressModel) {
-		this.totalProgressModel = totalProgressModel;
-	}
-	
-	/** 
-	 * Sets the currentLabel
-	 * @param currentLabel
-	 */
-	public void setCurrentLabel(JLabel currentLabel) {
-		this.currentLabel = currentLabel;
-	}
-	
-	/** 
-	 * Set hasGUI. If there is GUI it will be updated
-	 * @param b
-	 */
-	public void setHasGUI(boolean b) {
-		this.hasGUI = b;
+	public Copy(Path orig, Path dest, SuperModel SM) throws IOException {
+		this(orig.toString(), dest.toString(), SM);
 	}
 	
 	/** Sets the debug status
@@ -114,8 +75,7 @@ public class Copy extends Thread{
 			long tookAll = System.currentTimeMillis();
 			
 			long tookGetSize = System.currentTimeMillis();
-//			this.totalSize = Copy.getFolderArraySize(this.origDestMap.keySet());
-			this.totalProgressModel.setLongMaximum(linkedFileList.getTotalSize());
+			SM.totalProgressModel.setLongMaximum(SM.copiableList.getTotalSize());
 			tookGetSize = System.currentTimeMillis() - tookGetSize;
 			
 			long tookCopy = System.currentTimeMillis();
@@ -139,25 +99,6 @@ public class Copy extends Thread{
 		}
 	}
 	
-	private void doTheCopy(LinkedFile lf) throws IOException {
-		if (lf.destExists() && !lf.getOverwriteConfirmation()) {
-			if (lf.isFile()) {
-				handleFileExistDialog(lf);
-			} else {
-				handleFolderExistDialog(lf);
-			}
-		} else {
-			if (lf.isFile()) {
-				this.copyFile(lf);
-			} else {
-				lf.getAbsoluteDest().mkdirs();
-			}
-			
-			this.completeFileBar();
-			lf.setCopied();
-		}
-	}
-	
 	/** 
 	 * Copy the files and creates the folders
 	 * @throws IOException if fails
@@ -167,81 +108,28 @@ public class Copy extends Thread{
 		// TODO: handle copy in same path, should duplicate file with a "(copy)" at the end,
 		// TODO: Avoid copy folder into itself
 		// before file extension.
-		while (linkedFileList.hasNext()) {
-			LinkedFile lf = linkedFileList.getNext();
-			doTheCopy(lf);
-		}
-		this.completeFileBar();
-		this.completeTotalBar();
-	}
-	
-	/** 
-	 * Copy a file from origin to destination, and updates the UIElements.
-	 * @param orig origin path
-	 * @param dest destination path
-	 * @throws IOException if fails
-	 */
-	public void copyFile(LinkedFile lf) throws IOException {
-		InputStream is = new FileInputStream(lf.getOrigin());
-		OutputStream os = new FileOutputStream(lf.getAbsoluteDest());
-		resetUICopyFile(lf);
-		
-		try {
-			copyFileHelper(is, os); // does the copy
-		} finally {
-			is.close();
-			os.close();
-		}
-	}
-	
-	/** 
-	 * Does the actual copy
-	 * @param is InputStream
-	 * @param os OutputStream
-	 */
-	private void copyFileHelper(InputStream is, OutputStream os) throws IOException {
-		byte[] buf = new byte[DEFAULT_BUFFER_SIZE]; // TODO: Find optimal chunk size
-		int bytesRead;
-		
-		while ((bytesRead = is.read(buf)) > 0) {
-			os.write(buf, 0, bytesRead);
-			updateProgressBars(bytesRead);
-		}
-	}
-	
-	/** 
-	 * Resets the fileProgressBar, and the currentLabel
-	 * @param originF
-	 * @param destF // not used for now
-	 */
-	private void resetUICopyFile(LinkedFile lf) {
-		if (this.hasGUI) {
-			this.fileProgressModel.setLongMaximum(lf.getSize()); // resets the fileProgressBar
-			this.fileProgressModel.setLongValue(0); // resets the fileProgressBar
-			this.currentLabel.setText("Current: " + lf.getAbsoluteDest());
+		if (SM.copiableList.hasNext()) {
+			Copiable c = SM.copiableList.getNext();
+			if (!handleExists(c)) {
+				c.copy();
+				c.setCopied();
+				this.completeFileBar();
+			}
+			copy();
+		} else {
+			this.completeTotalBar();
 		}
 	}
 	
 	private void completeFileBar() {
-		if (this.hasGUI) {
-			this.fileProgressModel.setRangeProperties(100, 0, 0, 100, false); // resets the totalProgressBar
+		if (SM.hasGUI()) {
+			SM.fileProgressModel.setRangeProperties(100, 0, 0, 100, false); // resets the totalProgressBar
 		}
 	}
 	
 	private void completeTotalBar() {
-		if (this.hasGUI) {
-			this.totalProgressModel.setRangeProperties(100, 0, 0, 100, false); // resets the totalProgressBar
-		}
-	}
-	
-	/** 
-	 * Updates the progress bars if they exist
-	 * @param bytesRead last number of bytes read
-	 */
-	private void updateProgressBars(long bytesRead) {
-		if (this.hasGUI) {
-			this.fileProgressModel.addLongValue(bytesRead);
-			this.totalProgressModel.addLongValue(bytesRead);
+		if (SM.hasGUI()) {
+			SM.totalProgressModel.setRangeProperties(100, 0, 0, 100, false); // resets the totalProgressBar
 		}
 	}
 	
@@ -249,15 +137,27 @@ public class Copy extends Thread{
 	 * Check if there is any file in the copy that exists in the origin. If it does it will ask what to do with it.
 	 * Files will be renamed and removed after asking for all of them, to avoid concurrent operation errors.
 	 */
+	private boolean handleExists(Copiable c) {
+		if (c.destExists() && !c.getOverwriteConfirmation()) {
+			if (c.isFile()) {
+				handleFileExistDialog(c);
+			} else {
+				handleFolderExistDialog(c);
+			}
+			return true;
+		}
+		
+		return false;
+	}
 	
 	/**
 	 * Shows a dialog if the file already exists in the destination.
 	 * @param origin Origin path
 	 * @param dest Destination path
 	 */
-	private void handleFileExistDialog(LinkedFile lf) {
-		if (this.hasGUI) {
-			ExistsDialog dialog = ExistsDialogBuilder.getFileExistsDialog(this.frame, lf.getOrigin(), lf.getAbsoluteDest());
+	private void handleFileExistDialog(Copiable c) {
+		if (SM.hasGUI()) {
+			ExistsDialog dialog = ExistsDialogBuilder.getFileExistsDialog(SM.frame, c.getOrigin(), c.getAbsoluteDest());
 			dialog.show();
 			String action = dialog.getAction();
 			switch (action) {
@@ -266,21 +166,21 @@ public class Copy extends Thread{
 					break;
 				
 				case ExistsDialogBuilder.SKIP:
-					lf.skip();
-					this.totalProgressModel.setLongMaximum(linkedFileList.getTotalSize());
+					c.skip();
+					SM.totalProgressModel.setLongMaximum(SM.copiableList.getTotalSize());
 					break;
 				
 				case ExistsDialogBuilder.RENAME:
-					lf.renameDest(dialog.getInputValue());
+					c.renameCoreDest(dialog.getInputValue());
 					break;
 				
 				case ExistsDialogBuilder.REPLACE:
-					lf.setOverwrite();
+					c.setOverwrite();
 					break;
 			}
 		}
 		else {
-			lf.setOverwrite();
+			c.setOverwrite();
 		}
 	}
 	
@@ -289,9 +189,9 @@ public class Copy extends Thread{
 	 * @param origin Origin path
 	 * @param dest Destination path
 	 */
-	private void handleFolderExistDialog(LinkedFile lf) {
-		if (this.hasGUI) {
-			ExistsDialog dialog = ExistsDialogBuilder.getFolderExistsDialog(this.frame, lf.getOrigin(), lf.getAbsoluteDest());
+	private void handleFolderExistDialog(Copiable c) {
+		if (SM.hasGUI()) {
+			ExistsDialog dialog = ExistsDialogBuilder.getFolderExistsDialog(SM.frame, c.getOrigin(), c.getAbsoluteDest());
 			dialog.show();
 			String action = dialog.getAction();
 			switch (action) {
@@ -300,20 +200,20 @@ public class Copy extends Thread{
 					break;
 				
 				case ExistsDialogBuilder.SKIP:
-					lf.skip();
-					this.totalProgressModel.setLongMaximum(linkedFileList.getTotalSize());
+					c.skip();
+					SM.totalProgressModel.setLongMaximum(SM.copiableList.getTotalSize());
 					break;
 				
 				case ExistsDialogBuilder.RENAME:
-					lf.renameDest(dialog.getInputValue());
+					c.renameCoreDest(dialog.getInputValue());
 					break;
 				
 				case ExistsDialogBuilder.MERGE:
-					lf.setOverwrite();
+					c.setOverwrite();
 					break;
 			}
 		} else {
-			lf.setOverwrite();
+			c.setOverwrite();
 		}
 	}
 }

@@ -4,25 +4,25 @@ import java.io.File;
 import java.nio.file.Path;
 import java.util.ArrayList;
 
-public class LinkedFileList {
-	private ArrayList<LinkedFile> allFiles;  // a common arrayList between all objects, public for testing
+public class CopiableList {
+	private ArrayList<Copiable> allFiles;
 	private long totalSize;
 	private int lineupPointer;
 	
-	public LinkedFileList() {
+	public CopiableList() {
 		this.allFiles = new ArrayList<>();
 		this.totalSize = 0;
 		this.lineupPointer = 0;
 	}
 	
-	public void register(LinkedFile lf) {
-		this.allFiles.add(lf);
-		this.totalSize += lf.getSize();
+	public void register(Copiable c) {
+		this.allFiles.add(c);
+		this.totalSize += c.getSize();
 	}
 	
-	public void remove(LinkedFile lf) {
-		this.allFiles.remove(lf);
-		this.totalSize -= lf.getSize();
+	public void remove(Copiable c) {
+		this.allFiles.remove(c);
+		this.totalSize -= c.getSize();
 	}
 	
 	public void reset() {
@@ -34,11 +34,11 @@ public class LinkedFileList {
 		this.lineupPointer++;
 	}
 	
-	public void load(File origin, Path rootDest) {
-		LinkedFile rootLf = new LinkedFile(origin, origin.getParentFile().toPath(), rootDest, this);
-		rootLf.register();
-		rootLf.registerTree();
-	}
+//	public void load(File origin, Path rootDest) {
+//		LinkedFile rootLf = new LinkedFile(origin, origin.getParentFile().toPath(), rootDest, this);
+//		rootLf.register();
+//		rootLf.registerTree();
+//	}
 	
 	/** 
 	 * Checks if there are files left to be copied
@@ -52,10 +52,10 @@ public class LinkedFileList {
 	 * Returns the next LinkedFile that is not copied
 	 * @return Next LinkedFile that is not copied;
 	 */
-	public LinkedFile getNext() {  // non copied files should go first for this to work;
+	public Copiable getNext() {  // non copied files should go first for this to work;
 		if (hasNext()) {
-			LinkedFile f = allFiles.get(lineupPointer);
-			return f;
+			Copiable c = allFiles.get(lineupPointer);
+			return c;
 		} else {
 			return null; // TODO: throw error
 		}

@@ -3,7 +3,9 @@ import javax.swing.*;
 import javax.swing.event.ChangeListener;
 
 import copy.Copy;
-import copy.LinkedFileList;
+import copy.DinamicBuffer;
+import copy.SuperModel;
+import copy.CopiableList;
 import listeners.LongProgressBarListener;
 
 import java.awt.*;
@@ -88,13 +90,16 @@ public class CopyGUI implements Runnable{
 		Copy copyThread;
 //		UIElementsHolder holder = new UIElementsHolder(fileProgressModel, totalProgressModel, currentLabel);
 		try {
-			LinkedFileList linkedFileList = new LinkedFileList();
-			copyThread = new Copy(this.orig, this.dest, linkedFileList);
-			copyThread.setFileProgressModel(fileProgressModel);
-			copyThread.setTotalProgressModel(totalProgressModel);
-			copyThread.setCurrentLabel(currentLabel);
-			copyThread.setFrame(frame);
-			copyThread.setHasGUI(true);
+			CopiableList copiableList = new CopiableList();
+			DinamicBuffer DB = new DinamicBuffer();
+			SuperModel SM = new SuperModel(copiableList, DB);
+			SM.setFileProgressModel(fileProgressModel);
+			SM.setTotalProgressModel(totalProgressModel);
+			SM.setCurrentLabel(currentLabel);
+			SM.setFrame(frame);
+			SM.setHasGUI(true);
+			
+			copyThread = new Copy(this.orig, this.dest, SM);
 			
 			copyThread.start();
 		} catch (IOException e) {
