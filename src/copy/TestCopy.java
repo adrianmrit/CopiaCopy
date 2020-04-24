@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Test;
 
 class TestCopy {
@@ -14,6 +15,9 @@ class TestCopy {
 	void testCopyFile() throws IOException {
 		Path src = Paths.get("Sample/SampleFile.sample").toAbsolutePath();
 		Path dest = Paths.get("TestDest/").toAbsolutePath();
+		
+		FileUtils.deleteDirectory(dest.toFile()); // delete before tests
+		
 		File expected = Paths.get("TestDest/SampleFile.sample").toAbsolutePath().toFile();
 		CopiableList CL = new CopiableList();
 		DinamicBuffer DB = new DinamicBuffer();
@@ -23,14 +27,16 @@ class TestCopy {
 		
 		assertTrue(expected.exists());
 		
-		expected.delete();
-		dest.toFile().delete();
+		FileUtils.deleteDirectory(dest.toFile());
 	}
 	
 	@Test
 	void testCopyFolder() throws IOException {
 		Path src = Paths.get("Sample/").toAbsolutePath();
 		Path dest = Paths.get("TestDest/").toAbsolutePath();
+		
+		FileUtils.deleteDirectory(dest.toFile()); // delete before tests
+		
 		File expected = Paths.get("TestDest/Sample/SampleSubFolder").toAbsolutePath().toFile();
 		File expected2 = Paths.get("TestDest/Sample/SampleFile.sample").toAbsolutePath().toFile();
 		File expected3 = Paths.get("TestDest/Sample/SampleFile2.sample").toAbsolutePath().toFile();
@@ -44,10 +50,7 @@ class TestCopy {
 		assertTrue(expected2.exists());
 		assertTrue(expected3.exists());
 		
-		expected.delete();
-		expected2.delete();
-		expected3.delete();
-		dest.toFile().delete();
+		FileUtils.deleteDirectory(dest.toFile());
 	}
 
 }
