@@ -13,6 +13,13 @@ public abstract class CopiableAbstract implements Comparable<Copiable>, Copiable
 	private boolean copied = false;
 	private boolean overwrite = false;
 	
+	/**
+	 * An abstract copiable
+	 * @param origin
+	 * @param rootOrigin
+	 * @param rootDest
+	 * @param SM
+	 */
 	public CopiableAbstract(File origin, Path rootOrigin, Path rootDest, SuperModel SM) {
 		this.origin = origin;
 		this.rootOrigin = rootOrigin;
@@ -37,8 +44,7 @@ public abstract class CopiableAbstract implements Comparable<Copiable>, Copiable
 	}
 	
 	/** 
-	 * Replaces this LinkedFile core destination with a new path.
-	 * Must not be accessed outside of LinkedFile.
+	 * Replaces the core destination with a new path.
 	 * 
 	 * @param oldPath the old path to be replaced
 	 * @param newPath the path to replace the old path with
@@ -48,14 +54,22 @@ public abstract class CopiableAbstract implements Comparable<Copiable>, Copiable
 		this.setCoreDestPath(Paths.get(newPathString));
 	}
 	
+	/**
+	 * Sets the core destination path (path without root destination)
+	 * @param newCoreDestPath
+	 */
 	public void setCoreDestPath(Path newCoreDestPath) {
 		this.coreDestPath = newCoreDestPath;
 	}
 	
+	/**
+	 * Sets a default destination path
+	 */
 	private void setDefaultCoreDestPath() {
 		setCoreDestPath(getOriginCorePath());
 	}
 	
+
 	public boolean destExists() {
 		return this.getAbsoluteDest().exists();
 	}
@@ -84,9 +98,6 @@ public abstract class CopiableAbstract implements Comparable<Copiable>, Copiable
 		return this.rootDest;
 	}
 	
-	/**
-	 * Resolves the destination for the file
-	 */
 	public File getAbsoluteDest() {
 		String rootDestString = this.rootDest.toString();
 

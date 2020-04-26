@@ -12,16 +12,29 @@ import java.nio.file.Paths;
 
 public class LinkedFile extends CopiableAbstract{
 	/**
-	 * Core destination (path after rootDest)
+	 * Core destination (path after rootDest).
 	 */
 	private Path coreDestPath;
-	private int counter = 0;
 	
 	
+	/**
+	 * {@link Copiable} file representation.
+	 * @param origin Origin file
+	 * @param rootOrigin Origin root path
+	 * @param rootDest Destination root
+	 * @param SM {@link SuperModel} that contains some info
+	 */
 	public LinkedFile(File origin, Path rootOrigin, Path rootDest, SuperModel SM) {
 		super(origin, rootOrigin, rootDest, SM);
 	}
 	
+	/**
+	 * {@link Copiable} file representation.
+	 * @param origin Origin path
+	 * @param rootOrigin Origin root path
+	 * @param rootDest Destination root
+	 * @param SM {@link SuperModel} that contains some info
+	 */
 	public LinkedFile(Path origin, Path rootOrigin, Path rootDest, SuperModel SM) {
 		this(origin.toFile(), rootOrigin, rootDest, SM);
 	}
@@ -39,6 +52,11 @@ public class LinkedFile extends CopiableAbstract{
 		}
 	}
 	
+	/**
+	 * Copies a file.
+	 * While the copy is in progress, if there is a GUI, some things will update,
+	 * like progress bars and labels.
+	 */
 	public void copy() throws FileNotFoundException, IOException {
 		File dest = this.getAbsoluteDest();
 		dest.getParentFile().mkdirs();
@@ -68,14 +86,23 @@ public class LinkedFile extends CopiableAbstract{
 		}
 	}
 	
+	/**
+	 * Registers this file in the copiableList.
+	 */
 	public void register() {
 		SM.copiableList.register(this);
 	}
 	
+	/**
+	 * Gets the size of this file.
+	 */
 	public long getSize() {
 		return this.getOrigin().length();
 	}
 	
+	/**
+	 * Renames the destination path
+	 */
 	public void renameCoreDest(String newName){
 		Path parent = this.coreDestPath.getParent();
 		Path newPath = Paths.get(parent.toString(), newName);
@@ -83,6 +110,9 @@ public class LinkedFile extends CopiableAbstract{
 		this.setCoreDestPath(newPath);
 	}
 	
+	/**
+	 * Literally does nothing. Needed for CopiableAbstract
+	 */
 	public void renameTreeCoreDest(String oldPath, String newPath){
 		
 	}

@@ -15,6 +15,13 @@ public class LinkedFolder extends CopiableAbstract{
 	private TreeSet<Copiable> childrens= new TreeSet<>();
 	private long size = 0;
 	
+	/**
+	 * {@link Copiable} folder representation.
+	 * @param origin Origin folder
+	 * @param rootOrigin Origin root path
+	 * @param rootDest Destination root
+	 * @param SM {@link SuperModel} that contains some info
+	 */
 	public LinkedFolder(File origin, Path rootOrigin, Path rootDest, SuperModel SM) {
 		super(origin, rootOrigin, rootDest, SM);
 		
@@ -36,15 +43,29 @@ public class LinkedFolder extends CopiableAbstract{
 		}
 	}
 	
+	/**
+	 * {@link Copiable} folder representation.
+	 * @param origin Origin folder path
+	 * @param rootOrigin Origin root path
+	 * @param rootDest Destination root
+	 * @param SM {@link SuperModel} that contains some info
+	 */
 	public LinkedFolder(Path origin, Path rootOrigin, Path rootDest, SuperModel SM) {
 		this(origin.toFile(), rootOrigin, rootDest, SM);
 	}
 	
+	/**
+	 * Creates this directory and sub-directories that do not exist
+	 */
 	@Override
 	public void copy() throws FileNotFoundException, IOException {
 		getAbsoluteDest().mkdirs();
 	}
 	
+	/**
+	 * Adds file or folder to the childrens array
+	 * @param ch
+	 */
 	private void addChildren(File ch) {
 		if (ch.isFile()) {
 			addFile(ch);
@@ -53,10 +74,18 @@ public class LinkedFolder extends CopiableAbstract{
 		}
 	}
 	
+	/**
+	 * Updates the size of the folder
+	 * @param size
+	 */
 	private void updateSize(long size) {
 		this.size += size;
 	}
 	
+	/**
+	 * Adds a folder to the childrens array
+	 * @param ch
+	 */
 	private void addFolder(File ch) {
 		Copiable children = new LinkedFolder(ch, getRootOrigin(), getRootDest(), SM);
 		this.childrens.add(children);
@@ -64,6 +93,10 @@ public class LinkedFolder extends CopiableAbstract{
 		updateSize(children.getSize()); // updates the size
 	}
 	
+	/**
+	 * Adds a file to the childrens array
+	 * @param ch
+	 */
 	private void addFile(File ch) {
 		Copiable children = new LinkedFile(ch, getRootOrigin(), getRootDest(), SM);
 		this.childrens.add(children);
@@ -71,7 +104,11 @@ public class LinkedFolder extends CopiableAbstract{
 		updateSize(children.getSize()); // updates the size
 	}
 	
-	public void registerTree() {
+	/**
+	 * Registers the childrens of this LinkedFolder
+	 * @param ch
+	 */
+	private void registerTree() {
 		if (childrens.size() > 0) {
 			Iterator<Copiable> iterator = childrens.iterator();
 			while (iterator.hasNext()) {
@@ -81,11 +118,18 @@ public class LinkedFolder extends CopiableAbstract{
 		}
 	}
 	
+	/**
+	 * Register this folder and it's children
+	 */
 	public void register() {
 		SM.copiableList.register((Copiable) this);
 		registerTree();
 	}
 	
+	/**
+	 * Get's the size of this folder
+	 * @return size in bytes
+	 */
 	public long getSize() {
 		return this.size;
 	}
@@ -104,11 +148,10 @@ public class LinkedFolder extends CopiableAbstract{
 	}
 	
 	/**
-	 * Replaces this LinkedFile core destination and it's children.
-	 * Must not be accessed outside of LinkedFile
+	 * Replaces this core destination of it's children.
 	 * 
 	 * <b>oldPath</b> and newPath <b>newPath</b> are passed recursively down the file tree,
-	 * starting at this LinkedFile. Thus only the root path is changes, while keeping the 
+	 * thus only the root path is changes, while keeping the 
 	 * desired structure
 	 * 
 	 * @param oldPath
@@ -125,11 +168,17 @@ public class LinkedFolder extends CopiableAbstract{
 		}
 	}
 	
+	/**
+	 * Skips this folder and it's children, recursively
+	 */
 	public void skip() {
 		super.skip();
 		this.skipTree();
 	}
 	
+	/**
+	 * Skips this folder's children
+	 */
 	private void skipTree()	{
 		
 		Iterator<Copiable> childsIterator = childrens.iterator();
@@ -137,10 +186,6 @@ public class LinkedFolder extends CopiableAbstract{
 		while (childsIterator.hasNext()) {
 			childsIterator.next().skip();
 		}
-	}
-
-	public String toString() {
-		return this.getOrigin().toString();
 	}
 
 }
