@@ -5,11 +5,12 @@ import java.util.HashMap;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 
+import buffer.Buffer;
 import gui.LongProgressBarModel;
 
 public class SuperModel {
 	public CopiableList copiableList;
-	public DinamicBuffer dinamicBuffer;
+	public Buffer buffer;
 	
 	public LongProgressBarModel fileProgressModel;
 	public LongProgressBarModel totalProgressModel;
@@ -17,9 +18,9 @@ public class SuperModel {
 	public JFrame frame; // used to create windows
 	private boolean hasGUI = false;
 	
-	public SuperModel(CopiableList cl, DinamicBuffer dinb) {
+	public SuperModel(CopiableList cl, Buffer buffer) {
 		this.copiableList = cl;
-		this.dinamicBuffer = dinb;
+		this.buffer = buffer;
 	}
 	
 	/** 

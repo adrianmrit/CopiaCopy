@@ -2,8 +2,9 @@ package gui;
 import javax.swing.*;
 import javax.swing.event.ChangeListener;
 
+import buffer.Buffer;
+import buffer.StaticBuffer;
 import copy.Copy;
-import copy.DinamicBuffer;
 import copy.SuperModel;
 import copy.CopiableList;
 import listeners.LongProgressBarListener;
@@ -91,8 +92,8 @@ public class CopyGUI implements Runnable{
 //		UIElementsHolder holder = new UIElementsHolder(fileProgressModel, totalProgressModel, currentLabel);
 		try {
 			CopiableList copiableList = new CopiableList();
-			DinamicBuffer DB = new DinamicBuffer();
-			SuperModel SM = new SuperModel(copiableList, DB);
+			Buffer buffer = new StaticBuffer();
+			SuperModel SM = new SuperModel(copiableList, buffer);
 			SM.setFileProgressModel(fileProgressModel);
 			SM.setTotalProgressModel(totalProgressModel);
 			SM.setCurrentLabel(currentLabel);

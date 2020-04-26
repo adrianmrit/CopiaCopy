@@ -15,6 +15,7 @@ public class LinkedFile extends CopiableAbstract{
 	 * Core destination (path after rootDest)
 	 */
 	private Path coreDestPath;
+	private int counter = 0;
 	
 	
 	public LinkedFile(File origin, Path rootOrigin, Path rootDest, SuperModel SM) {
@@ -23,10 +24,6 @@ public class LinkedFile extends CopiableAbstract{
 	
 	public LinkedFile(Path origin, Path rootOrigin, Path rootDest, SuperModel SM) {
 		this(origin.toFile(), rootOrigin, rootDest, SM);
-	}
-	
-	private byte[] getBuffer() {
-		return new byte[SM.dinamicBuffer.getBuffer()];
 	}
 	
 	/** 
@@ -53,25 +50,21 @@ public class LinkedFile extends CopiableAbstract{
 		}
 		
 		try {
-			byte[] buf = getBuffer(); // TODO: Find optimal chunk size
+			byte[] buf = SM.buffer.getBuffer(); // TODO: Find optimal chunk size
 			int bytesRead;
 			
 			while ((bytesRead = is.read(buf)) > 0) {
-				SM.dinamicBuffer.resetTime();
+				SM.buffer.resetTime();
 				os.write(buf, 0, bytesRead);
 				if (SM.hasGUI()) {
 					SM.fileProgressModel.addLongValue(bytesRead);
 					SM.totalProgressModel.addLongValue(bytesRead);
 				}
-				
-				SM.dinamicBuffer.recalculate(bytesRead);
-				buf = getBuffer();
+				System.out.println(SM.buffer.getReadableSpeed(bytesRead));
 			}
 		} finally {
 			is.close();
 			os.close();
-			
-			SM.dinamicBuffer.reset();
 		}
 	}
 	

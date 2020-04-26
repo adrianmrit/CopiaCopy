@@ -10,6 +10,9 @@ import java.nio.file.Paths;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Test;
 
+import buffer.Buffer;
+import buffer.StaticBuffer;
+
 class TestCopy {
 	@Test
 	void testCopyFile() throws IOException {
@@ -20,8 +23,8 @@ class TestCopy {
 		
 		File expected = Paths.get("TestDest/SampleFile.sample").toAbsolutePath().toFile();
 		CopiableList CL = new CopiableList();
-		DinamicBuffer DB = new DinamicBuffer();
-		SuperModel SM = new SuperModel(CL, DB);
+		Buffer buffer = new StaticBuffer();
+		SuperModel SM = new SuperModel(CL, buffer);
 		Copy c = new Copy(src, dest, SM);
 		c.copy();
 		
@@ -41,8 +44,8 @@ class TestCopy {
 		File expected2 = Paths.get("TestDest/Sample/SampleFile.sample").toAbsolutePath().toFile();
 		File expected3 = Paths.get("TestDest/Sample/SampleFile2.sample").toAbsolutePath().toFile();
 		CopiableList CL = new CopiableList();
-		DinamicBuffer DB = new DinamicBuffer();
-		SuperModel SM = new SuperModel(CL, DB);
+		Buffer buffer = new StaticBuffer();
+		SuperModel SM = new SuperModel(CL, buffer);
 		Copy c = new Copy(src, dest, SM);
 		c.copy();
 		
