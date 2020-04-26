@@ -13,6 +13,7 @@ import org.apache.commons.lang3.ArrayUtils;
 
 public class LinkedFolder extends CopiableAbstract{
 	private TreeSet<Copiable> childrens= new TreeSet<>();
+	private long size = 0;
 	
 	public LinkedFolder(File origin, Path rootOrigin, Path rootDest, SuperModel SM) {
 		super(origin, rootOrigin, rootDest, SM);
@@ -52,14 +53,22 @@ public class LinkedFolder extends CopiableAbstract{
 		}
 	}
 	
+	private void updateSize(long size) {
+		this.size += size;
+	}
+	
 	private void addFolder(File ch) {
 		Copiable children = new LinkedFolder(ch, getRootOrigin(), getRootDest(), SM);
 		this.childrens.add(children);
+		
+		updateSize(children.getSize()); // updates the size
 	}
 	
 	private void addFile(File ch) {
 		Copiable children = new LinkedFile(ch, getRootOrigin(), getRootDest(), SM);
 		this.childrens.add(children);
+		
+		updateSize(children.getSize()); // updates the size
 	}
 	
 	public void registerTree() {
@@ -78,7 +87,7 @@ public class LinkedFolder extends CopiableAbstract{
 	}
 	
 	public long getSize() {
-		return 0;
+		return this.size;
 	}
 	
 	/** 
