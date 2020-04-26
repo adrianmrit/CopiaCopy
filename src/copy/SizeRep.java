@@ -1,13 +1,15 @@
 package copy;
 
+import org.apache.commons.io.FileUtils;
+
 public class SizeRep {
 	private SizeRep() {}
 	
 	public static final double BSize = 1;
-	public static final double KBSize = Math.pow(10, 3);
-	public static final double MBSize = Math.pow(10, 6);
-	public static final double GBSize = Math.pow(10, 9);
-	public static final double TBSize = Math.pow(10, 12);
+	public static final double KBSize = FileUtils.ONE_KB;
+	public static final double MBSize = FileUtils.ONE_MB;
+	public static final double GBSize = FileUtils.ONE_GB;
+	public static final double TBSize = FileUtils.ONE_TB;
 	
 	public static final String BRep = "b";
 	public static final String KBRep = "kb";
