@@ -1,8 +1,10 @@
-package copy;
+package copyTests;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
+
+import copy.SizeRep;
 
 class TestSizeRep {
 

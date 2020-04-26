@@ -1,4 +1,4 @@
-package copy;
+package copyTests;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -9,8 +9,10 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Iterator;
 
-import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Test;
+
+import copy.Copiable;
+import copy.LinkedFolder;
 
 class TestLinkedFolder {
 

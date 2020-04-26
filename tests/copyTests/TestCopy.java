@@ -1,4 +1,4 @@
-package copy;
+package copyTests;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -12,6 +12,9 @@ import org.junit.jupiter.api.Test;
 
 import buffer.Buffer;
 import buffer.StaticBuffer;
+import copy.CopiableList;
+import copy.Copy;
+import copy.SuperModel;
 
 class TestCopy {
 	@Test
