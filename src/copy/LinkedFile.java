@@ -11,10 +11,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class LinkedFile extends CopiableAbstract{
-	/**
-	 * Core destination (path after rootDest).
-	 */
-	private Path coreDestPath;
 	
 	
 	/**
@@ -48,18 +44,12 @@ public class LinkedFile extends CopiableAbstract{
 		if (SM.hasGUI()) {
 			SM.fileProgressModel.setLongMaximum(this.getSize()); // resets the fileProgressBar
 			SM.fileProgressModel.setLongValue(0); // resets the fileProgressBar
-			SM.currentLabel.setText("Current: " + this.getAbsoluteDest());
+			SM.currentLabel.setText("Current: " + this.getDest());
 		}
 	}
 	
-	/**
-	 * Copies a file.
-	 * While the copy is in progress, if there is a GUI, some things will update,
-	 * like progress bars and labels.
-	 */
-	public void copy() throws FileNotFoundException, IOException {
-		File dest = this.getAbsoluteDest();
-		dest.getParentFile().mkdirs();
+	private void handleCopy() throws FileNotFoundException, IOException{
+		File dest = this.getDest();
 		
 		InputStream is = new FileInputStream(this.getOrigin());
 		OutputStream os = new FileOutputStream(dest);
@@ -78,11 +68,22 @@ public class LinkedFile extends CopiableAbstract{
 					SM.fileProgressModel.addLongValue(bytesRead);
 					SM.totalProgressModel.addLongValue(bytesRead);
 				}
-				System.out.println(SM.buffer.getReadableSpeed(bytesRead));
 			}
 		} finally {
 			is.close();
 			os.close();
+		}
+	}
+	
+	/**
+	 * Copies a file.
+	 * While the copy is in progress, if there is a GUI, some things will update,
+	 * like progress bars and labels.
+	 */
+	public void copy() throws FileNotFoundException, IOException {
+		if (!this.wasCopied()) {
+			handleCopy();
+			this.setCopied();
 		}
 	}
 	
@@ -104,7 +105,7 @@ public class LinkedFile extends CopiableAbstract{
 	 * Renames the destination path
 	 */
 	public void renameCoreDest(String newName){
-		Path parent = this.coreDestPath.getParent();
+		Path parent = this.getCoreDest().getParent();
 		Path newPath = Paths.get(parent.toString(), newName);
 
 		this.setCoreDestPath(newPath);

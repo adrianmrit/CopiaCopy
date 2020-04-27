@@ -3,12 +3,13 @@ package copy;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.Path;
 
 /**
  * Abstract interface that represents a file or folder,
  * with an origin and a destination where it will be copied
  */
-public interface Copiable {
+public interface Copiable extends Comparable<Copiable>{
 	/** 
 	 * Copies the origin file to the destination
 	 * @throws FileNotFoundException if the origin file doesn't exist
@@ -50,6 +51,12 @@ public interface Copiable {
 	 * @return the File that represents the origin
 	 */
 	File getOrigin();
+	
+	/**
+	 * Gets the core origin {@link Path}
+	 * @return the Path that represents the origin - origin root
+	 */
+	Path getOriginCorePath();
 	
 	/**
 	 * Gets the size in bytes for this folder or file. If it's a folder it will return
@@ -101,5 +108,5 @@ public interface Copiable {
 	 * Gets the absolute destination
 	 * @return
 	 */
-	File getAbsoluteDest();
+	File getDest();
 }

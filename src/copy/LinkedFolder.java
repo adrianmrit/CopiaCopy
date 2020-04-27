@@ -59,7 +59,10 @@ public class LinkedFolder extends CopiableAbstract{
 	 */
 	@Override
 	public void copy() throws FileNotFoundException, IOException {
-		getAbsoluteDest().mkdirs();
+		if (!this.wasCopied()) {
+			getDest().mkdir();
+			this.setCopied();
+		}
 	}
 	
 	/**
@@ -171,6 +174,7 @@ public class LinkedFolder extends CopiableAbstract{
 	/**
 	 * Skips this folder and it's children, recursively
 	 */
+	@Override
 	public void skip() {
 		super.skip();
 		this.skipTree();

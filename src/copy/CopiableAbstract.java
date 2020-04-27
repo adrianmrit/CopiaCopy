@@ -4,11 +4,12 @@ import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-public abstract class CopiableAbstract implements Comparable<Copiable>, Copiable{
+public abstract class CopiableAbstract implements Copiable{
 	private File origin;
 	private Path rootOrigin;
 	private Path rootDest;
 	private Path coreDestPath;
+	private Path absoluteDest;
 	public SuperModel SM;
 	private boolean copied = false;
 	private boolean overwrite = false;
@@ -36,7 +37,7 @@ public abstract class CopiableAbstract implements Comparable<Copiable>, Copiable
 	 * <code>getOriginCorePath()</code> will return <b>"OriginFolder/Subpath"</b>
 	 * @return core Path
 	 */
-	private Path getOriginCorePath() {
+	public Path getOriginCorePath() {
 		String originRootString = this.rootOrigin.toString();
 		
 		String coreStruct = this.getOrigin().toString().replaceFirst(originRootString, "");  // removes the root
@@ -60,6 +61,7 @@ public abstract class CopiableAbstract implements Comparable<Copiable>, Copiable
 	 */
 	public void setCoreDestPath(Path newCoreDestPath) {
 		this.coreDestPath = newCoreDestPath;
+		this.absoluteDest = Paths.get(this.rootDest.toString(), this.coreDestPath.toString());
 	}
 	
 	/**
@@ -71,7 +73,7 @@ public abstract class CopiableAbstract implements Comparable<Copiable>, Copiable
 	
 
 	public boolean destExists() {
-		return this.getAbsoluteDest().exists();
+		return this.getDest().exists();
 	}
 	
 	public File getOrigin() {
@@ -98,11 +100,8 @@ public abstract class CopiableAbstract implements Comparable<Copiable>, Copiable
 		return this.rootDest;
 	}
 	
-	public File getAbsoluteDest() {
-		String rootDestString = this.rootDest.toString();
-
-		Path resolved = Paths.get(rootDestString, this.getCoreDest().toString());  // join both paths
-		return resolved.toFile();
+	public File getDest() {
+		return this.absoluteDest.toFile();
 	}
 	
 	public boolean getOverwriteConfirmation() {
