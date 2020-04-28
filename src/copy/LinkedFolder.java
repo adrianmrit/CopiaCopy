@@ -130,13 +130,16 @@ public class LinkedFolder extends CopiableAbstract{
 	}
 	
 	/**
-	 * Get's the size of this folder
+	 * Gets the total size of this folder content
 	 * @return size in bytes
 	 */
-	public long getSize() {
+	public long getSizeRec() {
 		return this.size;
 	}
 	
+	public long getSize() {
+		return 0;
+	}
 	/** 
 	 * Updates this LinkedFile core destination, and updates the core destination paths in it's children if there is any.
 	 * @param newName new name for the folder or file

@@ -59,10 +59,17 @@ public interface Copiable extends Comparable<Copiable>{
 	Path getOriginCorePath();
 	
 	/**
-	 * Gets the size in bytes for this folder or file. If it's a folder it will return
+	 * Gets the size in bytes for this folder or file. If it's a folder it will return 0
 	 * @return the size in bytes
 	 */
 	long getSize();
+	
+	/**
+	 * Same as {@link #getSize()}, except that the size of the folders will
+	 * be the total size of it's files instead of 0;
+	 * @return the size in bytes
+	 */
+	long getSizeRec();
 	
 	/**
 	 * Returns true if the file was copied.

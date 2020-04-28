@@ -101,6 +101,14 @@ public class LinkedFile extends CopiableAbstract{
 		return this.getOrigin().length();
 	}
 	
+	
+	/**
+	 * Same as getSize in this case.
+	 */
+	public long getSizeRec() {
+		return getSize();
+	}
+	
 	/**
 	 * Renames the destination path
 	 */
