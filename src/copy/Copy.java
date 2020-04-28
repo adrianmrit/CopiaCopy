@@ -1,5 +1,6 @@
 package copy;
 
+import java.awt.Component;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -15,11 +16,15 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeMap;
 
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 
 import org.apache.commons.io.FilenameUtils;
 
+import checkers.Checker;
+import checkers.Handlers;
 import gui.ExistsDialog;
 import gui.ExistsDialogBuilder;
 import gui.LongProgressBarModel;
@@ -32,6 +37,7 @@ public class Copy extends Thread{
 	private final File origin;
 	private final File dest;
 	private SuperModel SM;
+	private Handlers checkers;
 	
 	// TODO: 
 	
@@ -42,6 +48,7 @@ public class Copy extends Thread{
 		this.origin = new File(orig);
 		this.dest = new File(dest);
 		this.SM = SM;
+		this.checkers = new Handlers(SM);
 		
 		Copiable f;
 		
@@ -106,15 +113,15 @@ public class Copy extends Thread{
 	 * @throws IOException if fails
 	 */
 	public void copyAll() throws IOException {
-		// TODO: if folder exist, rename, merge (copy content and ask if content exist), or skip (cancel copy)
-		// TODO: handle copy in same path, should duplicate file with a "(copy)" at the end,
-		// TODO: Avoid copy folder into itself
-		// before file extension.
 		if (SM.copiableList.hasNext()) {
 			Copiable c = SM.copiableList.getNext();
-			handleChecks(c);
-			c.copy();
-			this.completeFileBar();
+			
+			if (checkers.handle(c)) {
+			
+				c.copy();
+				this.completeFileBar();
+			}
+			
 			copyAll();
 			return; // avoid calling the else statement after copy()
 		} else {
@@ -131,121 +138,6 @@ public class Copy extends Thread{
 	private void completeTotalBar() {
 		if (SM.hasGUI()) {
 			SM.totalProgressModel.setRangeProperties(100, 0, 0, 100, false); // resets the totalProgressBar
-		}
-	}
-	
-	private void handleChecks(Copiable c) {
-		handleDestEqualsOrigin(c);
-		handleCopyIntoItself(c); // should be handled after handleDestEqualOrigin
-		handleExists(c);
-	}
-	
-	/**
-	 * Check if there is any file in the copy that exists in the origin. If it does it will ask what to do with it.
-	 * Files will be renamed and removed after asking for all of them, to avoid concurrent operation errors.
-	 * 
-	 * @return true if file exists, false otherwise
-	 */
-	private void handleExists(Copiable c) {
-		if (c.destExists() && !c.getOverwriteConfirmation()) {
-			if (c.isFile()) {
-				handleFileExistDialog(c);
-			} else {
-				handleFolderExistDialog(c);
-			}
-			
-//			return true;
-		}
-		
-//		return false;
-	}
-	
-	private void handleDestEqualsOrigin(Copiable c) {
-		if (c.getDest().equals(c.getOrigin())) {
-			String newName = NameFactory.getUnique(c.getOrigin().toString());
-			newName = FilenameUtils.getName(newName);
-			
-			c.renameCoreDest(newName);
-		}
-	}
-	
-	private void handleCopyIntoItself(Copiable c) {
-		if (c.isFolder()) {
-			Path orig = c.getOrigin().toPath();
-			Path dest = c.getDest().toPath();
-			
-			if (dest.startsWith(orig)) { // checks if dest is sub-folder of orig
-				c.setCopied();  // TODO: change setCopied to something like notCopy()
-				c.skip(); // skips the tree
-				// TODO: Show message dialog saying you can't copy folder into itself
-			}
-		}
-	}
-	
-	/**
-	 * Shows a dialog if the file already exists in the destination.
-	 * @param origin Origin path
-	 * @param dest Destination path
-	 */
-	private void handleFileExistDialog(Copiable c) {
-		if (SM.hasGUI()) {
-			ExistsDialog dialog = ExistsDialogBuilder.getFileExistsDialog(SM.frame, c.getOrigin(), c.getDest());
-			dialog.show();
-			String action = dialog.getAction();
-			switch (action) {
-				case ExistsDialogBuilder.CANCEL:
-					System.exit(0);  // exit copy// TODO: handle file exists
-					break;
-				
-				case ExistsDialogBuilder.SKIP:
-					c.skip();
-					SM.totalProgressModel.setLongMaximum(SM.copiableList.getTotalSize());
-					break;
-				
-				case ExistsDialogBuilder.RENAME:
-					c.renameCoreDest(dialog.getInputValue());
-					break;
-				
-				case ExistsDialogBuilder.REPLACE:
-					c.setOverwrite();
-					break;
-			}
-		}
-		else {
-			c.setOverwrite();
-		}
-	}
-	
-	/**
-	 * Shows a dialog if the folder already exists in the destination.
-	 * @param origin Origin path
-	 * @param dest Destination path
-	 */
-	private void handleFolderExistDialog(Copiable c) {
-		if (SM.hasGUI()) {
-			ExistsDialog dialog = ExistsDialogBuilder.getFolderExistsDialog(SM.frame, c.getOrigin(), c.getDest());
-			dialog.show();
-			String action = dialog.getAction();
-			switch (action) {
-				case ExistsDialogBuilder.CANCEL:
-					System.exit(0);  // exit copy// TODO: handle file exists
-					break;
-				
-				case ExistsDialogBuilder.SKIP:
-					c.skip();
-					SM.totalProgressModel.setLongMaximum(SM.copiableList.getTotalSize());
-					break;
-				
-				case ExistsDialogBuilder.RENAME:
-					c.renameCoreDest(dialog.getInputValue());
-					break;
-				
-				case ExistsDialogBuilder.MERGE:
-					c.setOverwrite();
-					break;
-			}
-		} else {
-			c.setOverwrite();
 		}
 	}
 }

@@ -8,8 +8,8 @@ import copy.Copy;
 public class RunCopyGUIArgs {
 	public static void main(String args[]) {		
 		Path src = Paths.get("Sample/").toAbsolutePath();
-		Path dest = Paths.get("Sample/").toAbsolutePath();
-		
+		Path dest = Paths.get("TestDest/").toAbsolutePath();
+
 		CopyGUI.setDebug(true);
 		CopyGUI copy = new CopyGUI(src.toString(), dest.toString());
 		Copy.setDebug(true);
