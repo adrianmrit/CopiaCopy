@@ -32,10 +32,7 @@ import gui.LongProgressBarModel;
 
 public class Copy extends Thread{
 	private static boolean DEBUG = false;
-	
-	
-	private final File origin;
-	private final File dest;
+
 	private SuperModel SM;
 	private Handlers checkers;
 	
@@ -44,28 +41,34 @@ public class Copy extends Thread{
 //	private long totalSize = 0;  // TODO: Update final size dinamically
 	// GUI elements
 	
-	public Copy(String orig, String dest, SuperModel SM) throws IOException{
-		this.origin = new File(orig);
-		this.dest = new File(dest);
+	public Copy(SuperModel SM) throws IOException{
 		this.SM = SM;
 		this.checkers = new Handlers(SM);
+	}
+	
+	public void addToCopy(String orig, String dest, int mode) {
+		//TODO: set copy mode, copy, or move (or cut)
+		File origF = new File(orig);
+		File destF = new File(dest);
 		
 		Copiable f;
 		
-		if (this.origin.isFile()) {
-			f = new LinkedFile(this.origin, origin.getParentFile().toPath(), this.dest.toPath(), SM);
+		if (Files.isSymbolicLink(origF.toPath())) {
+			f = new SymLinkFile(origF, origF.getParentFile().toPath(), destF.toPath(), SM);
+		} else if (origF.isFile()) {
+			f = new LinkedFile(origF, origF.getParentFile().toPath(), destF.toPath(), SM);
 		} else {
-			f = new LinkedFolder(this.origin, origin.getParentFile().toPath(), this.dest.toPath(), SM);
+			f = new LinkedFolder(origF, origF.getParentFile().toPath(), destF.toPath(), SM);
 		}
 		f.register();
 	}
 	
-	public Copy(File orig, File dest, SuperModel SM) throws IOException {
-		this(orig.getAbsolutePath(), dest.getAbsolutePath(), SM);
+	public void addToCopy(Path orig, Path dest, int mode) {
+		this.addToCopy(orig.toString(), dest.toString(), mode);
 	}
 	
-	public Copy(Path orig, Path dest, SuperModel SM) throws IOException {
-		this(orig.toString(), dest.toString(), SM);
+	public void addToCopy(File orig, File dest, int mode) {
+		this.addToCopy(orig.toString(), dest.toString(), mode);
 	}
 	
 	/** Sets the debug status

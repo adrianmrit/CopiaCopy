@@ -10,6 +10,8 @@ import java.nio.file.Path;
  * with an origin and a destination where it will be copied
  */
 public interface Copiable extends Comparable<Copiable>{
+	public static int COPY_MODE = 1;
+	public static int CUT_MODE = 2;
 	/** 
 	 * Copies the origin file to the destination
 	 * @throws FileNotFoundException if the origin file doesn't exist

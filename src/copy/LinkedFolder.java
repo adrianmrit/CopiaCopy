@@ -27,19 +27,25 @@ public class LinkedFolder extends CopiableAbstract{
 		
 		FileFilter isFolderFilter = new IsFolderFilter();
 		FileFilter isFileFilter = new IsFileFilter();
+		FileFilter isSymbolicLinkFilter = new IsSymbolicLinkFilter();
 		
 		File[] folders = ArrayUtils.nullToEmpty(origin.listFiles(isFolderFilter), File[].class);
 		File[] files = ArrayUtils.nullToEmpty(origin.listFiles(isFileFilter), File[].class);
+		File[] symbolicLinks = ArrayUtils.nullToEmpty(origin.listFiles(isSymbolicLinkFilter), File[].class);
 		
+		for(int i=0; i<symbolicLinks.length; i++) {
+			File f = symbolicLinks[i];
+			addSymLink(f);
+		}
 		
 		for(int i=0; i<files.length; i++) {
 			File f = files[i];
-			addChildren(f);
+			addFile(f);
 		}
 		
 		for(int i=0; i<folders.length; i++) {
 			File f = folders[i];
-			addChildren(f);
+			addFolder(f);
 		}
 	}
 	
@@ -62,18 +68,6 @@ public class LinkedFolder extends CopiableAbstract{
 		if (!this.wasCopied()) {
 			getDest().mkdir();
 			this.setCopied();
-		}
-	}
-	
-	/**
-	 * Adds file or folder to the childrens array
-	 * @param ch
-	 */
-	private void addChildren(File ch) {
-		if (ch.isFile()) {
-			addFile(ch);
-		} else {
-			addFolder(ch);
 		}
 	}
 	
@@ -102,6 +96,17 @@ public class LinkedFolder extends CopiableAbstract{
 	 */
 	private void addFile(File ch) {
 		Copiable children = new LinkedFile(ch, getRootOrigin(), getRootDest(), SM);
+		this.childrens.add(children);
+		
+		updateSize(children.getSize()); // updates the size
+	}
+	
+	/**
+	 * Adds a symbolic link to the childrens array
+	 * @param ch
+	 */
+	private void addSymLink(File ch) {
+		Copiable children = new SymLinkFile(ch, getRootOrigin(), getRootDest(), SM);
 		this.childrens.add(children);
 		
 		updateSize(children.getSize()); // updates the size

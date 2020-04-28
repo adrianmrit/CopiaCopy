@@ -4,11 +4,11 @@ import java.io.File;
 import java.io.FileFilter;
 import java.nio.file.Files;
 
-public class IsFolderFilter implements FileFilter{
+public class IsSymbolicLinkFilter implements FileFilter{
 
 	@Override
 	public boolean accept(File pathname) {
-		return pathname.isDirectory() && !Files.isSymbolicLink(pathname.toPath());
+		return Files.isSymbolicLink(pathname.toPath());
 	}
 
 }

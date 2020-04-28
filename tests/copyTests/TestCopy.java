@@ -15,6 +15,7 @@ import org.junit.jupiter.api.AfterAll;
 
 import buffer.Buffer;
 import buffer.StaticBuffer;
+import copy.Copiable;
 import copy.CopiableList;
 import copy.Copy;
 import copy.SuperModel;
@@ -45,7 +46,8 @@ class TestCopy {
 		CopiableList CL = new CopiableList();
 		Buffer buffer = new StaticBuffer();
 		SuperModel SM = new SuperModel(CL, buffer);
-		Copy c = new Copy(src, dest, SM);
+		Copy c = new Copy(SM);
+		c.addToCopy(src, dest, Copiable.COPY_MODE);
 		c.copyAll();
 		
 		assertTrue(expected.exists());
@@ -62,7 +64,8 @@ class TestCopy {
 		CopiableList CL = new CopiableList();
 		Buffer buffer = new StaticBuffer();
 		SuperModel SM = new SuperModel(CL, buffer);
-		Copy c = new Copy(src, dest, SM);
+		Copy c = new Copy(SM);
+		c.addToCopy(src, dest, Copiable.COPY_MODE);
 		c.copyAll();
 		
 		assertTrue(expected.exists());

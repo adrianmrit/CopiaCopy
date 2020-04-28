@@ -6,6 +6,7 @@ import buffer.Buffer;
 import buffer.StaticBuffer;
 import copy.Copy;
 import copy.SuperModel;
+import copy.Copiable;
 import copy.CopiableList;
 import listeners.LongProgressBarListener;
 
@@ -100,9 +101,10 @@ public class CopyGUI implements Runnable{
 			SM.setFrame(frame);
 			SM.setHasGUI(true);
 			
-			copyThread = new Copy(this.orig, this.dest, SM);
-			
+			copyThread = new Copy(SM);
+			copyThread.addToCopy(this.orig, this.dest, Copiable.COPY_MODE);
 			copyThread.start();
+
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
