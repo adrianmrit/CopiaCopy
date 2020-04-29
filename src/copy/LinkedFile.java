@@ -7,8 +7,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 
 import org.apache.commons.io.FileUtils;
 
@@ -49,10 +52,10 @@ public class LinkedFile extends CopiableAbstract{
 	}
 	
 	private void handleCopy() throws FileNotFoundException, IOException{
-		File dest = this.getDest();
+		Path tempName = NameFactory.getTemp(this.getDest().toPath()); // use a temp name
 		
 		InputStream is = new FileInputStream(this.getOrigin());
-		OutputStream os = new FileOutputStream(dest);
+		OutputStream os = new FileOutputStream(tempName.toFile());
 		if (SM.hasGUI()) {
 			resetUICopyFile();
 		}
@@ -73,6 +76,8 @@ public class LinkedFile extends CopiableAbstract{
 			is.close();
 			os.close();
 		}
+		this.getDest().delete();
+		tempName.toFile().renameTo(this.getDest());
 	}
 	
 	/**

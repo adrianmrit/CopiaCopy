@@ -35,6 +35,12 @@ public interface Copiable extends Comparable<Copiable>{
 	void setCopied();
 
 	/**
+	 * Checks if it's a symbolic link
+	 * @return true if it's a symbolic link, false otherwise
+	 */
+	boolean isSymbolicLink();
+	
+	/**
 	 * Checks if it's a file
 	 * @return true if it's a file, false otherwise
 	 */

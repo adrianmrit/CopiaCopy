@@ -17,7 +17,11 @@ public class LinkedSymbolicLink extends CopiableAbstract{
 	
 	public void copy() throws FileNotFoundException, IOException {
 		if (!this.wasCopied()) {
-			Files.copy(this.getOrigin().toPath(), this.getDest().toPath(), LinkOption.NOFOLLOW_LINKS, StandardCopyOption.COPY_ATTRIBUTES);
+			Path tempName = NameFactory.getTemp(this.getDest().toPath());
+			Files.copy(this.getOrigin().toPath(), tempName, LinkOption.NOFOLLOW_LINKS, StandardCopyOption.COPY_ATTRIBUTES);
+			
+			this.getDest().delete();
+			tempName.toFile().renameTo(this.getDest());
 			this.setCopied();
 		}
 	}

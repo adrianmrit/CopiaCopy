@@ -144,12 +144,16 @@ public abstract class CopiableAbstract implements Copiable{
 		return this.origin;
 	}
 	
+	public boolean isSymbolicLink() {
+		return Files.isSymbolicLink(this.getOrigin().toPath());
+	}
+	
 	public boolean isFile() {
-		return this.origin.isFile();
+		return !isSymbolicLink() && this.getOrigin().isFile();
 	}
 	
 	public boolean isFolder() {
-		return this.origin.isDirectory();
+		return !isSymbolicLink() && this.getOrigin().isDirectory();
 	}
 	
 	public Path getCoreDest() {
