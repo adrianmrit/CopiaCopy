@@ -1,6 +1,7 @@
 Sample/
-/bin/
-TestDest/
+bin/
+TestFolder/
+TestDestFolder/
 .classpath
 .project
 .settings
