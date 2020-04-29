@@ -116,6 +116,11 @@ public class NameFactory {
 		return path.toString();
 	}
 	
+	public static Path getUnique(Path fPath) {
+		return Paths.get(getUnique(fPath.toString()));
+	}
+	
+	
 	/**
 	 * Gets a temporal filename denoted by the extension ".tmp".
 	 * The resulting temporal file does not exist
@@ -140,5 +145,9 @@ public class NameFactory {
 		} while (Files.exists(path)) ;
 		
 		return path.toString();
+	}
+	
+	public static Path getTemp(Path fPath) {
+		return Paths.get(getTemp(fPath.toString()));
 	}
 }
