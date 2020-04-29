@@ -109,7 +109,7 @@ public class LinkedFolder extends CopiableAbstract{
 	 * @param ch
 	 */
 	private void addSymLink(File ch) {
-		Copiable children = new SymLinkFile(ch, getRootOrigin(), getRootDest(), SM, this, this.getMode());
+		Copiable children = new LinkedSymbolicLink(ch, getRootOrigin(), getRootDest(), SM, this, this.getMode());
 		this.childrens.add(children);
 		
 		updateSize(children.getSize()); // updates the size

@@ -9,9 +9,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 
-public class SymLinkFile extends CopiableAbstract{
+public class LinkedSymbolicLink extends CopiableAbstract{
 
-	public SymLinkFile(File origin, Path rootOrigin, Path rootDest, SuperModel SM, Copiable parent, int mode) {
+	public LinkedSymbolicLink(File origin, Path rootOrigin, Path rootDest, SuperModel SM, Copiable parent, int mode) {
 		super(origin, rootOrigin, rootDest, SM, parent, mode);
 	}
 	

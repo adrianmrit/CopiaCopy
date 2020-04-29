@@ -55,7 +55,7 @@ public class Copy extends Thread{
 		Copiable f;
 		
 		if (Files.isSymbolicLink(origF.toPath())) {
-			f = new SymLinkFile(origF, origF.getParentFile().toPath(), destF.toPath(), SM, null, mode);
+			f = new LinkedSymbolicLink(origF, origF.getParentFile().toPath(), destF.toPath(), SM, null, mode);
 		} else if (origF.isFile()) {
 			f = new LinkedFile(origF, origF.getParentFile().toPath(), destF.toPath(), SM, null, mode);
 		} else {
