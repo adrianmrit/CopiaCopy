@@ -10,9 +10,9 @@ import java.io.OutputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import org.apache.commons.io.FileUtils;
+
 public class LinkedFile extends CopiableAbstract{
-	
-	
 	/**
 	 * {@link Copiable} file representation.
 	 * @param origin Origin file
@@ -20,8 +20,8 @@ public class LinkedFile extends CopiableAbstract{
 	 * @param rootDest Destination root
 	 * @param SM {@link SuperModel} that contains some info
 	 */
-	public LinkedFile(File origin, Path rootOrigin, Path rootDest, SuperModel SM) {
-		super(origin, rootOrigin, rootDest, SM);
+	public LinkedFile(File origin, Path rootOrigin, Path rootDest, SuperModel SM, Copiable parent, int mode) {
+		super(origin, rootOrigin, rootDest, SM, parent, mode);
 	}
 	
 	/**
@@ -31,8 +31,8 @@ public class LinkedFile extends CopiableAbstract{
 	 * @param rootDest Destination root
 	 * @param SM {@link SuperModel} that contains some info
 	 */
-	public LinkedFile(Path origin, Path rootOrigin, Path rootDest, SuperModel SM) {
-		this(origin.toFile(), rootOrigin, rootDest, SM);
+	public LinkedFile(Path origin, Path rootOrigin, Path rootDest, SuperModel SM, Copiable parent, int mode) {
+		this(origin.toFile(), rootOrigin, rootDest, SM, parent, mode);
 	}
 	
 	/** 
@@ -80,7 +80,7 @@ public class LinkedFile extends CopiableAbstract{
 	 * While the copy is in progress, if there is a GUI, some things will update,
 	 * like progress bars and labels.
 	 */
-	public void copy() throws FileNotFoundException, IOException {
+	public void copy() throws IOException {
 		if (!this.wasCopied()) {
 			handleCopy();
 			this.setCopied();

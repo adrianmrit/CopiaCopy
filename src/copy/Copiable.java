@@ -17,7 +17,11 @@ public interface Copiable extends Comparable<Copiable>{
 	 * @throws FileNotFoundException if the origin file doesn't exist
 	 * @throws IOException
 	 */
-	void copy() throws FileNotFoundException, IOException;
+	void paste() throws FileNotFoundException, IOException;
+	
+	void deleteThisAndParent();
+	
+	int getMode();
 	
 	/**
 	 * Adds this file to the {@link CopiableList}

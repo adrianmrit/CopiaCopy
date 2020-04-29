@@ -1,6 +1,9 @@
 package copy;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.FileStore;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -13,6 +16,8 @@ public abstract class CopiableAbstract implements Copiable{
 	public SuperModel SM;
 	private boolean copied = false;
 	private boolean overwrite = false;
+	private int mode;
+	private Copiable parent; // folder that will try to delete after moving
 	
 	/**
 	 * An abstract copiable
@@ -20,15 +25,74 @@ public abstract class CopiableAbstract implements Copiable{
 	 * @param rootOrigin
 	 * @param rootDest
 	 * @param SM
+	 * @param mode Copiable mode
 	 */
-	public CopiableAbstract(File origin, Path rootOrigin, Path rootDest, SuperModel SM) {
+	public CopiableAbstract(File origin, Path rootOrigin,
+			Path rootDest, SuperModel SM, Copiable parent, int mode) {
 		this.origin = origin;
 		this.rootOrigin = rootOrigin;
 		this.rootDest = rootDest;
 		this.SM = SM;
+		this.mode = mode;
+		this.parent = parent;
 		
 		setDefaultCoreDestPath();
 	}
+	
+	public int getMode() {
+		return this.mode;
+	}
+	
+	public Copiable getParent() {
+		return this.parent;
+	}
+	
+	/**
+	 * Either moves or copies this {@link Copiable} according to the mode.
+	 */
+	public void paste() throws IOException {
+		switch (getMode()) {
+		case Copiable.COPY_MODE:
+			this.copy();
+			break;
+		case Copiable.CUT_MODE:
+			this.move();
+			break;
+		}
+	}
+	
+	/**
+	 *	Deletes this copiable 
+	 */
+	public void deleteThisAndParent() {
+		this.getOrigin().delete();
+		if (this.getParent() != null) {
+			this.getParent().deleteThisAndParent();
+		}
+	}
+
+	/**
+	 * Moves a {@link Copiable} from its origin to its destination.
+	 * @throws IOException
+	 */
+	public void move() throws IOException {
+		// if not able to move then copy
+		boolean moveSucessful = this.getOrigin().renameTo(this.getDest());
+		
+		if(moveSucessful) {
+			this.skip(); // avoid doing the same for the rest of the tree
+						 // those files don't exist anyways so it will throw error
+		} else {  // copy and delete
+			copy();
+			deleteThisAndParent();
+		}
+	}
+	
+	/**
+	 * Copies this {@link Copiable} origin into its destination.
+	 * @throws IOException
+	 */
+	public abstract void copy() throws IOException;
 	
 	/**
 	 * Path that will be copied to destRoot by default, it could be changed. Example:

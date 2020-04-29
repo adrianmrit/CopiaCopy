@@ -20,10 +20,12 @@ public class CopyGUI implements Runnable{
 	
 	private final String orig;
 	private final String dest;
+	private final int mode;
 	
-	public CopyGUI(String orig, String dest) {
+	public CopyGUI(String orig, String dest, int mode) {
 		this.orig = orig;
 		this.dest = dest;
+		this.mode = mode;
 	}
 	
 	private static void addComponent(Container container, Component component,
@@ -102,7 +104,7 @@ public class CopyGUI implements Runnable{
 			SM.setHasGUI(true);
 			
 			copyThread = new Copy(SM);
-			copyThread.addToCopy(this.orig, this.dest, Copiable.COPY_MODE);
+			copyThread.addToCopy(this.orig, this.dest, this.mode);
 			copyThread.start();
 
 		} catch (IOException e) {

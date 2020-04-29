@@ -11,11 +11,10 @@ import java.nio.file.StandardCopyOption;
 
 public class SymLinkFile extends CopiableAbstract{
 
-	public SymLinkFile(File origin, Path rootOrigin, Path rootDest, SuperModel SM) {
-		super(origin, rootOrigin, rootDest, SM);
+	public SymLinkFile(File origin, Path rootOrigin, Path rootDest, SuperModel SM, Copiable parent, int mode) {
+		super(origin, rootOrigin, rootDest, SM, parent, mode);
 	}
-
-	@Override
+	
 	public void copy() throws FileNotFoundException, IOException {
 		if (!this.wasCopied()) {
 			Files.copy(this.getOrigin().toPath(), this.getDest().toPath(), LinkOption.NOFOLLOW_LINKS, StandardCopyOption.COPY_ATTRIBUTES);

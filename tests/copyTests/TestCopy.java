@@ -10,8 +10,8 @@ import java.nio.file.Paths;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.AfterEach;
 
 import buffer.Buffer;
 import buffer.StaticBuffer;
@@ -19,58 +19,56 @@ import copy.Copiable;
 import copy.CopiableList;
 import copy.Copy;
 import copy.SuperModel;
+import testFiles.TestFileFactory;
 
 class TestCopy {
 	/**
 	 * Empties TestDest and creates it before and after tests
+	 * @throws IOException 
 	 */
-	@BeforeAll
-	@AfterAll
-	static void setupTestDir() {
-		File dest = Paths.get("TestDest/").toAbsolutePath().toFile();
+	@BeforeEach
+	@AfterEach
+	void setupTestDir() throws IOException {
+		TestFileFactory.createTestFiles();
+		
 		try {
-			FileUtils.deleteDirectory(dest);
+			FileUtils.deleteDirectory(TestFileFactory.TEST_DEST_FOLDER_PARENT.toFile());
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		dest.mkdir();
+		TestFileFactory.TEST_DEST_FOLDER_PARENT.toFile().mkdir();
 	}
 	
 	@Test
 	void testCopyFile() throws IOException {
-		Path src = Paths.get("Sample/SampleFile.sample").toAbsolutePath();
-		Path dest = Paths.get("TestDest/").toAbsolutePath();
 		
-		File expected = Paths.get("TestDest/SampleFile.sample").toAbsolutePath().toFile();
 		CopiableList CL = new CopiableList();
 		Buffer buffer = new StaticBuffer();
 		SuperModel SM = new SuperModel(CL, buffer);
 		Copy c = new Copy(SM);
-		c.addToCopy(src, dest, Copiable.COPY_MODE);
+		
+		TestFileFactory.DEST_FILE_1.getParent().toFile().mkdir();
+		
+		c.addToCopy(TestFileFactory.FILE_1, TestFileFactory.DEST_FILE_1.getParent(), Copiable.COPY_MODE);
 		c.copyAll();
 		
-		assertTrue(expected.exists());
+		assertTrue(TestFileFactory.DEST_FILE_1.toFile().exists());
 	}
 	
 	@Test
 	void testCopyFolder() throws IOException {
-		Path src = Paths.get("Sample/").toAbsolutePath();
-		Path dest = Paths.get("TestDest/").toAbsolutePath();
-		
-		File expected = Paths.get("TestDest/Sample/SampleSubFolder").toAbsolutePath().toFile();
-		File expected2 = Paths.get("TestDest/Sample/SampleFile.sample").toAbsolutePath().toFile();
-		File expected3 = Paths.get("TestDest/Sample/SampleFile2.sample").toAbsolutePath().toFile();
 		CopiableList CL = new CopiableList();
 		Buffer buffer = new StaticBuffer();
 		SuperModel SM = new SuperModel(CL, buffer);
 		Copy c = new Copy(SM);
-		c.addToCopy(src, dest, Copiable.COPY_MODE);
+		
+		c.addToCopy(TestFileFactory.TEST_FOLDER, TestFileFactory.TEST_DEST_FOLDER_PARENT, Copiable.COPY_MODE);
 		c.copyAll();
 		
-		assertTrue(expected.exists());
-		assertTrue(expected2.exists());
-		assertTrue(expected3.exists());
+		assertTrue(TestFileFactory.DEST_FILE_1.toFile().exists());
+		assertTrue(TestFileFactory.DEST_FILE_2.toFile().exists());
+		assertTrue(TestFileFactory.DEST_SYMBOLIC_LINK.toFile().exists());
 	}
 
 }

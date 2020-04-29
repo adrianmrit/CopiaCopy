@@ -4,15 +4,19 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.FileStore;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.TreeSet;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.ArrayUtils;
 
 public class LinkedFolder extends CopiableAbstract{
-	private TreeSet<Copiable> childrens= new TreeSet<>();
+	private ArrayList<Copiable> childrens= new ArrayList<>();
 	private long size = 0;
 	
 	/**
@@ -22,8 +26,8 @@ public class LinkedFolder extends CopiableAbstract{
 	 * @param rootDest Destination root
 	 * @param SM {@link SuperModel} that contains some info
 	 */
-	public LinkedFolder(File origin, Path rootOrigin, Path rootDest, SuperModel SM) {
-		super(origin, rootOrigin, rootDest, SM);
+	public LinkedFolder(File origin, Path rootOrigin, Path rootDest,SuperModel SM, Copiable parent, int mode) {
+		super(origin, rootOrigin, rootDest, SM, parent, mode);
 		
 		FileFilter isFolderFilter = new IsFolderFilter();
 		FileFilter isFileFilter = new IsFileFilter();
@@ -56,15 +60,14 @@ public class LinkedFolder extends CopiableAbstract{
 	 * @param rootDest Destination root
 	 * @param SM {@link SuperModel} that contains some info
 	 */
-	public LinkedFolder(Path origin, Path rootOrigin, Path rootDest, SuperModel SM) {
-		this(origin.toFile(), rootOrigin, rootDest, SM);
+	public LinkedFolder(Path origin, Path rootOrigin, Path rootDest, SuperModel SM, Copiable parent, int mode) {
+		this(origin.toFile(), rootOrigin, rootDest, SM, parent, mode);
 	}
 	
 	/**
 	 * Creates this directory and sub-directories that do not exist
 	 */
-	@Override
-	public void copy() throws FileNotFoundException, IOException {
+	public void copy() throws IOException {
 		if (!this.wasCopied()) {
 			getDest().mkdir();
 			this.setCopied();
@@ -84,10 +87,10 @@ public class LinkedFolder extends CopiableAbstract{
 	 * @param ch
 	 */
 	private void addFolder(File ch) {
-		Copiable children = new LinkedFolder(ch, getRootOrigin(), getRootDest(), SM);
+		Copiable children = new LinkedFolder(ch, getRootOrigin(), getRootDest(), SM, this, this.getMode());
 		this.childrens.add(children);
 		
-		updateSize(children.getSize()); // updates the size
+		updateSize(children.getSizeRec()); // updates the size
 	}
 	
 	/**
@@ -95,7 +98,7 @@ public class LinkedFolder extends CopiableAbstract{
 	 * @param ch
 	 */
 	private void addFile(File ch) {
-		Copiable children = new LinkedFile(ch, getRootOrigin(), getRootDest(), SM);
+		Copiable children = new LinkedFile(ch, getRootOrigin(), getRootDest(), SM, this, this.getMode());
 		this.childrens.add(children);
 		
 		updateSize(children.getSize()); // updates the size
@@ -106,7 +109,7 @@ public class LinkedFolder extends CopiableAbstract{
 	 * @param ch
 	 */
 	private void addSymLink(File ch) {
-		Copiable children = new SymLinkFile(ch, getRootOrigin(), getRootDest(), SM);
+		Copiable children = new SymLinkFile(ch, getRootOrigin(), getRootDest(), SM, this, this.getMode());
 		this.childrens.add(children);
 		
 		updateSize(children.getSize()); // updates the size

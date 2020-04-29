@@ -8,6 +8,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.FileStore;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -46,7 +47,7 @@ public class Copy extends Thread{
 		this.checkers = new Handlers(SM);
 	}
 	
-	public void addToCopy(String orig, String dest, int mode) {
+	public void addToCopy(String orig, String dest, int mode) throws IOException {
 		//TODO: set copy mode, copy, or move (or cut)
 		File origF = new File(orig);
 		File destF = new File(dest);
@@ -54,20 +55,21 @@ public class Copy extends Thread{
 		Copiable f;
 		
 		if (Files.isSymbolicLink(origF.toPath())) {
-			f = new SymLinkFile(origF, origF.getParentFile().toPath(), destF.toPath(), SM);
+			f = new SymLinkFile(origF, origF.getParentFile().toPath(), destF.toPath(), SM, null, mode);
 		} else if (origF.isFile()) {
-			f = new LinkedFile(origF, origF.getParentFile().toPath(), destF.toPath(), SM);
+			f = new LinkedFile(origF, origF.getParentFile().toPath(), destF.toPath(), SM, null, mode);
 		} else {
-			f = new LinkedFolder(origF, origF.getParentFile().toPath(), destF.toPath(), SM);
+			f = new LinkedFolder(origF, origF.getParentFile().toPath(), destF.toPath(), SM, null, mode);
 		}
+		
 		f.register();
 	}
 	
-	public void addToCopy(Path orig, Path dest, int mode) {
+	public void addToCopy(Path orig, Path dest, int mode) throws IOException {
 		this.addToCopy(orig.toString(), dest.toString(), mode);
 	}
 	
-	public void addToCopy(File orig, File dest, int mode) {
+	public void addToCopy(File orig, File dest, int mode) throws IOException {
 		this.addToCopy(orig.toString(), dest.toString(), mode);
 	}
 	
@@ -121,7 +123,7 @@ public class Copy extends Thread{
 			
 			if (checkers.handle(c)) {
 			
-				c.copy();
+				c.paste();
 				this.completeFileBar();
 			}
 			
