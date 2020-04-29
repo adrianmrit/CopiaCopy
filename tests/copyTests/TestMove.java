@@ -20,7 +20,7 @@ import copy.Copiable;
 import copy.CopiableList;
 import copy.Copy;
 import copy.SuperModel;
-import testFiles.TestFileFactory;
+import testFiles.FileFactory;
 
 class TestMove {
 	/**
@@ -30,15 +30,15 @@ class TestMove {
 	@BeforeEach
 	@AfterEach
 	void setupTestDir() throws IOException {
-		TestFileFactory.createTestFiles();
+		FileFactory.createTestFiles();
 		
 		try {
-			FileUtils.deleteDirectory(TestFileFactory.TEST_DEST_FOLDER_PARENT.toFile());
+			FileUtils.deleteDirectory(FileFactory.TEST_DEST_FOLDER_PARENT.toFile());
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		TestFileFactory.TEST_DEST_FOLDER_PARENT.toFile().mkdir();
+		FileFactory.TEST_DEST_FOLDER_PARENT.toFile().mkdir();
 	}
 	
 	@Test
@@ -49,13 +49,13 @@ class TestMove {
 		SuperModel SM = new SuperModel(CL, buffer);
 		Copy c = new Copy(SM);
 		
-		c.addToCopy(TestFileFactory.FILE_1, TestFileFactory.TEST_DEST_FOLDER_PARENT, Copiable.CUT_MODE);
+		c.addToCopy(FileFactory.FILE_1, FileFactory.TEST_DEST_FOLDER_PARENT, Copiable.CUT_MODE);
 		c.copyAll();
 		
-		assertFalse(TestFileFactory.FILE_1.toFile().exists());
+		assertFalse(FileFactory.FILE_1.toFile().exists());
 		
-		Path expectedMoved = Paths.get(TestFileFactory.TEST_DEST_FOLDER_PARENT.toString(),
-				TestFileFactory.FILE_1.getFileName().toString());
+		Path expectedMoved = Paths.get(FileFactory.TEST_DEST_FOLDER_PARENT.toString(),
+				FileFactory.FILE_1.getFileName().toString());
 		
 		assertTrue(expectedMoved.toFile().exists());
 		
@@ -69,31 +69,31 @@ class TestMove {
 		SuperModel SM = new SuperModel(CL, buffer);
 		Copy c = new Copy(SM);
 		
-		assertTrue(TestFileFactory.TEST_FOLDER.toFile().exists());
-		assertTrue(TestFileFactory.SUB_FOLDER.toFile().exists());
-		assertTrue(TestFileFactory.FILE_1.toFile().exists());
-		assertTrue(TestFileFactory.FILE_2.toFile().exists());
+		assertTrue(FileFactory.TEST_FOLDER.toFile().exists());
+		assertTrue(FileFactory.SUB_FOLDER.toFile().exists());
+		assertTrue(FileFactory.FILE_1.toFile().exists());
+		assertTrue(FileFactory.FILE_2.toFile().exists());
 		
-		c.addToCopy(TestFileFactory.TEST_FOLDER, TestFileFactory.TEST_DEST_FOLDER_PARENT, Copiable.CUT_MODE);
+		c.addToCopy(FileFactory.TEST_FOLDER, FileFactory.TEST_DEST_FOLDER_PARENT, Copiable.CUT_MODE);
 		c.copyAll();
 		
-		assertFalse(TestFileFactory.TEST_FOLDER.toFile().exists());
-		assertFalse(TestFileFactory.SUB_FOLDER.toFile().exists());
-		assertFalse(TestFileFactory.FILE_1.toFile().exists());
-		assertFalse(TestFileFactory.FILE_2.toFile().exists());
+		assertFalse(FileFactory.TEST_FOLDER.toFile().exists());
+		assertFalse(FileFactory.SUB_FOLDER.toFile().exists());
+		assertFalse(FileFactory.FILE_1.toFile().exists());
+		assertFalse(FileFactory.FILE_2.toFile().exists());
 		
-		assertFalse(TestFileFactory.SYMBOLIC_LINK.toFile().exists());
+		assertFalse(FileFactory.SYMBOLIC_LINK.toFile().exists());
 		
-		System.out.println(TestFileFactory.TEST_FOLDER);
-		System.out.println(TestFileFactory.FILE_1);
-		System.out.println(TestFileFactory.DEST_FILE_1);
-		System.out.println(TestFileFactory.DEST_SYMBOLIC_LINK);
+		System.out.println(FileFactory.TEST_FOLDER);
+		System.out.println(FileFactory.FILE_1);
+		System.out.println(FileFactory.DEST_FILE_1);
+		System.out.println(FileFactory.DEST_SYMBOLIC_LINK);
 		
-		assertTrue(TestFileFactory.TEST_DEST_FOLDER_PARENT.toFile().exists());
-		assertTrue(TestFileFactory.DEST_SUB_FOLDER.toFile().exists());
-		assertTrue(TestFileFactory.DEST_FILE_1.toFile().exists());
-		assertTrue(TestFileFactory.DEST_FILE_2.toFile().exists());
-		assertTrue(TestFileFactory.DEST_SYMBOLIC_LINK.toFile().exists());
+		assertTrue(FileFactory.TEST_DEST_FOLDER_PARENT.toFile().exists());
+		assertTrue(FileFactory.DEST_SUB_FOLDER.toFile().exists());
+		assertTrue(FileFactory.DEST_FILE_1.toFile().exists());
+		assertTrue(FileFactory.DEST_FILE_2.toFile().exists());
+		assertTrue(FileFactory.DEST_SYMBOLIC_LINK.toFile().exists());
 	}
 
 }

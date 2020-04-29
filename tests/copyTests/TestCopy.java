@@ -19,7 +19,7 @@ import copy.Copiable;
 import copy.CopiableList;
 import copy.Copy;
 import copy.SuperModel;
-import testFiles.TestFileFactory;
+import testFiles.FileFactory;
 
 class TestCopy {
 	/**
@@ -29,15 +29,15 @@ class TestCopy {
 	@BeforeEach
 	@AfterEach
 	void setupTestDir() throws IOException {
-		TestFileFactory.createTestFiles();
+		FileFactory.createTestFiles();
 		
 		try {
-			FileUtils.deleteDirectory(TestFileFactory.TEST_DEST_FOLDER_PARENT.toFile());
+			FileUtils.deleteDirectory(FileFactory.TEST_DEST_FOLDER_PARENT.toFile());
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		TestFileFactory.TEST_DEST_FOLDER_PARENT.toFile().mkdir();
+		FileFactory.TEST_DEST_FOLDER_PARENT.toFile().mkdir();
 	}
 	
 	@Test
@@ -48,12 +48,12 @@ class TestCopy {
 		SuperModel SM = new SuperModel(CL, buffer);
 		Copy c = new Copy(SM);
 		
-		TestFileFactory.DEST_FILE_1.getParent().toFile().mkdir();
+		FileFactory.DEST_FILE_1.getParent().toFile().mkdir();
 		
-		c.addToCopy(TestFileFactory.FILE_1, TestFileFactory.DEST_FILE_1.getParent(), Copiable.COPY_MODE);
+		c.addToCopy(FileFactory.FILE_1, FileFactory.DEST_FILE_1.getParent(), Copiable.COPY_MODE);
 		c.copyAll();
 		
-		assertTrue(TestFileFactory.DEST_FILE_1.toFile().exists());
+		assertTrue(FileFactory.DEST_FILE_1.toFile().exists());
 	}
 	
 	@Test
@@ -63,12 +63,12 @@ class TestCopy {
 		SuperModel SM = new SuperModel(CL, buffer);
 		Copy c = new Copy(SM);
 		
-		c.addToCopy(TestFileFactory.TEST_FOLDER, TestFileFactory.TEST_DEST_FOLDER_PARENT, Copiable.COPY_MODE);
+		c.addToCopy(FileFactory.TEST_FOLDER, FileFactory.TEST_DEST_FOLDER_PARENT, Copiable.COPY_MODE);
 		c.copyAll();
 		
-		assertTrue(TestFileFactory.DEST_FILE_1.toFile().exists());
-		assertTrue(TestFileFactory.DEST_FILE_2.toFile().exists());
-		assertTrue(TestFileFactory.DEST_SYMBOLIC_LINK.toFile().exists());
+		assertTrue(FileFactory.DEST_FILE_1.toFile().exists());
+		assertTrue(FileFactory.DEST_FILE_2.toFile().exists());
+		assertTrue(FileFactory.DEST_SYMBOLIC_LINK.toFile().exists());
 	}
 
 }

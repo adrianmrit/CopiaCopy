@@ -17,33 +17,33 @@ import org.junit.jupiter.api.Test;
 
 import copy.Copiable;
 import copy.LinkedFolder;
-import testFiles.TestFileFactory;
+import testFiles.FileFactory;
 
 class TestLinkedFolder {
 
 	@BeforeEach
 	@AfterEach
 	void setupTestDir() throws IOException {
-		TestFileFactory.createTestFiles();
+		FileFactory.createTestFiles();
 		
 		try {
-			FileUtils.deleteDirectory(TestFileFactory.TEST_DEST_FOLDER_PARENT.toFile());
+			FileUtils.deleteDirectory(FileFactory.TEST_DEST_FOLDER_PARENT.toFile());
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		TestFileFactory.TEST_DEST_FOLDER_PARENT.toFile().mkdir();
+		FileFactory.TEST_DEST_FOLDER_PARENT.toFile().mkdir();
 	}
 
 	@Test
 	void test() {
-		Copiable copiable = new LinkedFolder(TestFileFactory.TEST_FOLDER,
-				TestFileFactory.TEST_DEST_FOLDER_PARENT, TestFileFactory.TEST_DEST_FOLDER,
+		Copiable copiable = new LinkedFolder(FileFactory.TEST_FOLDER,
+				FileFactory.TEST_DEST_FOLDER_PARENT, FileFactory.TEST_DEST_FOLDER,
 				null, null, Copiable.COPY_MODE);
 		
 		Iterator<Path> it = null;
 		try {
-			it = Files.walk(TestFileFactory.TEST_FOLDER).iterator();
+			it = Files.walk(FileFactory.TEST_FOLDER).iterator();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -63,13 +63,13 @@ class TestLinkedFolder {
 	
 	@Test
 	void testEmpty() {
-		Copiable copiable = new LinkedFolder(TestFileFactory.TEST_DEST_FOLDER_PARENT,
-				TestFileFactory.TEST_DEST_FOLDER_PARENT.getParent(), TestFileFactory.TEST_FOLDER,
+		Copiable copiable = new LinkedFolder(FileFactory.TEST_DEST_FOLDER_PARENT,
+				FileFactory.TEST_DEST_FOLDER_PARENT.getParent(), FileFactory.TEST_FOLDER,
 				null, null, Copiable.COPY_MODE);
 		
 		Iterator<Path> it = null;
 		try {
-			it = Files.walk(TestFileFactory.TEST_DEST_FOLDER_PARENT).iterator();
+			it = Files.walk(FileFactory.TEST_DEST_FOLDER_PARENT).iterator();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

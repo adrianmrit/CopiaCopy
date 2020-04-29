@@ -11,7 +11,7 @@ import java.util.Random;
 
 import org.apache.commons.io.FileUtils;
 
-public class TestFileFactory {
+public class FileFactory {
 	private static final int CHUNK_SIZE = (int) FileUtils.ONE_MB*30;
 	private static final byte FILLING_BYTE = 1;
 	
@@ -93,11 +93,11 @@ public class TestFileFactory {
 		}
 		
 		if (!Files.exists(FILE_1)) {
-			TestFileFactory.createRandomFile(FILE_SIZE, FILE_1);
+			FileFactory.createRandomFile(FILE_SIZE, FILE_1);
 		}
 		
 		if (!Files.exists(FILE_2)) {
-			TestFileFactory.createRandomFile(FILE_SIZE, FILE_2);
+			FileFactory.createRandomFile(FILE_SIZE, FILE_2);
 		}
 	}
 	
@@ -106,6 +106,6 @@ public class TestFileFactory {
 	}
 	
 	public static void main(String[] args) throws IOException {
-		TestFileFactory.createTestFiles();
+		FileFactory.createTestFiles();
 	}
 }
