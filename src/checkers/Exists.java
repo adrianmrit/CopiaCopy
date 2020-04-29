@@ -1,5 +1,7 @@
 package checkers;
 
+import java.nio.file.Files;
+
 import copy.Copiable;
 import copy.SuperModel;
 import gui.ExistsDialog;
@@ -23,7 +25,9 @@ public class Exists implements Checker{
 	@Override
 	public boolean handle(Copiable c) {
 		if (c.destExists() && !c.getOverwriteConfirmation()) {
-			if (c.isFile()) {
+			if (c.isSymbolicLink()) {
+				handleSymbolicLinkExistDialog(c);
+			} else if (c.isFile()) {
 				handleFileExistDialog(c);
 			} else {
 				handleFolderExistDialog(c);
@@ -94,6 +98,39 @@ public class Exists implements Checker{
 					break;
 				
 				case ExistsDialogBuilder.MERGE:
+					c.setOverwrite();
+					break;
+			}
+		} else {
+			c.setOverwrite();
+		}
+	}
+	
+	/**
+	 * Shows a dialog if the folder already exists in the destination.
+	 * @param origin Origin path
+	 * @param dest Destination path
+	 */
+	private void handleSymbolicLinkExistDialog(Copiable c) {
+		if (SM.hasGUI()) {
+			ExistsDialog dialog = ExistsDialogBuilder.getSymbolicLinkExistsDialog(SM.frame, c.getOrigin(), c.getDest());
+			dialog.show();
+			String action = dialog.getAction();
+			switch (action) {
+				case ExistsDialogBuilder.CANCEL:
+					System.exit(0);  // exit copy// TODO: handle file exists
+					break;
+				
+				case ExistsDialogBuilder.SKIP:
+					c.skip();
+					SM.totalProgressModel.setLongMaximum(SM.copiableList.getTotalSize());
+					break;
+				
+				case ExistsDialogBuilder.RENAME:
+					c.renameCoreDest(dialog.getInputValue());
+					break;
+				
+				case ExistsDialogBuilder.REPLACE:
 					c.setOverwrite();
 					break;
 			}

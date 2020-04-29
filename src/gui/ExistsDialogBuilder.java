@@ -21,12 +21,22 @@ public final class ExistsDialogBuilder {
 		return "<HTML><p>" + message + "</p></HTML>";
 	}
 	
+	private static String getSymbolicLinkExistsTitle(File dest) {
+		return toHTMLTitle("Replace symbolic link \"" + dest.getName() + "\"?");
+	}
+	
 	private static String getFileExistsTitle(File dest) {
 		return toHTMLTitle("Replace file \"" + dest.getName() + "\"?");
 	}
 	
 	private static String getFolderExistsTitle(File dest) {
 		return toHTMLTitle("Replace folder \"" + dest.getName() + "\"?");
+	}
+	
+	private static String getSymbolicLinkExistsMessage(File dest) {
+		String parentFolderName = dest.getParentFile().getName();
+		String message = "Anoter symbolic link with the same name already exists in \"" + parentFolderName +  "\".";
+		return toHTMLParagraph(message);
 	}
 	
 	private static String getFileExistsMessage(File dest) {
@@ -85,6 +95,26 @@ public final class ExistsDialogBuilder {
 		setCommons(dialog);
 		
 		dialog.setMRButton("Merge", MERGE);
+
+		return dialog;
+	}
+	
+	public static ExistsDialog getSymbolicLinkExistsDialog(JFrame parent, File origin, File dest) {
+		ExistsDialog dialog = new ExistsDialog(parent, origin, dest);
+		
+		String title = getSymbolicLinkExistsTitle(dest);
+		String message = getSymbolicLinkExistsMessage(dest);
+		
+		dialog.setWindowsTitle("Replace");
+		dialog.setTitle(title);
+		dialog.setMessage(message);
+		dialog.setReplaceWithBox(origin);
+		
+		dialog.setOriginalBox(dest);
+		
+		setCommons(dialog);
+		
+		dialog.setMRButton("Replace", REPLACE);
 
 		return dialog;
 	}
