@@ -160,6 +160,12 @@ public class ExistsDialog extends AbstractDialog{
 		}
 	}
 	
+	@Override
+	public String getAction() {
+		this.getParent().setEnabled(true);
+		return super.getAction();
+	}
+	
 	public void show() {
 		
 		this.getParent().setEnabled(false);

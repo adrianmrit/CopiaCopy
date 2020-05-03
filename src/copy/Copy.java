@@ -21,6 +21,7 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.SwingWorker;
 
 import org.apache.commons.io.FilenameUtils;
 
@@ -31,7 +32,7 @@ import gui.ExistsDialogBuilder;
 import gui.LongProgressBarModel;
 
 
-public class Copy extends Thread{
+public class Copy extends SwingWorker{
 	private static boolean DEBUG = false;
 
 	private SuperModel SM;
@@ -99,7 +100,7 @@ public class Copy extends Thread{
 	/** 
 	 * Used to run the copy in a thread
 	 */
-	public void run() {
+	public Object doInBackground() {
 		int exitStatus = 0;
 		
 		try {
@@ -129,6 +130,7 @@ public class Copy extends Thread{
 		if(!DEBUG) {
 			System.exit(exitStatus);
 		}
+		return 0;
 	}
 	
 	/** 

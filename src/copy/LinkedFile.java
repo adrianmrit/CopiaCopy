@@ -75,6 +75,14 @@ public class LinkedFile extends CopiableAbstract{
 			CopyTimer timer = new CopyTimer();
 			
 			while ((bytesRead = is.read(buf)) > 0) {
+				while (SM.isPaused()) {
+					try {
+						Thread.sleep(500);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
 				SM.buffer.resetTime();
 				os.write(buf, 0, bytesRead);
 				if (SM.hasGUI()) {

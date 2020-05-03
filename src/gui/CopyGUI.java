@@ -7,6 +7,8 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.LayoutManager;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -188,8 +190,21 @@ public class CopyGUI implements Runnable{
 		SM.setFrame(frame);
 		SM.setHasGUI(true);
 		
+		ActionListener pauseListener = new ActionListener() {
+			public void actionPerformed(ActionEvent actionEvent) {
+				SM.togglePaused();
+				if (SM.isPaused()) {
+					pauseButton.setText("Resume");
+				} else {
+					pauseButton.setText("Pause");
+				}
+			}
+		};
+		
+		pauseButton.addActionListener(pauseListener);
+		
 		copyThread = new Copy(SM);
 		copyThread.addToCopy(this.orig, this.dest, this.mode);
-		copyThread.start();
+		copyThread.doInBackground();
 	}
 }

@@ -39,6 +39,8 @@ public class SuperModel {
 	
 	private boolean calculatingTimeLeft = true;
 	
+	private boolean paused = false;
+	
 	private boolean hasGUI = false;
 		
 	/**
@@ -55,6 +57,14 @@ public class SuperModel {
 	public SuperModel(CopiableList cl, Buffer buffer) {
 		this.copiableList = cl;
 		this.buffer = buffer;
+	}
+	
+	public boolean isPaused() {
+		return this.paused;
+	}
+	
+	public void togglePaused() {
+		this.paused = !this.paused;
 	}
 	
 	/**
