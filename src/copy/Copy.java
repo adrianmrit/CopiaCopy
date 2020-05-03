@@ -101,6 +101,7 @@ public class Copy extends Thread{
 	 */
 	public void run() {
 		int exitStatus = 0;
+		
 		try {
 			long tookAll = System.currentTimeMillis();
 			
@@ -135,6 +136,9 @@ public class Copy extends Thread{
 	 * @throws IOException if fails
 	 */
 	public void copyAll() throws IOException {
+		
+		this.initTotalBar();
+		
 		if (SM.copiableList.hasNext()) {
 			Copiable c = SM.copiableList.getNext();
 			
@@ -149,6 +153,10 @@ public class Copy extends Thread{
 		} else {
 			this.completeTotalBar();
 		}
+	}
+	
+	private void initTotalBar() {
+		SM.totalProgressModel.setLongMaximum(SM.copiableList.getTotalSize());
 	}
 	
 	/**
