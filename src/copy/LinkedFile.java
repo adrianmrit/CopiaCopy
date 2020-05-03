@@ -15,6 +15,8 @@ import java.nio.file.StandardCopyOption;
 
 import org.apache.commons.io.FileUtils;
 
+import utils.TimerFormater;
+
 public class LinkedFile extends CopiableAbstract{
 	/**
 	 * {@link Copiable} file representation.
@@ -47,12 +49,14 @@ public class LinkedFile extends CopiableAbstract{
 		if (SM.hasGUI()) {
 			SM.fileProgressModel.setLongMaximum(this.getSize()); // resets the fileProgressBar
 			SM.fileProgressModel.setLongValue(0); // resets the fileProgressBar
-			SM.currentLabel.setText("Current: " + this.getDest());
 		}
 	}
 	
 	private void handleCopy() throws FileNotFoundException, IOException{
 		Path tempName = NameFactory.getTemp(this.getDest().toPath()); // use a temp name
+		
+//		SM.currentLabel.setText("from: " + this.getOrigin());
+//		SM.currentLabel.setText("to: " + this.getDest());
 		
 		InputStream is = new FileInputStream(this.getOrigin());
 		OutputStream os = new FileOutputStream(tempName.toFile());
@@ -63,18 +67,37 @@ public class LinkedFile extends CopiableAbstract{
 		try {
 			byte[] buf = SM.buffer.getBuffer(); // TODO: Find optimal chunk size
 			int bytesRead;
+			long totalCopied = 0;
+			double speed;
+			
+			SM.setCurrentTotalSize(this.getSize());
+			
+			CopyTimer timer = new CopyTimer();
 			
 			while ((bytesRead = is.read(buf)) > 0) {
 				SM.buffer.resetTime();
 				os.write(buf, 0, bytesRead);
 				if (SM.hasGUI()) {
-					SM.fileProgressModel.addLongValue(bytesRead);
-					SM.totalProgressModel.addLongValue(bytesRead);
+					totalCopied += bytesRead;
+					SM.addTotalCopiedSize(bytesRead);
+					
+					SM.setCurrentCopiedSize(bytesRead);
+					
+					
+					speed = SM.buffer.getSpeedSeconds(bytesRead);
+					SM.setSpeed(speed);
+					timer.calcAvgSpeed(speed);
+					if (!timer.isCalculating()) {
+						SM.setCalculatingTimeLeft(false); //TODO: fix big buffer sizes showing no time left
+						SM.setCurrentTimeLeft(timer.getTime(this.getSize()-totalCopied));
+						SM.setTotalTimeLeft(timer.getTime(SM.getTotalSizeLeft()));
+					}
 				}
 			}
 		} finally {
 			is.close();
 			os.close();
+			SM.addCopiedFile();
 		}
 		this.getDest().delete();
 		tempName.toFile().renameTo(this.getDest());

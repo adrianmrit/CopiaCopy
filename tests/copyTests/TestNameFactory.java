@@ -14,7 +14,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 
 import copy.NameFactory;
-import helpers.TestFile;
 import testFiles.FileFactory;
 
 
@@ -30,7 +29,6 @@ class TestNameFactory {
 		try {
 			FileUtils.deleteDirectory(FileFactory.TEST_DEST_FOLDER_PARENT.toFile());
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		FileFactory.TEST_DEST_FOLDER_PARENT.toFile().mkdir();

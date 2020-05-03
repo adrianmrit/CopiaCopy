@@ -37,18 +37,22 @@ public class Copy extends Thread{
 	private SuperModel SM;
 	private Handlers checkers;
 	
-	// TODO: 
-	
-//	private long totalSize = 0;  // TODO: Update final size dinamically
-	// GUI elements
-	
-	public Copy(SuperModel SM) throws IOException{
+	/**
+	 * Intermediate between copiables and the GUI
+	 * @param SM Model that holds some global data
+	 */
+	public Copy(SuperModel SM){
 		this.SM = SM;
 		this.checkers = new Handlers(SM);
 	}
 	
-	public void addToCopy(String orig, String dest, int mode) throws IOException {
-		//TODO: set copy mode, copy, or move (or cut)
+	/**
+	 * Creates a copiable and add it to the list.
+	 * @param orig origin path
+	 * @param dest parent destination path
+	 * @param mode {@link Copiable#COPY_MODE} or {@link Copiable#CUT_MODE}
+	 */
+	public void addToCopy(String orig, String dest, int mode){
 		File origF = new File(orig);
 		File destF = new File(dest);
 		
@@ -65,10 +69,22 @@ public class Copy extends Thread{
 		f.register();
 	}
 	
+	/**
+	 * Creates a copiable and add it to the list.
+	 * @param orig origin path
+	 * @param dest parent destination path
+	 * @param mode {@link Copiable#COPY_MODE} or {@link Copiable#CUT_MODE}
+	 */
 	public void addToCopy(Path orig, Path dest, int mode) throws IOException {
 		this.addToCopy(orig.toString(), dest.toString(), mode);
 	}
 	
+	/**
+	 * Creates a copiable and add it to the list.
+	 * @param orig origin file
+	 * @param dest parent destination file
+	 * @param mode {@link Copiable#COPY_MODE} or {@link Copiable#CUT_MODE}
+	 */
 	public void addToCopy(File orig, File dest, int mode) throws IOException {
 		this.addToCopy(orig.toString(), dest.toString(), mode);
 	}
@@ -89,9 +105,10 @@ public class Copy extends Thread{
 			long tookAll = System.currentTimeMillis();
 			
 			long tookGetSize = System.currentTimeMillis();
-			SM.totalProgressModel.setLongMaximum(SM.copiableList.getTotalSize());
-			tookGetSize = System.currentTimeMillis() - tookGetSize;
-			
+			if (SM.hasGUI()) {
+				tookGetSize = System.currentTimeMillis() - tookGetSize;
+			}
+
 			long tookCopy = System.currentTimeMillis();
 			this.copyAll();
 			tookCopy = System.currentTimeMillis() - tookCopy;
@@ -134,12 +151,18 @@ public class Copy extends Thread{
 		}
 	}
 	
+	/**
+	 * Completes the file progress bar.
+	 */
 	private void completeFileBar() {
 		if (SM.hasGUI()) {
 			SM.fileProgressModel.setRangeProperties(100, 0, 0, 100, false); // resets the totalProgressBar
 		}
 	}
 	
+	/**
+	 * Completes the total progress bar.
+	 */
 	private void completeTotalBar() {
 		if (SM.hasGUI()) {
 			SM.totalProgressModel.setRangeProperties(100, 0, 0, 100, false); // resets the totalProgressBar

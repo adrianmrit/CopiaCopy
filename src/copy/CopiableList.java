@@ -1,48 +1,79 @@
 package copy;
-
-import java.io.File;
-import java.nio.file.Path;
 import java.util.ArrayList;
 
 public class CopiableList {
 	private ArrayList<Copiable> allFiles;
-	private long totalSize;
-	private int lineupPointer;
+	private long totalSize = 0;
+	private int totalFiles = 0;
+	private int totalFolders = 0;
+	private int totalSymbolicLinks = 0;
+	private int lineupPointer = 0;
 	
+	/**
+	 * A list that hold all the copiables that will be copied
+	 */
 	public CopiableList() {
 		this.allFiles = new ArrayList<>();
-		this.totalSize = 0;
-		this.lineupPointer = 0;
 	}
 	
+	/**
+	 * Adds to the file count, folder count, or symbolic link count, depending on the copiable.
+	 * @param c
+	 */
+	private void addToCount(Copiable c) {
+		if (c.isFile()) {
+			totalFiles++;
+		} else if(c.isFolder()) {
+			totalFolders++;
+		} else if(c.isSymbolicLink()) {
+			totalSymbolicLinks++;
+		}
+	}
+	
+	/**
+	 * Removes from the file count, folder count, or symbolic link count, depending on the copiable.
+	 * @param c
+	 */
+	private void removeFromCount(Copiable c) {
+		if (c.isFile()) {
+			totalFiles--;
+		} else if(c.isFolder()) {
+			totalFolders--;
+		} else if(c.isSymbolicLink()) {
+			totalSymbolicLinks--;
+		}
+	}
+	
+	/**
+	 * Adds a copiable to the list, and updates counters.
+	 * @param c
+	 */
 	public void register(Copiable c) {
-		this.allFiles.add(c);
-		this.totalSize += c.getSize();
+		allFiles.add(c);
+		addToCount(c);
+		totalSize += c.getSize();
 	}
 	
+	/**
+	 * Removes a copiable from the list, and updates counters.
+	 * @param c
+	 */
 	public void remove(Copiable c) {
 		this.allFiles.remove(c);
+		removeFromCount(c);
 		this.totalSize -= c.getSize();
 	}
 	
-	public void reset() {
-		this.allFiles = new ArrayList<>();
-		this.totalSize = 0;
-	}
-	
+	/**
+	 * Moves the pointer to the next copiable object
+	 */
 	public void movePointer() {
 		this.lineupPointer++;
 	}
 	
-//	public void load(File origin, Path rootDest) {
-//		LinkedFile rootLf = new LinkedFile(origin, origin.getParentFile().toPath(), rootDest, this);
-//		rootLf.register();
-//		rootLf.registerTree();
-//	}
-	
 	/** 
-	 * Checks if there are files left to be copied
-	 * @return false if all files where copied, true otherwise.
+	 * Checks if there are copiables left to be copied
+	 * @return false if all copiables where copied, true otherwise.
 	 */
 	public boolean hasNext() {  // non copied files should go first for this to work;
 		return lineupPointer < allFiles.size();
@@ -61,12 +92,44 @@ public class CopiableList {
 		}
 	}
 	
+	/**
+	 * Gets the total size in bytes.
+	 * @return size in bytes
+	 */
 	public long getTotalSize() {
 		return this.totalSize;
 	}
 	
+	/**
+	 * Gets the number of copiable objects
+	 * @return number of copiables
+	 */
 	public int count() {
 		return this.allFiles.size();
+	}
+	
+	/**
+	 * Gets the number of files.
+	 * @return number of files
+	 */
+	public int getTotalFiles() {
+		return this.totalFiles;
+	}
+	
+	/**
+	 * Gets the number of folders.
+	 * @return number of folders
+	 */
+	public int getTotalFolders() {
+		return this.totalFolders;
+	}
+	
+	/**
+	 * Gets the number of symbolic links.
+	 * @return number of symbolic links
+	 */
+	public int getTotaXlSymbolicLinks() {
+		return this.totalSymbolicLinks;
 	}
 	
 	
