@@ -91,8 +91,8 @@ public class CopyGUI implements Runnable{
 			e.printStackTrace ();
 		}	
 		
-		JLabel nameLabel = new JLabel("name: Example Name", SwingConstants.LEFT);
-		JLabel infoLabel = new JLabel("copied: 100/200 (200MB/3GB)", SwingConstants.LEFT);
+		JLabel nameLabel = new JLabel("name:", SwingConstants.LEFT);
+		JLabel infoLabel = new JLabel("copied: ", SwingConstants.LEFT);
 		ExtendedProgressBarModel fileProgressModel = new ExtendedProgressBarModel();
 		LongProgressBarModel totalProgressModel = new LongProgressBarModel();
 		
@@ -186,7 +186,7 @@ public class CopyGUI implements Runnable{
 		SM.setFileProgressModel(fileProgressModel);
 		SM.setTotalProgressModel(totalProgressModel);
 		SM.setInfoLabel(infoLabel);
-		SM.setToLabel(nameLabel);
+		SM.setFromLabel(nameLabel);
 		SM.setFrame(frame);
 		SM.setHasGUI(true);
 		
@@ -201,7 +201,21 @@ public class CopyGUI implements Runnable{
 			}
 		};
 		
+		ActionListener cancelListener = new ActionListener() {
+			public void actionPerformed(ActionEvent actionEvent) {
+				System.exit(0);
+			}
+		};
+		
+		ActionListener skipListener = new ActionListener() {
+			public void actionPerformed(ActionEvent actionEvent) {
+				SM.skipCurrent();
+			}
+		};
+		
 		pauseButton.addActionListener(pauseListener);
+		cancelButton.addActionListener(cancelListener);
+		skipButton.addActionListener(skipListener);
 		
 		copyThread = new Copy(SM);
 		copyThread.addToCopy(this.orig, this.dest, this.mode);

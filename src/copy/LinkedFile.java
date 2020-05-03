@@ -55,9 +55,6 @@ public class LinkedFile extends CopiableAbstract{
 	private void handleCopy() throws FileNotFoundException, IOException{
 		Path tempName = NameFactory.getTemp(this.getDest().toPath()); // use a temp name
 		
-//		SM.currentLabel.setText("from: " + this.getOrigin());
-//		SM.currentLabel.setText("to: " + this.getDest());
-		
 		InputStream is = new FileInputStream(this.getOrigin());
 		OutputStream os = new FileOutputStream(tempName.toFile());
 		if (SM.hasGUI()) {
@@ -71,10 +68,14 @@ public class LinkedFile extends CopiableAbstract{
 			double speed;
 			
 			SM.setCurrentTotalSize(this.getSize());
+			SM.setFrom(this.getOrigin().toString());
 			
 			CopyTimer timer = new CopyTimer();
 			
 			while ((bytesRead = is.read(buf)) > 0) {
+				if (this.wasSkipped()) {
+					break;
+				}
 				while (SM.isPaused()) {
 					try {
 						Thread.sleep(500);
@@ -107,8 +108,12 @@ public class LinkedFile extends CopiableAbstract{
 			os.close();
 			SM.addCopiedFile();
 		}
-		this.getDest().delete();
-		tempName.toFile().renameTo(this.getDest());
+		if (!this.wasSkipped()) {
+			this.getDest().delete();
+			tempName.toFile().renameTo(this.getDest());
+		} else {
+			tempName.toFile().delete();
+		}
 	}
 	
 	/**
@@ -117,7 +122,7 @@ public class LinkedFile extends CopiableAbstract{
 	 * like progress bars and labels.
 	 */
 	public void copy() throws IOException {
-		if (!this.wasCopied()) {
+		if (!this.wasCopied() && !this.wasSkipped()) {
 			handleCopy();
 			this.setCopied();
 		}

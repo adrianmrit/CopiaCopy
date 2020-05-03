@@ -20,7 +20,7 @@ public class SuperModel {
 	public ExtendedProgressBarModel fileProgressModel;
 	public LongProgressBarModel totalProgressModel;
 //	public JLabel currentLabel;
-	public JLabel toLabel;
+	public JLabel fromLabel;
 	public JLabel infoLabel;
 	public JFrame frame; // used to create windows
 
@@ -65,6 +65,10 @@ public class SuperModel {
 	
 	public void togglePaused() {
 		this.paused = !this.paused;
+	}
+	
+	public void skipCurrent() {
+		this.copiableList.getNext().skip();
 	}
 	
 	/**
@@ -253,12 +257,16 @@ public class SuperModel {
 		this.totalProgressModel = totalProgressModel;
 	}
 	
+	public void setFrom(String path) {
+		this.fromLabel.setText("from: " + path);
+	}
+	
 	/** 
 	 * Sets the currentLabel
 	 * @param currentLabel
 	 */
-	public void setToLabel(JLabel toLabel) {
-		this.toLabel = toLabel;
+	public void setFromLabel(JLabel fromLabel) {
+		this.fromLabel = fromLabel;
 	}
 	
 	/**

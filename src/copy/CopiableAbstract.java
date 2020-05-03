@@ -15,6 +15,7 @@ public abstract class CopiableAbstract implements Copiable{
 	private Path absoluteDest;
 	public SuperModel SM;
 	private boolean copied = false;
+	private boolean skipped = false;
 	private boolean overwrite = false;
 	private int mode;
 	private Copiable parent; // folder that will try to delete after moving
@@ -190,7 +191,12 @@ public abstract class CopiableAbstract implements Copiable{
 	}
 	
 	public void skip() {
+		this.skipped = true;
 		SM.copiableList.movePointer();
+	}
+	
+	public boolean wasSkipped() {
+		return this.skipped;
 	}
 	
 	public int compareTo(Copiable other) {

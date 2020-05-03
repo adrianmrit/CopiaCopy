@@ -141,20 +141,17 @@ public class Copy extends SwingWorker{
 		
 		this.initTotalBar();
 		
-		if (SM.copiableList.hasNext()) {
+		while (SM.copiableList.hasNext()) {
 			Copiable c = SM.copiableList.getNext();
 			
 			if (checkers.handle(c)) {
 			
 				c.paste();
-				this.completeFileBar();
+			} else {
+				continue;
 			}
-			
-			copyAll();
-			return; // avoid calling the else statement after copy()
-		} else {
-			this.completeTotalBar();
 		}
+		this.completeTotalBar();
 	}
 	
 	private void initTotalBar() {
