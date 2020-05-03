@@ -16,6 +16,7 @@ import java.util.Date;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.Icon;
+import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -27,8 +28,7 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.DocumentFilter;
 
-import components.BigButton;
-import components.SmallButton;
+import components.DefaultButton;
 import components.UnstyledButton;
 import copy.SizeRep;
 import icons.ArrowIconBottom;
@@ -47,10 +47,10 @@ public class ExistsDialog extends AbstractDialog{
 	private Document renamedTextDocument;
 	private final String RENAME_TOGGLE_MESSAGE = "<HTML><p><b>Select a new name for this destination</b></p></HTML>";
 	private final String RENAME_BUTTON_MESSAGE = "Rename";
-	private BigButton cancelButton;
-	private SmallButton renameButton;
-	private BigButton skipButton;
-	private BigButton mrButton; // merge or replace
+	private JButton cancelButton;
+	private JButton renameButton;
+	private JButton skipButton;
+	private JButton mrButton; // merge or replace
 
 	public ExistsDialog(JFrame parent, File origin, File dest) {
 		super(parent);
@@ -87,23 +87,23 @@ public class ExistsDialog extends AbstractDialog{
 	}
 	
 	public void setCancelButton(String name, String action) {
-		cancelButton = new BigButton(name);
+		cancelButton = new DefaultButton(name);
 		registerButton(cancelButton, action);
 	}
 	
 	public void setRenameButton(String name, String action) {
-		renameButton = new SmallButton(name);
+		renameButton = new DefaultButton(name);
 		renameButton.setEnabled(false);
 		registerButton(renameButton, action);
 	}
 	
 	public void setSkipButton(String name, String action) {
-		skipButton = new BigButton(name);
+		skipButton = new DefaultButton(name);
 		registerButton(skipButton , action);
 	}
 	
 	public void setMRButton(String name, String action) {
-		mrButton = new BigButton(name);
+		mrButton = new DefaultButton(name);
 		registerButton(mrButton , action);
 	}
 	
@@ -204,7 +204,7 @@ public class ExistsDialog extends AbstractDialog{
 		/*************************************
 		 * Rename Section
 		 ************************************/
-		UnstyledButton renameToggleButton = new UnstyledButton(RENAME_TOGGLE_MESSAGE);
+		JButton renameToggleButton = new UnstyledButton(RENAME_TOGGLE_MESSAGE);
 		
 		int icoHeight = 8;
 		int icoWidth = 5;

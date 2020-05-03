@@ -1,31 +1,41 @@
 package gui;
-import javax.swing.*;
-import javax.swing.event.ChangeListener;
-import javax.swing.plaf.metal.MetalLookAndFeel;
-import javax.swing.plaf.metal.MetalProgressBarUI;
-import javax.swing.plaf.metal.MetalTheme;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.LayoutManager;
 
-import org.apache.commons.lang3.StringUtils;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JProgressBar;
+import javax.swing.SwingConstants;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.event.ChangeListener;
 
 import buffer.Buffer;
 import buffer.StaticBuffer;
+import components.DefaultButton;
 import components.ExtendedProgressBar;
 import components.ExtendedProgressBarUI;
+import copy.CopiableList;
 import copy.Copy;
 import copy.SuperModel;
-import copy.Copiable;
-import copy.CopiableList;
 import listeners.ExtendedProgressBarListener;
 import listeners.LongProgressBarListener;
 import mdlaf.MaterialLookAndFeel;
 import mdlaf.components.progressbar.MaterialProgressBarUI;
-import mdlaf.themes.JMarsDarkTheme;
 import mdlaf.themes.MaterialLiteTheme;
-import mdlaf.themes.MaterialOceanicTheme;
 import mdlaf.themes.MaterialTheme;
-
-import java.awt.*;
-import java.io.IOException;
 
 public class CopyGUI implements Runnable{
 	private static boolean DEBUG = false;
@@ -117,10 +127,10 @@ public class CopyGUI implements Runnable{
 		fileCopyProgressBar.setStringPainted(true);
 		totalCopyProgressBar.setStringPainted(true);
 		
-		JButton moreButton = new JButton("More");
-		JButton pauseButton = new JButton("Pause");
-		JButton skipButton = new JButton("Skip");
-		JButton cancelButton = new JButton("Cancel");
+		JButton moreButton = new DefaultButton("More");
+		JButton pauseButton = new DefaultButton("Pause");
+		JButton skipButton = new DefaultButton("Skip");
+		JButton cancelButton = new DefaultButton("Cancel");
 		
 		Box buttonsBox = Box.createHorizontalBox();
 		buttonsBox.add(moreButton, BorderLayout.CENTER);
@@ -147,10 +157,6 @@ public class CopyGUI implements Runnable{
 		
 		addComponent(labelsAndHPBarPanel, labelsBox, 0, 2, 1, 1, GridBagConstraints.CENTER, GridBagConstraints.BOTH);
 		labelsAndHPBarPanel.setPreferredSize(new Dimension(WINDOWS_WIDTH/3, 0));
-		
-		JLabel totalCopiedLabel = new JLabel("200mb/20GB", SwingConstants.CENTER);
-		
-		
 		
 		Box topContent = Box.createHorizontalBox();
 		topContent.add(totalCopyProgressBar);

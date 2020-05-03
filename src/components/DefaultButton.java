@@ -7,6 +7,7 @@ import javax.swing.Icon;
 import javax.swing.JButton;
 
 public class DefaultButton extends JButton{
+	private static final long serialVersionUID = 9027025054375381089L;
 	private final Cursor cursor = new Cursor(Cursor.HAND_CURSOR);
 	
 	public DefaultButton(Action a){
