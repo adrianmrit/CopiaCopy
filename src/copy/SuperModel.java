@@ -1,6 +1,8 @@
 package copy;
 
 import java.util.HashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -104,7 +106,7 @@ public class SuperModel {
 			String totalSizeString = FileUtils.byteCountToDisplaySize(this.copiableList.getTotalSize());
 			String copiedSizeString = FileUtils.byteCountToDisplaySize(this.totalCopiedSize);
 			String formatString = "%d/%d files - %s/%s, %s, %s";
-			String info = String.format(formatString, copiedFiles, this.copiableList.getTotalFiles(), copiedSizeString, totalSizeString, getSpeed(), getTotalTimeLeft());
+			String info = String.format(formatString, this.copiableList.getNaturalCurrentCopy(), this.copiableList.getCount(), copiedSizeString, totalSizeString, getSpeed(), getTotalTimeLeft());
 			if (infoLabel.getText() != info) {
 				infoLabel.setText(info);
 			}
@@ -201,6 +203,7 @@ public class SuperModel {
 	 * @param time time left in seconds
 	 */
 	public void setTotalTimeLeft(long time) {
+		time += (this.copiableList.getCount() - this.copiedFiles)/100;  // add one second per 100 remaining files
 		if (this.totalTimeLeft != time) {
 			this.totalTimeLeft = time;
 			updateInfoLabel();
@@ -258,7 +261,9 @@ public class SuperModel {
 	}
 	
 	public void setFrom(String path) {
-		this.fromLabel.setText("from: " + path);
+		if (hasGUI()) {
+			this.fromLabel.setText("from: " + path);
+		}
 	}
 	
 	/** 
@@ -290,5 +295,20 @@ public class SuperModel {
 	 */
 	public boolean hasGUI() {
 		return this.hasGUI;
+	}
+	
+	public void setIndeterminate(boolean val) {
+		fileProgressModel.setIndeterminate(val);
+		totalProgressModel.setIndeterminate(val);
+	}
+	
+	public void addLoading() {
+		if (hasGUI() && this.shouldUpdate()) {
+			Logger logger = Logger.getLogger("SuperModel");
+			logger.log(Level.FINE, "loading" , copiableList.getCount());
+			String loadingText = String.format("Loading %s files", copiableList.getCount());
+			this.fromLabel.setText(loadingText);
+			this.frame.setTitle(loadingText);
+		}
 	}
 }

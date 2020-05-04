@@ -20,8 +20,8 @@ public class CopyIntoItself implements Checker{
 	 */
 	public boolean handle(Copiable c) {
 		if (c.isFolder()) {
-			Path orig = c.getOrigin().toPath();
-			Path dest = c.getDest().toPath();
+			Path orig = c.getOrigin();
+			Path dest = c.getDest();
 			
 			if (dest.startsWith(orig)) { // checks if dest is sub-folder of orig
 				

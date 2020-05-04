@@ -4,13 +4,19 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.FileStore;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.TreeSet;
+import java.util.function.Consumer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.stream.Stream;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.ArrayUtils;
@@ -18,6 +24,7 @@ import org.apache.commons.lang3.ArrayUtils;
 public class LinkedFolder extends CopiableAbstract{
 	private ArrayList<Copiable> childrens= new ArrayList<>();
 	private long size = 0;
+//	private Logger logger = Logger.getLogger("linkedFolder");
 	
 	/**
 	 * {@link Copiable} folder representation.
@@ -26,50 +33,56 @@ public class LinkedFolder extends CopiableAbstract{
 	 * @param rootDest Destination root
 	 * @param SM {@link SuperModel} that contains some info
 	 */
-	public LinkedFolder(File origin, Path rootOrigin, Path rootDest,SuperModel SM, Copiable parent, int mode) {
+	public LinkedFolder(Path origin, Path rootOrigin, Path rootDest,SuperModel SM, Copiable parent, int mode) {
 		super(origin, rootOrigin, rootDest, SM, parent, mode);
-		
-		FileFilter isFolderFilter = new IsFolderFilter();
-		FileFilter isFileFilter = new IsFileFilter();
-		FileFilter isSymbolicLinkFilter = new IsSymbolicLinkFilter();
-		
-		File[] folders = ArrayUtils.nullToEmpty(origin.listFiles(isFolderFilter), File[].class);
-		File[] files = ArrayUtils.nullToEmpty(origin.listFiles(isFileFilter), File[].class);
-		File[] symbolicLinks = ArrayUtils.nullToEmpty(origin.listFiles(isSymbolicLinkFilter), File[].class);
-		
-		for(int i=0; i<symbolicLinks.length; i++) {
-			File f = symbolicLinks[i];
-			addSymLink(f);
+		 
+		ArrayList<Path> folders = new ArrayList<>();
+		ArrayList<Path> files = new ArrayList<>();
+		ArrayList<Path> symbolicLinks = new ArrayList<>();
+		folders.ensureCapacity(100);
+		files.ensureCapacity(100);
+		files.ensureCapacity(100);
+
+		Stream<Path> fileStream;
+		long time = System.currentTimeMillis();
+		try {
+			fileStream = Files.list(origin);
+			Consumer<Path> fileConsumer = new ChildFileConsumer(files, folders, symbolicLinks);
+			fileStream.forEach(fileConsumer);
+			fileStream.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			fileStream = null;
 		}
 		
-		for(int i=0; i<files.length; i++) {
-			File f = files[i];
-			addFile(f);
+		Iterator<Path> fIterator = symbolicLinks.iterator();
+		while (fIterator.hasNext()) {
+			addSymLink(fIterator.next());
 		}
 		
-		for(int i=0; i<folders.length; i++) {
-			File f = folders[i];
-			addFolder(f);
+		fIterator = files.iterator();
+		while (fIterator.hasNext()) {
+			addFile(fIterator.next());
 		}
+		
+		fIterator = folders.iterator();
+		while (fIterator.hasNext()) {
+			addFolder(fIterator.next());
+		}
+		time = (System.currentTimeMillis() - time);
+//		logger.log(Level.INFO, ""+time);
 	}
-	
-	/**
-	 * {@link Copiable} folder representation.
-	 * @param origin Origin folder path
-	 * @param rootOrigin Origin root path
-	 * @param rootDest Destination root
-	 * @param SM {@link SuperModel} that contains some info
-	 */
-	public LinkedFolder(Path origin, Path rootOrigin, Path rootDest, SuperModel SM, Copiable parent, int mode) {
-		this(origin.toFile(), rootOrigin, rootDest, SM, parent, mode);
-	}
-	
 	/**
 	 * Creates this directory and sub-directories that do not exist
 	 */
 	public void copy() throws IOException {
 		if (!this.wasCopied()) {
-			getDest().mkdir();
+			try {
+				Files.createDirectory(getDest());
+			} catch (FileAlreadyExistsException e){
+				// do nothing
+			}
 			this.setCopied();
 		}
 	}
@@ -86,7 +99,7 @@ public class LinkedFolder extends CopiableAbstract{
 	 * Adds a folder to the childrens array
 	 * @param ch
 	 */
-	private void addFolder(File ch) {
+	private void addFolder(Path ch) {
 		Copiable children = new LinkedFolder(ch, getRootOrigin(), getRootDest(), SM, this, this.getMode());
 		this.childrens.add(children);
 		
@@ -97,7 +110,7 @@ public class LinkedFolder extends CopiableAbstract{
 	 * Adds a file to the childrens array
 	 * @param ch
 	 */
-	private void addFile(File ch) {
+	private void addFile(Path ch) {
 		Copiable children = new LinkedFile(ch, getRootOrigin(), getRootDest(), SM, this, this.getMode());
 		this.childrens.add(children);
 		
@@ -108,33 +121,11 @@ public class LinkedFolder extends CopiableAbstract{
 	 * Adds a symbolic link to the childrens array
 	 * @param ch
 	 */
-	private void addSymLink(File ch) {
+	private void addSymLink(Path ch) {
 		Copiable children = new LinkedSymbolicLink(ch, getRootOrigin(), getRootDest(), SM, this, this.getMode());
 		this.childrens.add(children);
 		
 		updateSize(children.getSize()); // updates the size
-	}
-	
-	/**
-	 * Registers the childrens of this LinkedFolder
-	 * @param ch
-	 */
-	private void registerTree() {
-		if (childrens.size() > 0) {
-			Iterator<Copiable> iterator = childrens.iterator();
-			while (iterator.hasNext()) {
-				Copiable copiable = iterator.next();
-				copiable.register();
-			}
-		}
-	}
-	
-	/**
-	 * Register this folder and it's children
-	 */
-	public void register() {
-		SM.copiableList.register((Copiable) this);
-		registerTree();
 	}
 	
 	/**

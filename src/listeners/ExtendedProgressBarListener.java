@@ -23,6 +23,10 @@ public class ExtendedProgressBarListener implements ChangeListener{
 			progressBar.setLeftString(progressBarModel.getSizeLeft());
 			progressBar.setRightString(progressBarModel.getTimeLeft());
 			progressBar.setValue(progressBarModel.getValue());
+			if (progressBar.isIndeterminate() != progressBarModel.isIndeterminate()) {
+				progressBar.setIndeterminate(progressBarModel.isIndeterminate());
+			}
 		}
+		
 	}
 }

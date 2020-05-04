@@ -11,24 +11,18 @@ import java.nio.file.StandardCopyOption;
 
 public class LinkedSymbolicLink extends CopiableAbstract{
 
-	public LinkedSymbolicLink(File origin, Path rootOrigin, Path rootDest, SuperModel SM, Copiable parent, int mode) {
+	public LinkedSymbolicLink(Path origin, Path rootOrigin, Path rootDest, SuperModel SM, Copiable parent, int mode) {
 		super(origin, rootOrigin, rootDest, SM, parent, mode);
 	}
 	
 	public void copy() throws FileNotFoundException, IOException {
 		if (!this.wasCopied()) {
-			Path tempName = NameFactory.getTemp(this.getDest().toPath());
-			Files.copy(this.getOrigin().toPath(), tempName, LinkOption.NOFOLLOW_LINKS, StandardCopyOption.COPY_ATTRIBUTES);
-			
-			this.getDest().delete();
-			tempName.toFile().renameTo(this.getDest());
+			Files.copy(this.getOrigin(), this.getDest(),
+					LinkOption.NOFOLLOW_LINKS,
+					StandardCopyOption.COPY_ATTRIBUTES,
+					StandardCopyOption.REPLACE_EXISTING);
 			this.setCopied();
 		}
-	}
-
-	@Override
-	public void register() {
-		SM.copiableList.register(this);
 	}
 
 	@Override

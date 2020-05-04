@@ -25,19 +25,8 @@ public class LinkedFile extends CopiableAbstract{
 	 * @param rootDest Destination root
 	 * @param SM {@link SuperModel} that contains some info
 	 */
-	public LinkedFile(File origin, Path rootOrigin, Path rootDest, SuperModel SM, Copiable parent, int mode) {
-		super(origin, rootOrigin, rootDest, SM, parent, mode);
-	}
-	
-	/**
-	 * {@link Copiable} file representation.
-	 * @param origin Origin path
-	 * @param rootOrigin Origin root path
-	 * @param rootDest Destination root
-	 * @param SM {@link SuperModel} that contains some info
-	 */
 	public LinkedFile(Path origin, Path rootOrigin, Path rootDest, SuperModel SM, Copiable parent, int mode) {
-		this(origin.toFile(), rootOrigin, rootDest, SM, parent, mode);
+		super(origin, rootOrigin, rootDest, SM, parent, mode);
 	}
 	
 	/** 
@@ -53,9 +42,9 @@ public class LinkedFile extends CopiableAbstract{
 	}
 	
 	private void handleCopy() throws FileNotFoundException, IOException{
-		Path tempName = NameFactory.getTemp(this.getDest().toPath()); // use a temp name
+		Path tempName = NameFactory.getTemp(this.getDest()); // use a temp name
 		
-		InputStream is = new FileInputStream(this.getOrigin());
+		InputStream is = new FileInputStream(this.getOrigin().toFile());
 		OutputStream os = new FileOutputStream(tempName.toFile());
 		if (SM.hasGUI()) {
 			resetUICopyFile();
@@ -109,8 +98,9 @@ public class LinkedFile extends CopiableAbstract{
 			SM.addCopiedFile();
 		}
 		if (!this.wasSkipped()) {
-			this.getDest().delete();
-			tempName.toFile().renameTo(this.getDest());
+			Files.deleteIfExists(this.getDest());
+			Files.move(tempName, this.getDest(), StandardCopyOption.ATOMIC_MOVE,
+					StandardCopyOption.REPLACE_EXISTING);
 		} else {
 			tempName.toFile().delete();
 		}
@@ -129,17 +119,15 @@ public class LinkedFile extends CopiableAbstract{
 	}
 	
 	/**
-	 * Registers this file in the copiableList.
-	 */
-	public void register() {
-		SM.copiableList.register(this);
-	}
-	
-	/**
 	 * Gets the size of this file.
 	 */
 	public long getSize() {
-		return this.getOrigin().length();
+		try {
+			return Files.size(this.getOrigin());
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			return 0;
+		}
 	}
 	
 	

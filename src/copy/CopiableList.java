@@ -2,47 +2,49 @@ package copy;
 import java.util.ArrayList;
 
 public class CopiableList {
+	private static final int DFAULT_ARRAY_CAPACITY = 1000;
 	private ArrayList<Copiable> allFiles;
 	private long totalSize = 0;
-	private int totalFiles = 0;
-	private int totalFolders = 0;
-	private int totalSymbolicLinks = 0;
+//	private int totalFiles = 0;
+//	private int totalFolders = 0;
+//	private int totalSymbolicLinks = 0;
 	private int lineupPointer = 0;
 	
 	/**
 	 * A list that hold all the copiables that will be copied
 	 */
 	public CopiableList() {
-		this.allFiles = new ArrayList<>();
+		this.allFiles = new ArrayList<>(DFAULT_ARRAY_CAPACITY);
+		this.allFiles.ensureCapacity(DFAULT_ARRAY_CAPACITY);
 	}
 	
 	/**
 	 * Adds to the file count, folder count, or symbolic link count, depending on the copiable.
 	 * @param c
 	 */
-	private void addToCount(Copiable c) {
-		if (c.isFile()) {
-			totalFiles++;
-		} else if(c.isFolder()) {
-			totalFolders++;
-		} else if(c.isSymbolicLink()) {
-			totalSymbolicLinks++;
-		}
-	}
+//	private void addToCount(Copiable c) {
+//		if (c.isFile()) {
+//			totalFiles++;
+//		} else if(c.isFolder()) {
+//			totalFolders++;
+//		} else if(c.isSymbolicLink()) {
+//			totalSymbolicLinks++;
+//		}
+//	}
 	
 	/**
 	 * Removes from the file count, folder count, or symbolic link count, depending on the copiable.
 	 * @param c
 	 */
-	private void removeFromCount(Copiable c) {
-		if (c.isFile()) {
-			totalFiles--;
-		} else if(c.isFolder()) {
-			totalFolders--;
-		} else if(c.isSymbolicLink()) {
-			totalSymbolicLinks--;
-		}
-	}
+//	private void removeFromCount(Copiable c) {
+//		if (c.isFile()) {
+//			totalFiles--;
+//		} else if(c.isFolder()) {
+//			totalFolders--;
+//		} else if(c.isSymbolicLink()) {
+//			totalSymbolicLinks--;
+//		}
+//	}
 	
 	/**
 	 * Adds a copiable to the list, and updates counters.
@@ -50,7 +52,7 @@ public class CopiableList {
 	 */
 	public void register(Copiable c) {
 		allFiles.add(c);
-		addToCount(c);
+//		addToCount(c);
 		totalSize += c.getSize();
 	}
 	
@@ -60,7 +62,7 @@ public class CopiableList {
 	 */
 	public void remove(Copiable c) {
 		this.allFiles.remove(c);
-		removeFromCount(c);
+//		removeFromCount(c);
 		this.totalSize -= c.getSize();
 	}
 	
@@ -69,6 +71,14 @@ public class CopiableList {
 	 */
 	public void movePointer() {
 		this.lineupPointer++;
+	}
+	
+	public int getTotalCopied() {
+		return this.lineupPointer;
+	}
+	
+	public int getNaturalCurrentCopy() {
+		return this.lineupPointer+1;
 	}
 	
 	/** 
@@ -104,7 +114,7 @@ public class CopiableList {
 	 * Gets the number of copiable objects
 	 * @return number of copiables
 	 */
-	public int count() {
+	public int getCount() {
 		return this.allFiles.size();
 	}
 	
@@ -112,25 +122,25 @@ public class CopiableList {
 	 * Gets the number of files.
 	 * @return number of files
 	 */
-	public int getTotalFiles() {
-		return this.totalFiles;
-	}
-	
-	/**
-	 * Gets the number of folders.
-	 * @return number of folders
-	 */
-	public int getTotalFolders() {
-		return this.totalFolders;
-	}
-	
-	/**
-	 * Gets the number of symbolic links.
-	 * @return number of symbolic links
-	 */
-	public int getTotaXlSymbolicLinks() {
-		return this.totalSymbolicLinks;
-	}
+//	public int getTotalFiles() {
+//		return this.totalFiles;
+//	}
+//	
+//	/**
+//	 * Gets the number of folders.
+//	 * @return number of folders
+//	 */
+//	public int getTotalFolders() {
+//		return this.totalFolders;
+//	}
+//	
+//	/**
+//	 * Gets the number of symbolic links.
+//	 * @return number of symbolic links
+//	 */
+//	public int getTotaXlSymbolicLinks() {
+//		return this.totalSymbolicLinks;
+//	}
 	
 	
 }

@@ -1,14 +1,18 @@
 package copy;
 
 import java.io.File;
+import java.io.IOError;
 import java.io.IOException;
+import java.nio.file.CopyOption;
 import java.nio.file.FileStore;
 import java.nio.file.Files;
+import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 
 public abstract class CopiableAbstract implements Copiable{
-	private File origin;
+	private Path origin;
 	private Path rootOrigin;
 	private Path rootDest;
 	private Path coreDestPath;
@@ -28,7 +32,7 @@ public abstract class CopiableAbstract implements Copiable{
 	 * @param SM
 	 * @param mode Copiable mode
 	 */
-	public CopiableAbstract(File origin, Path rootOrigin,
+	public CopiableAbstract(Path origin, Path rootOrigin,
 			Path rootDest, SuperModel SM, Copiable parent, int mode) {
 		this.origin = origin;
 		this.rootOrigin = rootOrigin;
@@ -38,6 +42,15 @@ public abstract class CopiableAbstract implements Copiable{
 		this.parent = parent;
 		
 		setDefaultCoreDestPath();
+		
+		if (SM != null && SM.copiableList != null) {
+			this.register();
+		}
+	}
+	
+	public void register() {
+		SM.copiableList.register(this);
+		SM.addLoading();
 	}
 	
 	public int getMode() {
@@ -66,7 +79,11 @@ public abstract class CopiableAbstract implements Copiable{
 	 *	Deletes this copiable 
 	 */
 	public void deleteThisAndParent() {
-		this.getOrigin().delete();
+		try {
+			Files.deleteIfExists(this.getOrigin());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		if (this.getParent() != null) {
 			this.getParent().deleteThisAndParent();
 		}
@@ -78,12 +95,12 @@ public abstract class CopiableAbstract implements Copiable{
 	 */
 	public void move() throws IOException {
 		// if not able to move then copy
-		boolean moveSucessful = this.getOrigin().renameTo(this.getDest());
-		
-		if(moveSucessful) {
-			this.skip(); // avoid doing the same for the rest of the tree
-						 // those files don't exist anyways so it will throw error
-		} else {  // copy and delete
+		try {
+			Files.move(this.getOrigin(), this.getDest(),
+					StandardCopyOption.ATOMIC_MOVE,
+					StandardCopyOption.REPLACE_EXISTING);
+					this.skip();
+		} catch (IOError e) {
 			copy();
 			deleteThisAndParent();
 		}
@@ -138,23 +155,23 @@ public abstract class CopiableAbstract implements Copiable{
 	
 
 	public boolean destExists() {
-		return this.getDest().exists();
+		return Files.exists(this.getDest(), LinkOption.NOFOLLOW_LINKS);
 	}
 	
-	public File getOrigin() {
+	public Path getOrigin() {
 		return this.origin;
 	}
 	
 	public boolean isSymbolicLink() {
-		return Files.isSymbolicLink(this.getOrigin().toPath());
+		return Files.isSymbolicLink(this.getOrigin());
 	}
 	
 	public boolean isFile() {
-		return !isSymbolicLink() && this.getOrigin().isFile();
+		return !isSymbolicLink() && Files.isRegularFile(this.getOrigin(), LinkOption.NOFOLLOW_LINKS);
 	}
 	
 	public boolean isFolder() {
-		return !isSymbolicLink() && this.getOrigin().isDirectory();
+		return !isSymbolicLink() && Files.isDirectory(this.getOrigin(), LinkOption.NOFOLLOW_LINKS);
 	}
 	
 	public Path getCoreDest() {
@@ -169,8 +186,8 @@ public abstract class CopiableAbstract implements Copiable{
 		return this.rootDest;
 	}
 	
-	public File getDest() {
-		return this.absoluteDest.toFile();
+	public Path getDest() {
+		return this.absoluteDest;
 	}
 	
 	public boolean getOverwriteConfirmation() {

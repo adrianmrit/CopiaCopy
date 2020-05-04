@@ -62,7 +62,7 @@ public interface Copiable extends Comparable<Copiable>{
 	 * Gets the origin {@link File}
 	 * @return the File that represents the origin
 	 */
-	File getOrigin();
+	Path getOrigin();
 	
 	/**
 	 * Gets the core origin {@link Path}
@@ -127,5 +127,5 @@ public interface Copiable extends Comparable<Copiable>{
 	 * Gets the absolute destination
 	 * @return
 	 */
-	File getDest();
+	Path getDest();
 }

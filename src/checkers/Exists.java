@@ -46,7 +46,7 @@ public class Exists implements Checker{
 	 */
 	private void handleFileExistDialog(Copiable c) {
 		if (SM.hasGUI()) {
-			ExistsDialog dialog = ExistsDialogBuilder.getFileExistsDialog(SM.frame, c.getOrigin(), c.getDest());
+			ExistsDialog dialog = ExistsDialogBuilder.getFileExistsDialog(SM.frame, c.getOrigin().toFile(), c.getDest().toFile());
 			dialog.show();
 			String action = dialog.getAction();
 			switch (action) {
@@ -80,7 +80,7 @@ public class Exists implements Checker{
 	 */
 	private void handleFolderExistDialog(Copiable c) {
 		if (SM.hasGUI()) {
-			ExistsDialog dialog = ExistsDialogBuilder.getFolderExistsDialog(SM.frame, c.getOrigin(), c.getDest());
+			ExistsDialog dialog = ExistsDialogBuilder.getFolderExistsDialog(SM.frame, c.getOrigin().toFile(), c.getDest().toFile());
 			dialog.show();
 			String action = dialog.getAction();
 			switch (action) {
@@ -113,7 +113,7 @@ public class Exists implements Checker{
 	 */
 	private void handleSymbolicLinkExistDialog(Copiable c) {
 		if (SM.hasGUI()) {
-			ExistsDialog dialog = ExistsDialogBuilder.getSymbolicLinkExistsDialog(SM.frame, c.getOrigin(), c.getDest());
+			ExistsDialog dialog = ExistsDialogBuilder.getSymbolicLinkExistsDialog(SM.frame, c.getOrigin().toFile(), c.getDest().toFile());
 			dialog.show();
 			String action = dialog.getAction();
 			switch (action) {

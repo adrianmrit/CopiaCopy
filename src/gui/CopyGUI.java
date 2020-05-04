@@ -9,6 +9,7 @@ import java.awt.Insets;
 import java.awt.LayoutManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.lang.reflect.InvocationTargetException;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -30,6 +31,7 @@ import components.DefaultButton;
 import components.ExtendedProgressBar;
 import components.ExtendedProgressBarUI;
 import copy.CopiableList;
+import copy.CopiableLoader;
 import copy.Copy;
 import copy.SuperModel;
 import listeners.ExtendedProgressBarListener;
@@ -72,7 +74,7 @@ public class CopyGUI implements Runnable{
 	}
 	
 	public void run() {
-		final JFrame frame = new JFrame("Copy Sample");
+		final JFrame frame = new JFrame("Copy");
 		final JPanel content = new JPanel();
 		LayoutManager layout = new BoxLayout (content, BoxLayout.Y_AXIS);
 		content.setLayout(layout);
@@ -91,8 +93,8 @@ public class CopyGUI implements Runnable{
 			e.printStackTrace ();
 		}	
 		
-		JLabel nameLabel = new JLabel("name:", SwingConstants.LEFT);
-		JLabel infoLabel = new JLabel("copied: ", SwingConstants.LEFT);
+		JLabel nameLabel = new JLabel("", SwingConstants.LEFT);
+		JLabel infoLabel = new JLabel("", SwingConstants.LEFT);
 		ExtendedProgressBarModel fileProgressModel = new ExtendedProgressBarModel();
 		LongProgressBarModel totalProgressModel = new LongProgressBarModel();
 		
@@ -145,11 +147,6 @@ public class CopyGUI implements Runnable{
 		labelsBox.add(Box.createVerticalStrut(5));
 		labelsBox.add(infoLabel, BorderLayout.CENTER);
 		labelsBox.add(Box.createVerticalStrut(5));
-		
-		JLabel sizeCopiedLabel = new JLabel("200mb/1GB", SwingConstants.LEFT);
-		JLabel timeLeftLabel = new JLabel("00:01:59", SwingConstants.RIGHT);
-		sizeCopiedLabel.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
-		timeLeftLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 5));
 		
 		JPanel labelsAndHPBarPanel = new JPanel();
 		labelsAndHPBarPanel.setLayout(new GridBagLayout());
@@ -217,8 +214,12 @@ public class CopyGUI implements Runnable{
 		cancelButton.addActionListener(cancelListener);
 		skipButton.addActionListener(skipListener);
 		
+		fileCopyProgressBar.setIndeterminate(true);
+		totalCopyProgressBar.setIndeterminate(true);
+		
 		copyThread = new Copy(SM);
-		copyThread.addToCopy(this.orig, this.dest, this.mode);
+		CopiableLoader loader = new CopiableLoader(SM, this.orig, this.dest, this.mode);
+		copyThread.addToCopy(loader);
 		copyThread.doInBackground();
 	}
 }

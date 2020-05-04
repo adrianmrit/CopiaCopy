@@ -8,8 +8,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.file.FileStore;
 import java.nio.file.Files;
+import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -37,7 +39,7 @@ public class Copy extends SwingWorker{
 
 	private SuperModel SM;
 	private Handlers checkers;
-	
+	private CopiableLoader loader;
 	/**
 	 * Intermediate between copiables and the GUI
 	 * @param SM Model that holds some global data
@@ -53,21 +55,25 @@ public class Copy extends SwingWorker{
 	 * @param dest parent destination path
 	 * @param mode {@link Copiable#COPY_MODE} or {@link Copiable#CUT_MODE}
 	 */
-	public void addToCopy(String orig, String dest, int mode){
-		File origF = new File(orig);
-		File destF = new File(dest);
-		
-		Copiable f;
-		
-		if (Files.isSymbolicLink(origF.toPath())) {
-			f = new LinkedSymbolicLink(origF, origF.getParentFile().toPath(), destF.toPath(), SM, null, mode);
-		} else if (origF.isFile()) {
-			f = new LinkedFile(origF, origF.getParentFile().toPath(), destF.toPath(), SM, null, mode);
-		} else {
-			f = new LinkedFolder(origF, origF.getParentFile().toPath(), destF.toPath(), SM, null, mode);
-		}
-		
-		f.register();
+//	public void addToCopy(String orig, String dest, int mode){
+//		Path origF = Paths.get(orig);
+//		Path destF = Paths.get(dest);
+//		
+//		Copiable f;
+//		
+//		if (Files.isSymbolicLink(origF)) {
+//			f = new LinkedSymbolicLink(origF, origF.getParent(), destF, SM, null, mode);
+//		} else if (Files.isRegularFile(origF, LinkOption.NOFOLLOW_LINKS)) {
+//			f = new LinkedFile(origF, origF.getParent(), destF, SM, null, mode);
+//		} else {
+//			f = new LinkedFolder(origF, origF.getParent(), destF, SM, null, mode);
+//		}
+//		
+////		f.register();
+//	}
+	
+	public void addToCopy(CopiableLoader loader){
+		this.loader = loader;
 	}
 	
 	/**
@@ -76,19 +82,19 @@ public class Copy extends SwingWorker{
 	 * @param dest parent destination path
 	 * @param mode {@link Copiable#COPY_MODE} or {@link Copiable#CUT_MODE}
 	 */
-	public void addToCopy(Path orig, Path dest, int mode) throws IOException {
-		this.addToCopy(orig.toString(), dest.toString(), mode);
-	}
-	
-	/**
-	 * Creates a copiable and add it to the list.
-	 * @param orig origin file
-	 * @param dest parent destination file
-	 * @param mode {@link Copiable#COPY_MODE} or {@link Copiable#CUT_MODE}
-	 */
-	public void addToCopy(File orig, File dest, int mode) throws IOException {
-		this.addToCopy(orig.toString(), dest.toString(), mode);
-	}
+//	public void addToCopy(Path orig, Path dest, int mode) throws IOException {
+//		this.addToCopy(orig.toString(), dest.toString(), mode);
+//	}
+//	
+//	/**
+//	 * Creates a copiable and add it to the list.
+//	 * @param orig origin file
+//	 * @param dest parent destination file
+//	 * @param mode {@link Copiable#COPY_MODE} or {@link Copiable#CUT_MODE}
+//	 */
+//	public void addToCopy(File orig, File dest, int mode) throws IOException {
+//		this.addToCopy(orig.toString(), dest.toString(), mode);
+//	}
 	
 	/** Sets the debug status
 	 * @param debug status
@@ -101,6 +107,9 @@ public class Copy extends SwingWorker{
 	 * Used to run the copy in a thread
 	 */
 	public Object doInBackground() {
+		loader.load();
+		this.SM.fileProgressModel.setIndeterminate(false);
+		this.SM.totalProgressModel.setIndeterminate(false);
 		int exitStatus = 0;
 		
 		try {
@@ -155,7 +164,9 @@ public class Copy extends SwingWorker{
 	}
 	
 	private void initTotalBar() {
-		SM.totalProgressModel.setLongMaximum(SM.copiableList.getTotalSize());
+		if (SM.hasGUI()) {
+			SM.totalProgressModel.setLongMaximum(SM.copiableList.getTotalSize());
+		}
 	}
 	
 	/**

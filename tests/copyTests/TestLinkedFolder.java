@@ -16,7 +16,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import copy.Copiable;
+import copy.CopiableList;
 import copy.LinkedFolder;
+import copy.SuperModel;
 import testFiles.FileFactory;
 
 class TestLinkedFolder {
