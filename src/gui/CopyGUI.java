@@ -40,6 +40,9 @@ import mdlaf.MaterialLookAndFeel;
 import mdlaf.components.progressbar.MaterialProgressBarUI;
 import mdlaf.themes.MaterialLiteTheme;
 import mdlaf.themes.MaterialTheme;
+import mdlaf.utils.MaterialBorders;
+import mdlaf.utils.MaterialColors;
+import net.miginfocom.swing.MigLayout;
 
 public class CopyGUI implements Runnable{
 	private static boolean DEBUG = false;
@@ -58,14 +61,6 @@ public class CopyGUI implements Runnable{
 		this.mode = mode;
 	}
 	
-	private static void addComponent(Container container, Component component,
-			int gridx, int gridy, int gridwidth, int gridheight, int anchor,
-			int fill) {
-			GridBagConstraints gbc = new GridBagConstraints(gridx, gridy,
-			gridwidth, gridheight, 1.0, 1.0, anchor, fill, insets, 0, 0);
-			container.add(component, gbc);
-	}
-	
 	/** Sets the debug status
 	 * @param debug status
 	 */
@@ -76,10 +71,15 @@ public class CopyGUI implements Runnable{
 	public void run() {
 		final JFrame frame = new JFrame("Copy");
 		final JPanel content = new JPanel();
-		LayoutManager layout = new BoxLayout (content, BoxLayout.Y_AXIS);
+		LayoutManager layout = new MigLayout("gap 0 0 0 0, fill");
 		content.setLayout(layout);
 		frame.setContentPane(content);
-		UIManager.put("ProgressBar.verticalSize", new Dimension(12, 146));
+		
+		// avoids
+		// Exception in thread "main" java.lang.ClassCastException: java.lang.Integer cannot be cast to java.awt.Dimension
+		// DO NOT REMOVE NEXT LINE
+		UIManager.put("ProgressBar.verticalSize", new Dimension(12, 146)); 		
+		// DO NOT REMOVE PREVIOUS LINE
 		
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
@@ -95,12 +95,14 @@ public class CopyGUI implements Runnable{
 		
 		JLabel nameLabel = new JLabel("", SwingConstants.LEFT);
 		JLabel infoLabel = new JLabel("", SwingConstants.LEFT);
+		
 		ExtendedProgressBarModel fileProgressModel = new ExtendedProgressBarModel();
 		LongProgressBarModel totalProgressModel = new LongProgressBarModel();
 		
 		
 		ExtendedProgressBar fileCopyProgressBar = new ExtendedProgressBar(fileProgressModel);
 		fileCopyProgressBar.setUI(new ExtendedProgressBarUI(fileCopyProgressBar));
+		
 		ChangeListener fileProgressListener = new LongProgressBarListener(fileCopyProgressBar);
 		ChangeListener extendedProgressListener = new ExtendedProgressBarListener(fileCopyProgressBar);
 		fileProgressModel.addChangeListener(fileProgressListener);
@@ -135,37 +137,23 @@ public class CopyGUI implements Runnable{
 		JButton pauseButton = new DefaultButton("Pause");
 		JButton skipButton = new DefaultButton("Skip");
 		JButton cancelButton = new DefaultButton("Cancel");
+
+		final JPanel rightContent = new JPanel();
+		rightContent.setLayout(new MigLayout());
+		rightContent.add(nameLabel, "span");
+		rightContent.add(fileCopyProgressBar, "span, width 100%-6!, height 40px!");
+		rightContent.add(infoLabel, "span");
 		
-		Box buttonsBox = Box.createHorizontalBox();
-		buttonsBox.add(moreButton, BorderLayout.CENTER);
-		buttonsBox.add(Box.createHorizontalGlue(), BorderLayout.CENTER);
-		buttonsBox.add(pauseButton, BorderLayout.CENTER);
-		buttonsBox.add(skipButton, BorderLayout.CENTER);
-		buttonsBox.add(cancelButton, BorderLayout.CENTER);
+		final JPanel bottomContent = new JPanel();
+		bottomContent.setLayout(new MigLayout("fill"));
+		bottomContent.add(moreButton, "push 200");
+		bottomContent.add(pauseButton, "");
+		bottomContent.add(skipButton, "");
+		bottomContent.add(cancelButton, "");
 		
-		Box labelsBox = Box.createVerticalBox();
-		labelsBox.add(Box.createVerticalStrut(5));
-		labelsBox.add(infoLabel, BorderLayout.CENTER);
-		labelsBox.add(Box.createVerticalStrut(5));
-		
-		JPanel labelsAndHPBarPanel = new JPanel();
-		labelsAndHPBarPanel.setLayout(new GridBagLayout());
-		addComponent(labelsAndHPBarPanel, nameLabel, 0, 0, 1, 1, GridBagConstraints.CENTER, GridBagConstraints.BOTH);
-		
-		addComponent(labelsAndHPBarPanel, fileCopyProgressBar, 0, 1, 1, 1, GridBagConstraints.CENTER, GridBagConstraints.BOTH);
-		
-		addComponent(labelsAndHPBarPanel, labelsBox, 0, 2, 1, 1, GridBagConstraints.CENTER, GridBagConstraints.BOTH);
-		labelsAndHPBarPanel.setPreferredSize(new Dimension(WINDOWS_WIDTH/3, 0));
-		
-		Box topContent = Box.createHorizontalBox();
-		topContent.add(totalCopyProgressBar);
-		topContent.add(Box.createHorizontalStrut(5));
-		topContent.add(labelsAndHPBarPanel);
-		
-		content.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-		content.add(topContent, BorderLayout.CENTER);
-		content.add(Box.createVerticalStrut(5));
-		content.add(buttonsBox, BorderLayout.CENTER);
+		content.add(bottomContent, "dock south, width 100%!");
+		content.add(totalCopyProgressBar, "dock west, gapx 6 0, gaptop 6");
+		content.add(rightContent, "dock north, width 80%+7!, gapx 0 0");
 		
 		
 		totalCopyProgressBar.setPreferredSize(new Dimension(WINDOWS_WIDTH/6, 0));
@@ -213,11 +201,6 @@ public class CopyGUI implements Runnable{
 		pauseButton.addActionListener(pauseListener);
 		cancelButton.addActionListener(cancelListener);
 		skipButton.addActionListener(skipListener);
-		
-		fileCopyProgressBar.setIndeterminate(true);
-		totalCopyProgressBar.setIndeterminate(true);
-		fileProgressModel.setStringPainted(false);
-		totalProgressModel.setStringPainted(false);
 		
 		copyThread = new Copy(SM);
 		CopiableLoader loader = new CopiableLoader(SM, this.orig, this.dest, this.mode);
