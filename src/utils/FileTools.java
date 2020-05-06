@@ -6,7 +6,10 @@ import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import org.apache.commons.lang3.StringUtils;
+
 public class FileTools{
+	public static final String[] PATH_SEPARATORS = new String[] {"/", "\\"};
 	
 	/**
 	 * Checks if a path is valid or not
@@ -23,6 +26,25 @@ public class FileTools{
 		} catch (InvalidPathException e) {
 			return false;
 		}
+	}
+	
+	/**
+	 * Checks if the given string is a valid file name but not a path.
+	 * @param fileName string to be checked
+	 * @return true if its valid, false otherwise
+	 */
+	public static boolean isValidFileName(String fileName) {
+		for (String c:PATH_SEPARATORS) {  // checks that is it not a path
+			if (fileName.contains(c)){
+				return false;
+			}
+		}
+		
+		if (isValidPath(fileName)) {  // checks whether the name contains valid characters
+			return false;
+		}
+		
+		return true;
 	}
 	
 	/**

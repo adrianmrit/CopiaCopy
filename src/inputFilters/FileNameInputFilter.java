@@ -86,7 +86,7 @@ public class FileNameInputFilter extends DocumentFilter {
 	
 	private String checkInput(String proposedValue, int offset) {
 		
-		boolean isValid = FileTools.isValidPath(proposedValue);
+		boolean isValid = FileTools.isValidFileName(proposedValue);
 
 		
 		if (isValid) {
