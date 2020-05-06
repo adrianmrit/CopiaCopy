@@ -1,20 +1,13 @@
 package gui;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.Insets;
 import java.awt.LayoutManager;
-import java.awt.LayoutManager2;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.Date;
 
-import javax.swing.Box;
-import javax.swing.BoxLayout;
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -22,7 +15,6 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.SwingConstants;
 import javax.swing.text.AbstractDocument;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
@@ -35,6 +27,7 @@ import icons.ArrowIconBottom;
 import icons.ArrowIconRight;
 import icons.IcoHelpers;
 import inputFilters.FileNameInputFilter;
+import net.miginfocom.swing.MigLayout;
 
 public class ExistsDialog extends AbstractDialog{
 	private File origin;
@@ -42,8 +35,8 @@ public class ExistsDialog extends AbstractDialog{
 	private String windowsTitle;
 	private String title;
 	private String message;
-	private Box replaceWithBox;
-	private Box originalBox;
+	private JPanel replaceWithBox;
+	private JPanel originalBox;
 	private Document renamedTextDocument;
 	private final String RENAME_TOGGLE_MESSAGE = "<HTML><p><b>Select a new name for this destination</b></p></HTML>";
 	private final String RENAME_BUTTON_MESSAGE = "Rename";
@@ -79,11 +72,11 @@ public class ExistsDialog extends AbstractDialog{
 	}
 	
 	public void setReplaceWithBox(File f) {
-		this.replaceWithBox = getFileBox(f, "Replace with");
+		this.replaceWithBox = getFilePanel(f, "Replace with");
 	}
 	
 	public void setOriginalBox(File f) {
-		this.originalBox = getFileBox(f, "Original");
+		this.originalBox = getFilePanel(f, "Original");
 	}
 	
 	public void setCancelButton(String name, String action) {
@@ -108,7 +101,7 @@ public class ExistsDialog extends AbstractDialog{
 	}
 	
 	
-	private Box getFileBox(File f, String label) {
+	private JPanel getFilePanel(File f, String label) {
 		String origSizeString;
 		if (f.isFile()) {
 			double fileSize = SizeRep.readableVal(f.length());
@@ -137,16 +130,18 @@ public class ExistsDialog extends AbstractDialog{
 		JLabel origModLabel = new JLabel(String.format("%1$tF %1$tr", lastMod));
 		
 		// Origin file container
-		Box fileBox = Box.createVerticalBox();
+		final JPanel fileBox = new JPanel();
+		fileBox.setLayout(new MigLayout("fill, hidemode 2"));
+
 		Icon ico = IcoHelpers.loadFileIco(f);
 		
 		JLabel icoLabel = new JLabel(ico);
 		
-		fileBox.add(icoLabel, BorderLayout.CENTER);
-		fileBox.add(origLabel, BorderLayout.CENTER);
-		fileBox.add(origSizeLabel, BorderLayout.CENTER);
-		fileBox.add(lastModLabel, BorderLayout.CENTER);
-		fileBox.add(origModLabel, BorderLayout.CENTER);
+		fileBox.add(icoLabel, "span, align center");
+		fileBox.add(origLabel, "span, align center");
+		fileBox.add(origSizeLabel, "span, align center");
+		fileBox.add(lastModLabel, "span, align center");
+		fileBox.add(origModLabel, "span, align center");
 		
 		return fileBox;
 	}
@@ -167,12 +162,15 @@ public class ExistsDialog extends AbstractDialog{
 	}
 	
 	public void show() {
-		
 		this.getParent().setEnabled(false);
 		this.setJDialog(new JDialog(this.getParent(), windowsTitle, true));
 		this.getJDialog().setLayout(new GridBagLayout());
 		this.getJDialog().setResizable(false);
 		this.getJDialog().setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+		final JPanel content = new JPanel();
+		LayoutManager layout = new MigLayout("gap 0 0 0 0, fill");
+		content.setLayout(layout);
+		this.getJDialog().setContentPane(content);
 		
 		/*************************************
 		 * Message Section
@@ -181,9 +179,9 @@ public class ExistsDialog extends AbstractDialog{
 		JLabel titleLabel = new JLabel(this.title);
 		JLabel messageLabel = new JLabel(this.message);
 		
-		Box messagesBox = Box.createVerticalBox();
-		messagesBox.add(titleLabel, BorderLayout.CENTER);
-		messagesBox.add(messageLabel, BorderLayout.CENTER);
+//		Box messagesBox = Box.createVerticalBox();
+//		messagesBox.add(titleLabel, BorderLayout.CENTER);
+//		messagesBox.add(messageLabel, BorderLayout.CENTER);
 		/*************************************
 		 * End Message Section
 		 ************************************/
@@ -192,16 +190,8 @@ public class ExistsDialog extends AbstractDialog{
 		 * Files Section
 		 ************************************/
 		
-		Box replaceBox = getFileBox(this.dest, "Replace with");
-		Box origBox = getFileBox(this.origin, "Original");
-		
-		// Files boxes container
-		Box filesBox = Box.createHorizontalBox();
-		filesBox.add(Box.createHorizontalGlue(), BorderLayout.CENTER);
-		filesBox.add(origBox, BorderLayout.CENTER);
-		filesBox.add(Box.createHorizontalGlue(), BorderLayout.CENTER);
-		filesBox.add(replaceBox, BorderLayout.CENTER);
-		filesBox.add(Box.createHorizontalGlue(), BorderLayout.CENTER);
+		JPanel replacePanel = getFilePanel(this.dest, "Replace with");
+		JPanel origPanel = getFilePanel(this.origin, "Original");
 		
 		/*************************************
 		 * End Files Section
@@ -223,22 +213,20 @@ public class ExistsDialog extends AbstractDialog{
 		JLabel renameErrorLabel = new JLabel("");
 		renameErrorLabel.setVisible(false);
 
-		renameField.setMargin(new Insets(0,0,0,0));
-		Box renameBox = Box.createHorizontalBox();
-		renameBox.add(Box.createRigidArea(new Dimension(100, 0)), BorderLayout.CENTER);
-		renameBox.add(renameField, BorderLayout.CENTER);
-		renameBox.add(renameButton, BorderLayout.CENTER);
-		renameBox.add(Box.createRigidArea(new Dimension(100, 0)), BorderLayout.CENTER);
+		final JPanel renamePanel = new JPanel();
+		renamePanel.setLayout(new MigLayout("fill, hidemode 2"));
+		renamePanel.add(renameField, "gapleft push, width 60%!, height 30px!");
+		renamePanel.add(renameButton, "gapright push, height 30px!");
 
-		renameBox.setVisible(false);
+		renamePanel.setVisible(false);
 		
 		ActionListener toggleRenameListener = new ActionListener() {
 			public void actionPerformed(ActionEvent actionEvent) {
-				if(renameBox.isVisible()) {
-					renameBox.setVisible(false);
+				if(renamePanel.isVisible()) {
+					renamePanel.setVisible(false);
 					renameToggleButton.setIcon(icoUnnactive);
 				} else {
-					renameBox.setVisible(true);
+					renamePanel.setVisible(true);
 					renameToggleButton.setIcon(icoActive);
 				}
 			}
@@ -256,27 +244,25 @@ public class ExistsDialog extends AbstractDialog{
 		/*************************************
 		 * Buttons Section
 		 ************************************/
-
-		Box buttonsBox = Box.createHorizontalBox();
-		buttonsBox.add(cancelButton, BorderLayout.CENTER);
-		buttonsBox.add(Box.createHorizontalGlue(), BorderLayout.CENTER);
-		buttonsBox.add(skipButton, BorderLayout.CENTER);
-		buttonsBox.add(mrButton, BorderLayout.SOUTH);
+		final JPanel buttonsBox = new JPanel();
+		buttonsBox.setLayout(new MigLayout("fill"));
+		
+		buttonsBox.add(cancelButton, "push 200");
+		buttonsBox.add(skipButton);
+		buttonsBox.add(mrButton);
 
 		/*************************************
 		 * End Buttons Section
 		 ************************************/
+		content.add(titleLabel, "dock north");
+		content.add(messageLabel, "dock north");
+		content.add(origPanel, "gapleft push, width 50%!");
+		content.add(replacePanel, "gapright push, width 50%!, wrap");
+		content.add(renameToggleButton, "span, align center");
+		content.add(renamePanel, "span, width 100%!");
+		content.add(buttonsBox, "span, dock south");
 		
-		Insets insets = new Insets(20, 20, 20, 20);
-		
-		GUIHelpers.addComponent(this.getJDialog(), messagesBox, 0, 0, 1, 1, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, insets);
-		GUIHelpers.addComponent(this.getJDialog(), filesBox, 0, 1, 1, 1, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, insets);
-		GUIHelpers.addComponent(this.getJDialog(), renameToggleButton, 0, 2, 1, 1, GridBagConstraints.SOUTH, GridBagConstraints.HORIZONTAL, insets);
-		GUIHelpers.addComponent(this.getJDialog(), renameBox, 0, 3, 1, 1, GridBagConstraints.SOUTH, GridBagConstraints.HORIZONTAL, insets);
-		GUIHelpers.addComponent(this.getJDialog(), renameErrorLabel, 0, 4, 1, 1, GridBagConstraints.SOUTH, GridBagConstraints.HORIZONTAL, insets);
-		GUIHelpers.addComponent(this.getJDialog(), buttonsBox, 0, 5, 1, 1, GridBagConstraints.SOUTH, GridBagConstraints.HORIZONTAL, insets);
-		
-		setSize(700, 500);
+		setSize(600, 450);
 		showDialog();
 	}
 
