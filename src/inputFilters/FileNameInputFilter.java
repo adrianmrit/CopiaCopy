@@ -1,5 +1,8 @@
 package inputFilters;
 
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.text.AttributeSet;
@@ -7,10 +10,14 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.DocumentFilter;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
+
+import utils.FileTools;
+
 public class FileNameInputFilter extends DocumentFilter {
 	private String currentValue;
 	private String initialValue;
-	private static final String[] invalidCharacters = new String[] {"/", "\\"};
 	private JLabel errorLabel;
 	private JButton submitButton;
 	
@@ -59,8 +66,8 @@ public class FileNameInputFilter extends DocumentFilter {
 			fb.replace(offset, length, text, attrs);
 	}
 	
-	private void handleInvalid(int invalidCharIndex) {
-		this.errorLabel.setText(invalidCharacters[invalidCharIndex] + " is not a valid character.");
+	private void handleInvalid(String proposedValue) {
+		this.errorLabel.setText(String.format("%s is not a valid name", proposedValue));
 		this.errorLabel.setVisible(true);
 		this.submitButton.setEnabled(false);
 		
@@ -78,20 +85,14 @@ public class FileNameInputFilter extends DocumentFilter {
 	}
 	
 	private String checkInput(String proposedValue, int offset) {
-		int invalidChar = -1;
-		boolean invalid = false;
-
-		for (int i=0; i<invalidCharacters.length; i++) {
-			if (proposedValue.contains(invalidCharacters[i])) {
-				invalid = true;
-				invalidChar = i;
-			}
-		}
 		
-		if (invalid) {
-			handleInvalid(invalidChar);
-		} else {
+		boolean isValid = FileTools.isValidPath(proposedValue);
+
+		
+		if (isValid) {
 			handleValid(proposedValue);
+		} else {
+			handleInvalid(proposedValue);
 		}
 		
 		return proposedValue;
