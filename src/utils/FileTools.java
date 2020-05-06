@@ -37,7 +37,7 @@ public class FileTools{
 			}
 		}
 		
-		if (isValidPath(fileName)) {  // checks whether the name contains valid characters
+		if (!isValidPath(fileName)) {  // checks whether the name contains valid characters
 			return false;
 		}
 		
