@@ -17,9 +17,6 @@ public class FileTools{
 	 * @return true if path is valid, false otherwise
 	 */
 	public static boolean isValidPath(String path) {
-		if (path.contains("0")) {
-			return false;
-		}
 		try {
 			Paths.get(path);
 			return true;
