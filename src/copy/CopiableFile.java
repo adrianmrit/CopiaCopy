@@ -17,7 +17,7 @@ import org.apache.commons.io.FileUtils;
 
 import utils.TimerFormater;
 
-public class LinkedFile extends CopiableAbstract{
+public class CopiableFile extends CopiableAbstract{
 	/**
 	 * {@link Copiable} file representation.
 	 * @param origin Origin file
@@ -25,7 +25,7 @@ public class LinkedFile extends CopiableAbstract{
 	 * @param rootDest Destination root
 	 * @param SM {@link SuperModel} that contains some info
 	 */
-	public LinkedFile(Path origin, Path rootOrigin, Path rootDest, SuperModel SM, Copiable parent, int mode) {
+	public CopiableFile(Path origin, Path rootOrigin, Path rootDest, SuperModel SM, Copiable parent, int mode) {
 		super(origin, rootOrigin, rootDest, SM, parent, mode);
 	}
 	

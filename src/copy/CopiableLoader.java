@@ -33,11 +33,11 @@ public class CopiableLoader implements Runnable{
 	public void run() {
 		
 		if (Files.isSymbolicLink(orig)) {
-			new LinkedSymbolicLink(orig, orig.getParent(), dest, SM, null, mode);
+			new CopiableSymbolicLink(orig, orig.getParent(), dest, SM, null, mode);
 		} else if (Files.isRegularFile(orig, LinkOption.NOFOLLOW_LINKS)) {
-			new LinkedFile(orig, orig.getParent(), dest, SM, null, mode);
+			new CopiableFile(orig, orig.getParent(), dest, SM, null, mode);
 		} else {
-			new LinkedFolder(orig, orig.getParent(), dest, SM, null, mode);
+			new CopiableFolder(orig, orig.getParent(), dest, SM, null, mode);
 		}
 		
 	}

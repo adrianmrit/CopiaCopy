@@ -21,7 +21,7 @@ import java.util.stream.Stream;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.ArrayUtils;
 
-public class LinkedFolder extends CopiableAbstract{
+public class CopiableFolder extends CopiableAbstract{
 	private ArrayList<Copiable> childrens= new ArrayList<>();
 	private long size = 0;
 //	private Logger logger = Logger.getLogger("linkedFolder");
@@ -33,7 +33,7 @@ public class LinkedFolder extends CopiableAbstract{
 	 * @param rootDest Destination root
 	 * @param SM {@link SuperModel} that contains some info
 	 */
-	public LinkedFolder(Path origin, Path rootOrigin, Path rootDest,SuperModel SM, Copiable parent, int mode) {
+	public CopiableFolder(Path origin, Path rootOrigin, Path rootDest,SuperModel SM, Copiable parent, int mode) {
 		super(origin, rootOrigin, rootDest, SM, parent, mode);
 		 
 		ArrayList<Path> folders = new ArrayList<>();
@@ -100,7 +100,7 @@ public class LinkedFolder extends CopiableAbstract{
 	 * @param ch
 	 */
 	private void addFolder(Path ch) {
-		Copiable children = new LinkedFolder(ch, getRootOrigin(), getRootDest(), SM, this, this.getMode());
+		Copiable children = new CopiableFolder(ch, getRootOrigin(), getRootDest(), SM, this, this.getMode());
 		this.childrens.add(children);
 		
 		updateSize(children.getSizeRec()); // updates the size
@@ -111,7 +111,7 @@ public class LinkedFolder extends CopiableAbstract{
 	 * @param ch
 	 */
 	private void addFile(Path ch) {
-		Copiable children = new LinkedFile(ch, getRootOrigin(), getRootDest(), SM, this, this.getMode());
+		Copiable children = new CopiableFile(ch, getRootOrigin(), getRootDest(), SM, this, this.getMode());
 		this.childrens.add(children);
 		
 		updateSize(children.getSize()); // updates the size
@@ -122,7 +122,7 @@ public class LinkedFolder extends CopiableAbstract{
 	 * @param ch
 	 */
 	private void addSymLink(Path ch) {
-		Copiable children = new LinkedSymbolicLink(ch, getRootOrigin(), getRootDest(), SM, this, this.getMode());
+		Copiable children = new CopiableSymbolicLink(ch, getRootOrigin(), getRootDest(), SM, this, this.getMode());
 		this.childrens.add(children);
 		
 		updateSize(children.getSize()); // updates the size
