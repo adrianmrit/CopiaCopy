@@ -25,6 +25,7 @@ public class LongProgressBarModel implements BoundedRangeModel{
 	private EventListenerList listenerList;
 	private ChangeEvent changeEvent;
 	private boolean indeterminate = true;
+	private boolean stringPainted = true;
 	
 	/** An extended <b>javax.swing.JProgressBar</b>.
 	 * Allows the use of long type numbers instead of integers 
@@ -257,8 +258,17 @@ public class LongProgressBarModel implements BoundedRangeModel{
 		fireStateChanged();
 	}
 	
+	public void setStringPainted(boolean val) {
+		this.stringPainted  = val;
+		fireStateChanged();
+	}
+	
 	public boolean isIndeterminate() {
 		return this.indeterminate;
+	}
+	
+	public boolean isStringPainted() {
+		return this.stringPainted;
 	}
 	
 }

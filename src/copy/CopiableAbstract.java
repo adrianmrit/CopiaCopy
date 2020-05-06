@@ -3,6 +3,7 @@ package copy;
 import java.io.File;
 import java.io.IOError;
 import java.io.IOException;
+import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.CopyOption;
 import java.nio.file.FileStore;
 import java.nio.file.Files;
@@ -100,7 +101,7 @@ public abstract class CopiableAbstract implements Copiable{
 					StandardCopyOption.ATOMIC_MOVE,
 					StandardCopyOption.REPLACE_EXISTING);
 					this.skip();
-		} catch (IOError e) {
+		} catch (AtomicMoveNotSupportedException e) {
 			copy();
 			deleteThisAndParent();
 		}

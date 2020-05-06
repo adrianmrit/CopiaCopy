@@ -20,9 +20,8 @@ public class LongProgressBarListener implements ChangeListener{
 			LongProgressBarModel progressBarModel = (LongProgressBarModel)source;
 			if (!progressBarModel.getValueIsAdjusting()) {
 				progressBar.setValue(progressBarModel.getValue());
-			}
-			if (progressBar.isIndeterminate() != progressBarModel.isIndeterminate()) {
 				progressBar.setIndeterminate(progressBarModel.isIndeterminate());
+				progressBar.setStringPainted(progressBarModel.isStringPainted());
 			}
 		}
 	}

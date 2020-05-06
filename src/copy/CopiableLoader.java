@@ -9,16 +9,20 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class CopiableLoader implements Runnable{
-	private String orig;
-	private String dest;
+	private Path orig;
+	private Path dest;
 	private int mode;
 	private SuperModel SM;
 	
-	public CopiableLoader(SuperModel SM, String orig, String dest, int mode){
+	public CopiableLoader(SuperModel SM, Path orig, Path dest, int mode){
 		this.SM = SM;
 		this.orig = orig;
 		this.dest = dest;
 		this.mode = mode;
+	}
+	
+	public CopiableLoader(SuperModel SM, String orig, String dest, int mode){
+		this(SM, Paths.get(orig), Paths.get(dest), mode);
 	}
 	
 	public void load(){
@@ -27,15 +31,13 @@ public class CopiableLoader implements Runnable{
 
 	@Override
 	public void run() {
-		Path origF = Paths.get(orig);
-		Path destF = Paths.get(dest);
 		
-		if (Files.isSymbolicLink(origF)) {
-			new LinkedSymbolicLink(origF, origF.getParent(), destF, SM, null, mode);
-		} else if (Files.isRegularFile(origF, LinkOption.NOFOLLOW_LINKS)) {
-			new LinkedFile(origF, origF.getParent(), destF, SM, null, mode);
+		if (Files.isSymbolicLink(orig)) {
+			new LinkedSymbolicLink(orig, orig.getParent(), dest, SM, null, mode);
+		} else if (Files.isRegularFile(orig, LinkOption.NOFOLLOW_LINKS)) {
+			new LinkedFile(orig, orig.getParent(), dest, SM, null, mode);
 		} else {
-			new LinkedFolder(origF, origF.getParent(), destF, SM, null, mode);
+			new LinkedFolder(orig, orig.getParent(), dest, SM, null, mode);
 		}
 		
 	}

@@ -13,16 +13,25 @@ import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 
 import buffer.Buffer;
 import buffer.StaticBuffer;
 import copy.Copiable;
 import copy.CopiableList;
+import copy.CopiableLoader;
 import copy.Copy;
 import copy.SuperModel;
 import testFiles.FileFactory;
+import utils.SystemProps;
 
 class TestMove {
+	
+	@BeforeAll
+	static void setUp() {
+		SystemProps.setBooleanProp("debug", true);
+	}
+	
 	/**
 	 * Empties TestDest and creates it before and after tests
 	 * @throws IOException 
@@ -49,8 +58,11 @@ class TestMove {
 		SuperModel SM = new SuperModel(CL, buffer);
 		Copy c = new Copy(SM);
 		
-		c.addToCopy(FileFactory.FILE_1, FileFactory.TEST_DEST_FOLDER_PARENT, Copiable.CUT_MODE);
-		c.copyAll();
+		CopiableLoader loader = new CopiableLoader(SM, FileFactory.FILE_1,
+				FileFactory.TEST_DEST_FOLDER_PARENT, Copiable.CUT_MODE);
+		
+		c.addToCopy(loader);
+		c.doTheCopy();
 		
 		assertFalse(FileFactory.FILE_1.toFile().exists());
 		
@@ -74,8 +86,11 @@ class TestMove {
 		assertTrue(FileFactory.FILE_1.toFile().exists());
 		assertTrue(FileFactory.FILE_2.toFile().exists());
 		
-		c.addToCopy(FileFactory.TEST_FOLDER, FileFactory.TEST_DEST_FOLDER_PARENT, Copiable.CUT_MODE);
-		c.copyAll();
+		CopiableLoader loader = new CopiableLoader(SM, FileFactory.TEST_FOLDER,
+				FileFactory.TEST_DEST_FOLDER_PARENT, Copiable.CUT_MODE);
+		
+		c.addToCopy(loader);
+		c.doTheCopy();
 		
 		assertFalse(FileFactory.TEST_FOLDER.toFile().exists());
 		assertFalse(FileFactory.SUB_FOLDER.toFile().exists());

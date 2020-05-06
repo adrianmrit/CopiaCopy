@@ -32,10 +32,11 @@ import checkers.Handlers;
 import gui.ExistsDialog;
 import gui.ExistsDialogBuilder;
 import gui.LongProgressBarModel;
+import utils.SystemProps;
 
 
-public class Copy extends SwingWorker{
-	private static boolean DEBUG = false;
+public class Copy extends SwingWorker<Object, Object>{
+	private static boolean DEBUG = SystemProps.getBooleanProp("debug");
 
 	private SuperModel SM;
 	private Handlers checkers;
@@ -103,13 +104,22 @@ public class Copy extends SwingWorker{
 		DEBUG = debug;
 	}
 	
+	public Object doInBackground() {
+		this.doTheCopy();
+		return 0;
+	}
+	
 	/** 
 	 * Used to run the copy in a thread
 	 */
-	public Object doInBackground() {
+	public void doTheCopy() {
 		loader.load();
-		this.SM.fileProgressModel.setIndeterminate(false);
-		this.SM.totalProgressModel.setIndeterminate(false);
+		if (SM.hasGUI()) {
+			this.SM.fileProgressModel.setIndeterminate(false);
+			this.SM.totalProgressModel.setIndeterminate(false);
+			this.SM.fileProgressModel.setStringPainted(true);
+			this.SM.totalProgressModel.setStringPainted(true);
+		}
 		int exitStatus = 0;
 		
 		try {
@@ -139,7 +149,6 @@ public class Copy extends SwingWorker{
 		if(!DEBUG) {
 			System.exit(exitStatus);
 		}
-		return 0;
 	}
 	
 	/** 

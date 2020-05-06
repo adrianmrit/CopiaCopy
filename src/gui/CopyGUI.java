@@ -216,6 +216,8 @@ public class CopyGUI implements Runnable{
 		
 		fileCopyProgressBar.setIndeterminate(true);
 		totalCopyProgressBar.setIndeterminate(true);
+		fileProgressModel.setStringPainted(false);
+		totalProgressModel.setStringPainted(false);
 		
 		copyThread = new Copy(SM);
 		CopiableLoader loader = new CopiableLoader(SM, this.orig, this.dest, this.mode);

@@ -9,11 +9,11 @@ import testFiles.FileFactory;
 
 public class RunCopyGUIArgs {
 	public static void main(String args[]) {		
-//		Path src = FileFactory.TEST_FOLDER;
-//		Path dest = FileFactory.TEST_DEST_FOLDER_PARENT; // must exist
+		Path src = FileFactory.TEST_FOLDER;
+		Path dest = FileFactory.TEST_DEST_FOLDER_PARENT; // must exist
 
-		Path src = Paths.get("/media/adrianmrit/EXTERNAL/Coding");
-		Path dest = Paths.get("/media/adrianmrit/EXTERNAL/escuela"); // must exist
+//		Path src = Paths.get("/media/adrianmrit/EXTERNAL/Coding");
+//		Path dest = Paths.get("/media/adrianmrit/EXTERNAL/escuela"); // must exist
 		
 		CopyGUI.setDebug(true);
 		CopyGUI copy = new CopyGUI(src.toString(), dest.toString(), Copiable.COPY_MODE);
