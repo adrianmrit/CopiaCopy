@@ -8,12 +8,24 @@ import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+/**
+ * A loader for copiables. If the origin is a folder, loads this folder
+ * and it's content. It can also load in a separate thread.
+ * @author adrianmrit
+ */
 public class CopiableLoader implements Runnable{
 	private Path orig;
 	private Path dest;
 	private int mode;
 	private SuperModel SM;
 	
+	/**
+	 * Creates a CopiableLoader that can load copiables in the future
+	 * @param SM
+	 * @param orig Origin copiable
+	 * @param dest Destination path
+	 * @param mode {@link Copiable#COPY_MODE} or {@link Copiable#CUT_MODE}
+	 */
 	public CopiableLoader(SuperModel SM, Path orig, Path dest, int mode){
 		this.SM = SM;
 		this.orig = orig;
@@ -21,14 +33,27 @@ public class CopiableLoader implements Runnable{
 		this.mode = mode;
 	}
 	
+	/**
+	 * Creates a CopiableLoader that can load copiables in the future
+	 * @param SM
+	 * @param orig Origin copiable
+	 * @param dest Destination path
+	 * @param mode {@link Copiable#COPY_MODE} or {@link Copiable#CUT_MODE}
+	 */
 	public CopiableLoader(SuperModel SM, String orig, String dest, int mode){
 		this(SM, Paths.get(orig), Paths.get(dest), mode);
 	}
 	
+	/**
+	 * Loads the copiables, same as {@link #run()}
+	 */
 	public void load(){
 		run();
 	}
 
+	/**
+	 * Loads the copiables, same as {@link #load()}
+	 */
 	@Override
 	public void run() {
 		

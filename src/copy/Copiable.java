@@ -19,8 +19,15 @@ public interface Copiable extends Comparable<Copiable>{
 	 */
 	void paste() throws FileNotFoundException, IOException;
 	
+	/**
+	 * Deletes this copiable and tries to delete its parent
+	 */
 	void deleteThisAndParent();
 	
+	/**
+	 * Gets the mode, {@link #COPY_MODE} or {@link #CUT_MODE}.
+	 * @return The copiable mode
+	 */
 	int getMode();
 	
 	/**
