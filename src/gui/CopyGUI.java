@@ -1,19 +1,9 @@
 package gui;
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
 import java.awt.LayoutManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.lang.reflect.InvocationTargetException;
 
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
@@ -38,18 +28,15 @@ import listeners.ExtendedProgressBarListener;
 import listeners.LongProgressBarListener;
 import mdlaf.MaterialLookAndFeel;
 import mdlaf.components.progressbar.MaterialProgressBarUI;
-import mdlaf.themes.MaterialLiteTheme;
 import mdlaf.themes.MaterialTheme;
-import mdlaf.utils.MaterialBorders;
-import mdlaf.utils.MaterialColors;
 import net.miginfocom.swing.MigLayout;
+import themes.LiteCustom;
 
 public class CopyGUI implements Runnable{
 	private static boolean DEBUG = false;
 	
-	private static final Insets insets = new Insets(0,0,0,0);
-	private static final int WINDOWS_HEIGHT = 200;
-	private static final int WINDOWS_WIDTH = 600;
+	private static final int WINDOWS_HEIGHT = 180;
+	private static final int WINDOWS_WIDTH = 500;
 	
 	private final String orig;
 	private final String dest;
@@ -85,7 +72,7 @@ public class CopyGUI implements Runnable{
 		
 		try {
 			JDialog.setDefaultLookAndFeelDecorated(true);
-			MaterialTheme theme = new MaterialLiteTheme();
+			MaterialTheme theme = new LiteCustom();
 			UIManager.setLookAndFeel (new MaterialLookAndFeel (theme));
 			content.setBackground(theme.getBackgroundPrimary());
 		}
