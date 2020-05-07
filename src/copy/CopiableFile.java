@@ -113,6 +113,7 @@ public class CopiableFile extends CopiableAbstract{
 	 * like progress bars and labels.
 	 */
 	public void copy() throws IOException {
+		SM.removeCopyQueue(this);
 		if (!this.wasCopied() && this.getConflictAction() != ConflictAction.SKIP) {
 			handleCopy();
 			this.setCopied();
@@ -163,6 +164,16 @@ public class CopiableFile extends CopiableAbstract{
 		if (action != ConflictAction.MERGE) {  // files are not supposed to be merged
 			super.setConflictAction(action);
 		}
+
+		if (action == ConflictAction.SKIP) {
+			SM.removeCopyQueue(this);
+		}
+	}
+	
+	@Override
+	public void register() {
+		super.register();
+		SM.insertCopyQueue(this);
 	}
 
 }

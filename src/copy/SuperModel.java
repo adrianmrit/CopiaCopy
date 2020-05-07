@@ -6,6 +6,7 @@ import java.util.logging.Logger;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.table.TableModel;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -14,6 +15,7 @@ import buffer.Buffer;
 import enums.ConflictAction;
 import gui.ExtendedProgressBarModel;
 import gui.LongProgressBarModel;
+import models.CopyQueueModel;
 import utils.TimerFormater;
 
 public class SuperModel {
@@ -52,6 +54,7 @@ public class SuperModel {
 	 */
 	public final int UPDATE_SPEED = 200; //Ms
 	private ConflictAction forAll = ConflictAction.DEFAULT;
+	private CopyQueueModel copyQueueModel;
 	
 	/**
 	 * Model that hold some data and updates the GUI
@@ -98,6 +101,18 @@ public class SuperModel {
 	public void setFrame(JFrame frame) {
 		this.frame = frame;
 		this.lastGUIUpdate = System.currentTimeMillis();
+	}
+	
+	public void setQueueModel(TableModel copyQueueModel) {
+		this.copyQueueModel = (CopyQueueModel) copyQueueModel;
+	}
+	
+	public void insertCopyQueue(Copiable c) {
+		this.copyQueueModel.insert(c);
+	}
+	
+	public void removeCopyQueue(Copiable c) {
+		this.copyQueueModel.remove(c);
 	}
 	
 	/**

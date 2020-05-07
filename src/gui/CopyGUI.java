@@ -3,6 +3,7 @@ import java.awt.Dimension;
 import java.awt.LayoutManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -10,10 +11,13 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.event.ChangeListener;
+import javax.swing.table.TableModel;
 
 import buffer.Buffer;
 import buffer.StaticBuffer;
@@ -29,13 +33,15 @@ import listeners.LongProgressBarListener;
 import mdlaf.MaterialLookAndFeel;
 import mdlaf.components.progressbar.MaterialProgressBarUI;
 import mdlaf.themes.MaterialTheme;
+import models.CopyQueueModel;
 import net.miginfocom.swing.MigLayout;
+import themes.JMarsDarkCustom;
 import themes.LiteCustom;
 
 public class CopyGUI implements Runnable{
 	private static boolean DEBUG = false;
 	
-	private static final int WINDOWS_HEIGHT = 180;
+	private static final int WINDOWS_HEIGHT = 500;
 	private static final int WINDOWS_WIDTH = 500;
 	
 	private final String orig;
@@ -72,7 +78,7 @@ public class CopyGUI implements Runnable{
 		
 		try {
 			JDialog.setDefaultLookAndFeelDecorated(true);
-			MaterialTheme theme = new LiteCustom();
+			MaterialTheme theme = new JMarsDarkCustom();
 			UIManager.setLookAndFeel (new MaterialLookAndFeel (theme));
 			content.setBackground(theme.getBackgroundPrimary());
 		}
@@ -138,6 +144,34 @@ public class CopyGUI implements Runnable{
 		bottomContent.add(skipButton, "");
 		bottomContent.add(cancelButton, "");
 		
+		final JPanel tableContent = new JPanel();
+		tableContent.setLayout(new MigLayout("fill"));
+		CopyQueueModel copyQueueModel = new CopyQueueModel();
+		
+		JTable fileQueueTable = new JTable(copyQueueModel) {
+			public String getToolTipText(MouseEvent e) {
+				String tip = null;
+				java.awt.Point p = e.getPoint();
+				int rowIndex = rowAtPoint(p);
+				int colIndex = columnAtPoint(p);
+				try {
+					tip = getValueAt(rowIndex, colIndex).toString();
+				} catch (RuntimeException exception) {
+					// catch null pointer exception
+				}
+				
+				return tip;
+			}
+		};
+		
+		JScrollPane fileQueueScrollPane = new JScrollPane(fileQueueTable);
+		JButton skipSelected = new DefaultButton("skip selected");
+		
+		tableContent.add(fileQueueScrollPane, "span, width 100%-11!");
+		tableContent.add(skipSelected, "gapleft push");
+		
+		
+		content.add(tableContent, "dock south, width 100%!");
 		content.add(bottomContent, "dock south, width 100%!");
 		content.add(totalCopyProgressBar, "dock west, gapx 6 0, gaptop 6");
 		content.add(rightContent, "dock north, width 80%+7!, gapx 0 0");
@@ -159,6 +193,7 @@ public class CopyGUI implements Runnable{
 		SM.setTotalProgressModel(totalProgressModel);
 		SM.setInfoLabel(infoLabel);
 		SM.setCurrentLabel(nameLabel);
+		SM.setQueueModel(copyQueueModel);
 		SM.setFrame(frame);
 		SM.setHasGUI(true);
 		
@@ -185,9 +220,22 @@ public class CopyGUI implements Runnable{
 			}
 		};
 		
+		ActionListener skipSelectedListener = new ActionListener() {
+			public void actionPerformed(ActionEvent actionEvent) {
+				SM.togglePaused();// avoids starting a new copy while deleting rows
+				for(int i:fileQueueTable.getSelectedRows()) {
+					System.out.print(i + " ");
+				}
+				copyQueueModel.skip(fileQueueTable.getSelectedRows());
+				
+				SM.togglePaused();
+			}
+		};
+		
 		pauseButton.addActionListener(pauseListener);
 		cancelButton.addActionListener(cancelListener);
 		skipButton.addActionListener(skipListener);
+		skipSelected.addActionListener(skipSelectedListener);
 		
 		copyThread = new Copy(SM);
 		CopiableLoader loader = new CopiableLoader(SM, this.orig, this.dest, this.mode);

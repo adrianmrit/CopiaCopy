@@ -238,21 +238,13 @@ public abstract class CopiableAbstract implements Copiable{
 		return result;
 	}
 
+	/**
+	 * Use default equals. Even if two {@link Copiable} instances have the same values,
+	 * they should be treated as different
+	 */
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Copiable other = (Copiable) obj;
-		if (origin == null) {
-			if (other.getOrigin() != null)
-				return false;
-		} else if (!this.getOrigin().equals(other.getOrigin()))
-			return false;
-		return true;
+		return super.equals(obj);
 	}
 
 	public String toString() {
