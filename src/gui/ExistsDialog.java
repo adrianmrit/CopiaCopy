@@ -266,8 +266,8 @@ public class ExistsDialog extends AbstractDialog{
 		/*************************************
 		 * End Buttons Section
 		 ************************************/
-		content.add(titleLabel, "dock north");
-		content.add(messageLabel, "dock north");
+		content.add(titleLabel, "dock north, gapx 5 5");
+		content.add(messageLabel, "dock north, gap 5 5");
 		content.add(origPanel, "gapleft push, width 50%!");
 		content.add(replacePanel, "gapright push, width 50%!, wrap");
 		content.add(renameToggleButton, "span, align center");
