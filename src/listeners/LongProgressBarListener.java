@@ -4,7 +4,7 @@ import javax.swing.JProgressBar;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import gui.LongProgressBarModel;
+import models.LongProgressBarModel;
 
 public class LongProgressBarListener implements ChangeListener{
 	private JProgressBar progressBar;

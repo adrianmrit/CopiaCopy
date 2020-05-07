@@ -16,6 +16,8 @@ import java.nio.file.StandardCopyOption;
 import org.apache.commons.io.FileUtils;
 
 import enums.ConflictAction;
+import models.SuperModel;
+import utils.NameFactory;
 import utils.TimerFormater;
 
 public class CopiableFile extends CopiableAbstract{

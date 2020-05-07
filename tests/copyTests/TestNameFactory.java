@@ -13,8 +13,8 @@ import org.apache.commons.io.FilenameUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 
-import copy.NameFactory;
 import testFiles.FileFactory;
+import utils.NameFactory;
 
 
 class TestNameFactory {

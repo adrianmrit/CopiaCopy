@@ -11,6 +11,7 @@ import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import enums.ConflictAction;
+import models.SuperModel;
 
 public class CopiableFolder extends CopiableAbstract{
 	private ArrayList<Copiable> childrens= new ArrayList<>();

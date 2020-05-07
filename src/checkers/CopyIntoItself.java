@@ -6,8 +6,8 @@ import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 
 import copy.Copiable;
-import copy.SuperModel;
 import enums.ConflictAction;
+import models.SuperModel;
 
 public class CopyIntoItself implements Checker{
 	private SuperModel SM;

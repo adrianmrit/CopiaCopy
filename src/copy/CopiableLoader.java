@@ -8,6 +8,8 @@ import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import models.SuperModel;
+
 /**
  * A loader for copiables. If the origin is a folder, loads this folder
  * and it's content. It can also load in a separate thread.

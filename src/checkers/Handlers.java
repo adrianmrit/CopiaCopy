@@ -1,7 +1,7 @@
 package checkers;
 
 import copy.Copiable;
-import copy.SuperModel;
+import models.SuperModel;
 
 public class Handlers implements Checker{
 	private Checker[] checkers;

@@ -26,12 +26,12 @@ import javax.swing.text.DocumentFilter;
 
 import components.DefaultButton;
 import components.UnstyledButton;
-import copy.SizeRep;
 import icons.ArrowIconBottom;
 import icons.ArrowIconRight;
 import icons.IcoHelpers;
 import inputFilters.FileNameInputFilter;
 import net.miginfocom.swing.MigLayout;
+import utils.SizeRep;
 
 public class ExistsDialog extends AbstractDialog{
 	private File origin;

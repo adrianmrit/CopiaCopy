@@ -21,7 +21,7 @@ import copy.Copiable;
 import copy.CopiableList;
 import copy.CopiableLoader;
 import copy.Copy;
-import copy.SuperModel;
+import models.SuperModel;
 import testFiles.FileFactory;
 import utils.SystemProps;
 

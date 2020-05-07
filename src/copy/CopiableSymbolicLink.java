@@ -10,6 +10,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 
 import enums.ConflictAction;
+import models.SuperModel;
 
 public class CopiableSymbolicLink extends CopiableAbstract{
 

@@ -31,7 +31,8 @@ import checkers.Checker;
 import checkers.Handlers;
 import gui.ExistsDialog;
 import gui.ExistsDialogBuilder;
-import gui.LongProgressBarModel;
+import models.LongProgressBarModel;
+import models.SuperModel;
 import utils.SystemProps;
 
 

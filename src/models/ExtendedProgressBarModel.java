@@ -1,4 +1,4 @@
-package gui;
+package models;
 
 import components.ExtendedProgressBar;
 

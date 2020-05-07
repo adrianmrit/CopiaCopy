@@ -13,6 +13,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 
 import enums.ConflictAction;
+import models.SuperModel;
 
 /**
  * An abstract class that implements common functions for all copiables.

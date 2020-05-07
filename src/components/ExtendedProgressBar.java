@@ -6,8 +6,8 @@ import java.text.NumberFormat;
 
 import javax.swing.JProgressBar;
 
-import copy.SuperModel;
-import gui.LongProgressBarModel;
+import models.LongProgressBarModel;
+import models.SuperModel;
 
 public class ExtendedProgressBar extends JProgressBar{
 	/**

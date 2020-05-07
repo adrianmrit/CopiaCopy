@@ -3,7 +3,7 @@ package checkers;
 import org.apache.commons.io.FilenameUtils;
 
 import copy.Copiable;
-import copy.NameFactory;
+import utils.NameFactory;
 
 public class DestEqualsOrigin implements Checker{
 	

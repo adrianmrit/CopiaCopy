@@ -3,11 +3,11 @@ package checkers;
 import java.nio.file.Files;
 
 import copy.Copiable;
-import copy.SuperModel;
 import enums.ActionUtils;
 import enums.ConflictAction;
 import gui.ExistsDialog;
 import gui.ExistsDialogBuilder;
+import models.SuperModel;
 
 public class Exists implements Checker{
 	private SuperModel SM;

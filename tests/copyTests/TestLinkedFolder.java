@@ -17,8 +17,8 @@ import org.junit.jupiter.api.Test;
 
 import copy.Copiable;
 import copy.CopiableList;
+import models.SuperModel;
 import copy.CopiableFolder;
-import copy.SuperModel;
 import testFiles.FileFactory;
 
 class TestLinkedFolder {

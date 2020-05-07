@@ -5,8 +5,8 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import components.ExtendedProgressBar;
-import gui.ExtendedProgressBarModel;
-import gui.LongProgressBarModel;
+import models.ExtendedProgressBarModel;
+import models.LongProgressBarModel;
 
 public class ExtendedProgressBarListener implements ChangeListener{
 	private ExtendedProgressBar progressBar;

@@ -1,4 +1,4 @@
-package copy;
+package models;
 
 import java.util.HashMap;
 import java.util.logging.Level;
@@ -12,10 +12,9 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import buffer.Buffer;
+import copy.Copiable;
+import copy.CopiableList;
 import enums.ConflictAction;
-import gui.ExtendedProgressBarModel;
-import gui.LongProgressBarModel;
-import models.CopyQueueModel;
 import utils.TimerFormater;
 
 /**
