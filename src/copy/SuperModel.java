@@ -138,6 +138,20 @@ public class SuperModel {
 			if (infoLabel.getText() != info) {
 				infoLabel.setText(info);
 			}
+			updateFrameLabel();
+		}
+	}
+	
+	private void updateFrameLabel() {
+		if(this.hasGUI()) {
+			int percent = totalProgressModel.getValue();
+			String totalSizeString = FileUtils.byteCountToDisplaySize(this.copiableList.getTotalSize());
+			String copiedSizeString = FileUtils.byteCountToDisplaySize(this.totalCopiedSize);
+			String formatString = "%d%% - %d/%d - %s/%s, %s";
+			String info = String.format(formatString, percent, this.copiableList.getNaturalCurrentCopy(), this.copiableList.getCount(), copiedSizeString, totalSizeString, getTotalTimeLeft());
+			if (frame.getTitle() != info) {
+				frame.setTitle(info);
+			}
 		}
 	}
 	
