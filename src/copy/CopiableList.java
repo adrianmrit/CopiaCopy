@@ -51,17 +51,16 @@ public class CopiableList {
 	 */
 	public void register(Copiable c) {
 		allFiles.add(c);
-//		addToCount(c);
 		totalSize += c.getSize();
 	}
 	
 	/**
-	 * Removes a copiable from the list, and updates counters.
+	 * Does not actually removes a file from the list, copiables should be set to SKIP
+	 * if they shouldn't be copied. Updates counters.
 	 * @param c
 	 */
 	public void remove(Copiable c) {
-		this.allFiles.remove(c);
-//		removeFromCount(c);
+//		this.allFiles.remove(c);
 		this.totalSize -= c.getSize();
 	}
 	

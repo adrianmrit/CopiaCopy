@@ -74,6 +74,14 @@ public class SuperModel {
 		this.paused = !this.paused;
 	}
 	
+	public void pause() {
+		this.paused = true;
+	}
+	
+	public void play() {
+		this.paused = false;
+	}
+	
 //	public void skipCurrent() {
 //		this.copiableList.getNext().setCheckedAction(Actiontype);
 //	}
@@ -112,7 +120,10 @@ public class SuperModel {
 	}
 	
 	public void removeCopyQueue(Copiable c) {
+		this.pause();
 		this.copyQueueModel.remove(c);
+		this.copiableList.remove(c);
+		this.play();
 	}
 	
 	/**
