@@ -13,6 +13,7 @@ import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.JToggleButton;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
@@ -41,8 +42,9 @@ import themes.LiteCustom;
 public class CopyGUI implements Runnable{
 	private static boolean DEBUG = false;
 	
-	private static final int WINDOWS_HEIGHT = 500;
+	private static final int WINDOWS_HEIGHT = 180;
 	private static final int WINDOWS_WIDTH = 500;
+	private static final int MORE_INFO_HEIGHT = 250;
 	
 	private final String orig;
 	private final String dest;
@@ -64,7 +66,7 @@ public class CopyGUI implements Runnable{
 	public void run() {
 		final JFrame frame = new JFrame("Copy");
 		final JPanel content = new JPanel();
-		LayoutManager layout = new MigLayout("gap 0 0 0 0, fill");
+		LayoutManager layout = new MigLayout("gap 0 0 0 0, fill, hidemode 3");
 		content.setLayout(layout);
 		frame.setContentPane(content);
 		
@@ -126,7 +128,7 @@ public class CopyGUI implements Runnable{
 		fileCopyProgressBar.setStringPainted(true);
 		totalCopyProgressBar.setStringPainted(true);
 		
-		JButton moreButton = new DefaultButton("More");
+		JToggleButton moreButton = new JToggleButton("More");
 		JButton pauseButton = new DefaultButton("Pause");
 		JButton skipButton = new DefaultButton("Skip");
 		JButton cancelButton = new DefaultButton("Cancel");
@@ -173,7 +175,7 @@ public class CopyGUI implements Runnable{
 		
 		content.add(tableContent, "dock south, width 100%!");
 		content.add(bottomContent, "dock south, width 100%!");
-		content.add(totalCopyProgressBar, "dock west, gapx 6 0, gaptop 6");
+		content.add(totalCopyProgressBar, "dock west, gapx 6 0, gapy 6 push, height 100px!");
 		content.add(rightContent, "dock north, width 80%+7!, gapx 0 0");
 		
 		
@@ -222,16 +224,33 @@ public class CopyGUI implements Runnable{
 		
 		ActionListener skipSelectedListener = new ActionListener() {
 			public void actionPerformed(ActionEvent actionEvent) {
-				SM.togglePaused();// avoids starting a new copy while deleting rows
-				for(int i:fileQueueTable.getSelectedRows()) {
-					System.out.print(i + " ");
-				}
+				SM.togglePaused(); // avoids starting a new copy while deleting rows
+
 				copyQueueModel.skip(fileQueueTable.getSelectedRows());
 				
-				SM.togglePaused();
+				SM.togglePaused();// continues the copy
 			}
 		};
 		
+		ActionListener moreListener = new ActionListener() {
+			public void actionPerformed(ActionEvent actionEvent) {
+				JToggleButton toggleButton = (JToggleButton) actionEvent.getSource();
+				if (toggleButton.isSelected()) {
+					tableContent.setVisible(true);
+					skipSelected.setEnabled(true);
+					frame.setSize(new Dimension(WINDOWS_WIDTH, WINDOWS_HEIGHT + MORE_INFO_HEIGHT));
+				} else {
+					tableContent.setVisible(false);
+					skipSelected.setEnabled(false);
+					frame.setSize(new Dimension(WINDOWS_WIDTH, WINDOWS_HEIGHT));
+				}
+				
+			}
+		};
+		
+		tableContent.setVisible(false);
+		
+		moreButton.addActionListener(moreListener);
 		pauseButton.addActionListener(pauseListener);
 		cancelButton.addActionListener(cancelListener);
 		skipButton.addActionListener(skipListener);
