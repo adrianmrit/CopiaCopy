@@ -11,6 +11,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import buffer.Buffer;
+import enums.ConflictAction;
 import gui.ExtendedProgressBarModel;
 import gui.LongProgressBarModel;
 import utils.TimerFormater;
@@ -50,6 +51,7 @@ public class SuperModel {
 	 * It might take longer to update, but not less.
 	 */
 	public final int UPDATE_SPEED = 200; //Ms
+	private ConflictAction forAll = ConflictAction.DEFAULT;
 	
 	/**
 	 * Model that hold some data and updates the GUI
@@ -69,9 +71,9 @@ public class SuperModel {
 		this.paused = !this.paused;
 	}
 	
-	public void skipCurrent() {
-		this.copiableList.getNext().skip();
-	}
+//	public void skipCurrent() {
+//		this.copiableList.getNext().setCheckedAction(Actiontype);
+//	}
 	
 	/**
 	 * Calculates the elapsed time from the last call of this function.
@@ -310,5 +312,13 @@ public class SuperModel {
 			this.fromLabel.setText(loadingText);
 			this.frame.setTitle(loadingText);
 		}
+	}
+
+	public void setForAll(ConflictAction action) {
+		copiableList.setForAll(action);
+	}
+	
+	public void skipCurrent() {
+		this.copiableList.getNext().setConflictAction(ConflictAction.SKIP);
 	}
 }

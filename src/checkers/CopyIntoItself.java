@@ -7,6 +7,7 @@ import javax.swing.JOptionPane;
 
 import copy.Copiable;
 import copy.SuperModel;
+import enums.ConflictAction;
 
 public class CopyIntoItself implements Checker{
 	private SuperModel SM;
@@ -31,7 +32,7 @@ public class CopyIntoItself implements Checker{
 				JDialog dialog = optionPane.createDialog(SM.frame, "Copy error");
 						dialog.setVisible(true);
 
-				c.skip(); // skips the tree
+				c.setConflictAction(ConflictAction.SKIP); // skips the tree
 				
 				return false;
 			}

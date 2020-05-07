@@ -15,6 +15,7 @@ import java.nio.file.StandardCopyOption;
 
 import org.apache.commons.io.FileUtils;
 
+import enums.ConflictAction;
 import utils.TimerFormater;
 
 public class CopiableFile extends CopiableAbstract{
@@ -62,7 +63,7 @@ public class CopiableFile extends CopiableAbstract{
 			CopyTimer timer = new CopyTimer();
 			
 			while ((bytesRead = is.read(buf)) > 0) {
-				if (this.wasSkipped()) {
+				if (this.getConflictAction() == ConflictAction.SKIP) {
 					break;
 				}
 				while (SM.isPaused()) {
@@ -97,7 +98,7 @@ public class CopiableFile extends CopiableAbstract{
 			os.close();
 			SM.addCopiedFile();
 		}
-		if (!this.wasSkipped()) {
+		if (this.getConflictAction() != ConflictAction.SKIP) {
 			Files.deleteIfExists(this.getDest());
 			Files.move(tempName, this.getDest(), StandardCopyOption.ATOMIC_MOVE,
 					StandardCopyOption.REPLACE_EXISTING);
@@ -112,7 +113,7 @@ public class CopiableFile extends CopiableAbstract{
 	 * like progress bars and labels.
 	 */
 	public void copy() throws IOException {
-		if (!this.wasCopied() && !this.wasSkipped()) {
+		if (!this.wasCopied() && this.getConflictAction() != ConflictAction.SKIP) {
 			handleCopy();
 			this.setCopied();
 		}
@@ -153,6 +154,13 @@ public class CopiableFile extends CopiableAbstract{
 	 */
 	public void renameTreeCoreDest(String oldPath, String newPath){
 		
+	}
+	
+	@Override
+	public void setConflictAction(ConflictAction action) {
+		if (action != ConflictAction.MERGE) {  // files are not supposed to be merged
+			super.setConflictAction(action);
+		}
 	}
 
 }

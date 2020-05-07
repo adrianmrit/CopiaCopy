@@ -1,13 +1,12 @@
 package copy;
 import java.util.ArrayList;
 
+import enums.ConflictAction;
+
 public class CopiableList {
 	private static final int DFAULT_ARRAY_CAPACITY = 1000;
 	private ArrayList<Copiable> allFiles;
 	private long totalSize = 0;
-//	private int totalFiles = 0;
-//	private int totalFolders = 0;
-//	private int totalSymbolicLinks = 0;
 	private int lineupPointer = 0;
 	
 	/**
@@ -117,30 +116,11 @@ public class CopiableList {
 	public int getCount() {
 		return this.allFiles.size();
 	}
-	
-	/**
-	 * Gets the number of files.
-	 * @return number of files
-	 */
-//	public int getTotalFiles() {
-//		return this.totalFiles;
-//	}
-//	
-//	/**
-//	 * Gets the number of folders.
-//	 * @return number of folders
-//	 */
-//	public int getTotalFolders() {
-//		return this.totalFolders;
-//	}
-//	
-//	/**
-//	 * Gets the number of symbolic links.
-//	 * @return number of symbolic links
-//	 */
-//	public int getTotaXlSymbolicLinks() {
-//		return this.totalSymbolicLinks;
-//	}
-	
-	
+
+	public void setForAll(ConflictAction action) {
+		for (Copiable c:allFiles) {
+			c.setConflictAction(action);
+		}
+		
+	}
 }

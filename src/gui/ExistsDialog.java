@@ -5,11 +5,15 @@ import java.awt.GridBagLayout;
 import java.awt.LayoutManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.io.File;
 import java.util.Date;
 
+import javax.swing.AbstractButton;
 import javax.swing.Icon;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -44,6 +48,7 @@ public class ExistsDialog extends AbstractDialog{
 	private JButton renameButton;
 	private JButton skipButton;
 	private JButton mrButton; // merge or replace
+	private boolean forAll = false;
 
 	public ExistsDialog(JFrame parent, File origin, File dest) {
 		super(parent);
@@ -155,6 +160,10 @@ public class ExistsDialog extends AbstractDialog{
 		}
 	}
 	
+	public boolean isForAll() {
+		return this.forAll;
+	}
+	
 	@Override
 	public String getAction() {
 		this.getParent().setEnabled(true);
@@ -245,9 +254,12 @@ public class ExistsDialog extends AbstractDialog{
 		 * Buttons Section
 		 ************************************/
 		final JPanel buttonsBox = new JPanel();
+		JCheckBox forAllCheckBox = new JCheckBox("Do for all?");
+		forAllCheckBox.addActionListener(getCheckBoxListener());
 		buttonsBox.setLayout(new MigLayout("fill"));
 		
 		buttonsBox.add(cancelButton, "push 200");
+		buttonsBox.add(forAllCheckBox);
 		buttonsBox.add(skipButton);
 		buttonsBox.add(mrButton);
 
@@ -264,6 +276,15 @@ public class ExistsDialog extends AbstractDialog{
 		
 		setSize(600, 450);
 		showDialog();
+	}
+	
+	private ActionListener getCheckBoxListener() {
+		return new ActionListener() {
+			public void actionPerformed(ActionEvent actionEvent) {
+				AbstractButton abstractButton = (AbstractButton) actionEvent.getSource();
+				forAll = abstractButton.getModel().isSelected();
+			}
+		};
 	}
 
 }

@@ -50,52 +50,9 @@ public class Copy extends SwingWorker<Object, Object>{
 		this.checkers = new Handlers(SM);
 	}
 	
-	/**
-	 * Creates a copiable and add it to the list.
-	 * @param orig origin path
-	 * @param dest parent destination path
-	 * @param mode {@link Copiable#COPY_MODE} or {@link Copiable#CUT_MODE}
-	 */
-//	public void addToCopy(String orig, String dest, int mode){
-//		Path origF = Paths.get(orig);
-//		Path destF = Paths.get(dest);
-//		
-//		Copiable f;
-//		
-//		if (Files.isSymbolicLink(origF)) {
-//			f = new LinkedSymbolicLink(origF, origF.getParent(), destF, SM, null, mode);
-//		} else if (Files.isRegularFile(origF, LinkOption.NOFOLLOW_LINKS)) {
-//			f = new LinkedFile(origF, origF.getParent(), destF, SM, null, mode);
-//		} else {
-//			f = new LinkedFolder(origF, origF.getParent(), destF, SM, null, mode);
-//		}
-//		
-////		f.register();
-//	}
-	
 	public void addToCopy(CopiableLoader loader){
 		this.loader = loader;
 	}
-	
-	/**
-	 * Creates a copiable and add it to the list.
-	 * @param orig origin path
-	 * @param dest parent destination path
-	 * @param mode {@link Copiable#COPY_MODE} or {@link Copiable#CUT_MODE}
-	 */
-//	public void addToCopy(Path orig, Path dest, int mode) throws IOException {
-//		this.addToCopy(orig.toString(), dest.toString(), mode);
-//	}
-//	
-//	/**
-//	 * Creates a copiable and add it to the list.
-//	 * @param orig origin file
-//	 * @param dest parent destination file
-//	 * @param mode {@link Copiable#COPY_MODE} or {@link Copiable#CUT_MODE}
-//	 */
-//	public void addToCopy(File orig, File dest, int mode) throws IOException {
-//		this.addToCopy(orig.toString(), dest.toString(), mode);
-//	}
 	
 	/** Sets the debug status
 	 * @param debug status

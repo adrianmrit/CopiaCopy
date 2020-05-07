@@ -5,6 +5,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
 
+import enums.ConflictAction;
+
 /**
  * Abstract interface that represents a file or folder,
  * with an origin and a destination where it will be copied
@@ -18,6 +20,24 @@ public interface Copiable extends Comparable<Copiable>{
 	 * @throws IOException
 	 */
 	void paste() throws FileNotFoundException, IOException;
+	
+	/**
+	 * Sets what to do by default in case a file exists
+	 * @param action
+	 */
+	public void setConflictAction(ConflictAction action);
+	
+	/**
+	 * Calls {@link setConflictAction} on all the tree of a {@link CopiableFolder}
+	 * @param Actiontype
+	 */
+	public void setConflictActionForTree(ConflictAction Actiontype);
+	
+	/**
+	 * Gets what to do by default in case a file exists
+	 * @return
+	 */
+	public ConflictAction getConflictAction();
 	
 	/**
 	 * Deletes this copiable and tries to delete its parent
@@ -40,6 +60,12 @@ public interface Copiable extends Comparable<Copiable>{
 	 * to the next {@link Copiable}
 	 */
 	void setCopied();
+	
+	/**
+	 * Sets this file to copied and move the pointer in the {@link CopiableList}
+	 * to the next {@link Copiable}
+	 */
+	void setTreeCopied();
 
 	/**
 	 * Checks if it's a symbolic link
@@ -95,22 +121,6 @@ public interface Copiable extends Comparable<Copiable>{
 	 * @return true if file was copied, false otherwise
 	 */
 	boolean wasCopied();
-	
-	/**
-	 * Set this copiable to be overwritten if it exists
-	 */
-	void setOverwrite();
-	
-	/**
-	 * Gets if this copiable is set to be overwritten
-	 * @return
-	 */
-	boolean getOverwriteConfirmation();
-	
-	/**
-	 * Skips this copiable
-	 */
-	void skip();
 	
 	/**
 	 * Renames the destination file

@@ -12,6 +12,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 
+import enums.ConflictAction;
+
 public abstract class CopiableAbstract implements Copiable{
 	private Path origin;
 	private Path rootOrigin;
@@ -24,6 +26,7 @@ public abstract class CopiableAbstract implements Copiable{
 	private boolean overwrite = false;
 	private int mode;
 	private Copiable parent; // folder that will try to delete after moving
+	private ConflictAction onConflict = ConflictAction.DEFAULT;
 	
 	/**
 	 * An abstract copiable
@@ -100,7 +103,8 @@ public abstract class CopiableAbstract implements Copiable{
 			Files.move(this.getOrigin(), this.getDest(),
 					StandardCopyOption.ATOMIC_MOVE,
 					StandardCopyOption.REPLACE_EXISTING);
-					this.skip();
+					this.setCopied();
+					this.setTreeCopied();
 		} catch (AtomicMoveNotSupportedException e) {
 			copy();
 			deleteThisAndParent();
@@ -191,30 +195,29 @@ public abstract class CopiableAbstract implements Copiable{
 		return this.absoluteDest;
 	}
 	
-	public boolean getOverwriteConfirmation() {
-		return this.overwrite;
-	}
-	
-	public void setOverwrite() {
-		this.overwrite = true;  // !WARNING, the tree set should not be set to overwrite automatically, ask confirmation for each one
-	}
-	
 	public void setCopied() {
 		this.copied = true;
 		this.SM.copiableList.movePointer();
 	}
 	
+	public void setTreeCopied() {
+
+	}
+	
+	public void setConflictAction(ConflictAction action) {
+		this.onConflict = action;
+	}
+	
+	public void setConflictActionForTree(ConflictAction action) {
+
+	}
+	
+	public ConflictAction getConflictAction() {
+		return this.onConflict;
+	}
+	
 	public boolean wasCopied() {
 		return this.copied;
-	}
-	
-	public void skip() {
-		this.skipped = true;
-		SM.copiableList.movePointer();
-	}
-	
-	public boolean wasSkipped() {
-		return this.skipped;
 	}
 	
 	public int compareTo(Copiable other) {

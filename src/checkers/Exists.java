@@ -4,6 +4,8 @@ import java.nio.file.Files;
 
 import copy.Copiable;
 import copy.SuperModel;
+import enums.ActionUtils;
+import enums.ConflictAction;
 import gui.ExistsDialog;
 import gui.ExistsDialogBuilder;
 
@@ -24,7 +26,7 @@ public class Exists implements Checker{
 	 */
 	@Override
 	public boolean handle(Copiable c) {
-		if (c.destExists() && !c.getOverwriteConfirmation()) {
+		if (c.destExists() && c.getConflictAction() == ConflictAction.DEFAULT) {
 			if (c.isSymbolicLink()) {
 				handleSymbolicLinkExistDialog(c);
 			} else if (c.isFile()) {
@@ -55,7 +57,7 @@ public class Exists implements Checker{
 					break;
 				
 				case ExistsDialogBuilder.SKIP:
-					c.skip();
+					ActionUtils.setConflictAction(SM.copiableList, c, ConflictAction.SKIP, dialog.isForAll());
 					SM.totalProgressModel.setLongMaximum(SM.copiableList.getTotalSize());
 					break;
 				
@@ -64,12 +66,12 @@ public class Exists implements Checker{
 					break;
 				
 				case ExistsDialogBuilder.REPLACE:
-					c.setOverwrite();
+					ActionUtils.setConflictAction(SM.copiableList, c, ConflictAction.REPLACE, dialog.isForAll());
 					break;
 			}
 		}
 		else {
-			c.setOverwrite();
+			c.setConflictAction(ConflictAction.REPLACE);
 		}
 	}
 	
@@ -89,7 +91,7 @@ public class Exists implements Checker{
 					break;
 				
 				case ExistsDialogBuilder.SKIP:
-					c.skip();
+					ActionUtils.setConflictAction(SM.copiableList, c, ConflictAction.SKIP, dialog.isForAll());
 					SM.totalProgressModel.setLongMaximum(SM.copiableList.getTotalSize());
 					break;
 				
@@ -98,11 +100,11 @@ public class Exists implements Checker{
 					break;
 				
 				case ExistsDialogBuilder.MERGE:
-					c.setOverwrite();
+					ActionUtils.setConflictAction(SM.copiableList, c, ConflictAction.MERGE, dialog.isForAll());
 					break;
 			}
 		} else {
-			c.setOverwrite();
+			c.setConflictAction(ConflictAction.MERGE);
 		}
 	}
 	
@@ -122,7 +124,8 @@ public class Exists implements Checker{
 					break;
 				
 				case ExistsDialogBuilder.SKIP:
-					c.skip();
+					ActionUtils.setConflictAction(SM.copiableList, c, ConflictAction.SKIP, dialog.isForAll());
+//					c.skip();
 					SM.totalProgressModel.setLongMaximum(SM.copiableList.getTotalSize());
 					break;
 				
@@ -131,11 +134,11 @@ public class Exists implements Checker{
 					break;
 				
 				case ExistsDialogBuilder.REPLACE:
-					c.setOverwrite();
+					ActionUtils.setConflictAction(SM.copiableList, c, ConflictAction.REPLACE, dialog.isForAll());
 					break;
 			}
 		} else {
-			c.setOverwrite();
+			c.setConflictAction(ConflictAction.REPLACE);
 		}
 	}
 

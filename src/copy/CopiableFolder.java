@@ -1,30 +1,20 @@
 package copy;
 
-import java.io.File;
-import java.io.FileFilter;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.FileAlreadyExistsException;
-import java.nio.file.FileStore;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
-import java.util.TreeSet;
 import java.util.function.Consumer;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.stream.Stream;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.ArrayUtils;
+import enums.ConflictAction;
 
 public class CopiableFolder extends CopiableAbstract{
 	private ArrayList<Copiable> childrens= new ArrayList<>();
 	private long size = 0;
-//	private Logger logger = Logger.getLogger("linkedFolder");
 	
 	/**
 	 * {@link Copiable} folder representation.
@@ -51,7 +41,6 @@ public class CopiableFolder extends CopiableAbstract{
 			fileStream.forEach(fileConsumer);
 			fileStream.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			fileStream = null;
 		}
@@ -71,13 +60,12 @@ public class CopiableFolder extends CopiableAbstract{
 			addFolder(fIterator.next());
 		}
 		time = (System.currentTimeMillis() - time);
-//		logger.log(Level.INFO, ""+time);
 	}
 	/**
 	 * Creates this directory and sub-directories that do not exist
 	 */
 	public void copy() throws IOException {
-		if (!this.wasCopied()) {
+		if (!this.wasCopied() && this.getConflictAction() != ConflictAction.SKIP) {
 			try {
 				Files.createDirectory(getDest());
 			} catch (FileAlreadyExistsException e){
@@ -173,24 +161,39 @@ public class CopiableFolder extends CopiableAbstract{
 		}
 	}
 	
-	/**
-	 * Skips this folder and it's children, recursively
-	 */
 	@Override
-	public void skip() {
-		super.skip();
-		this.skipTree();
+	public void setConflictAction(ConflictAction action)	{
+		super.setConflictAction(action);
+		
+		Iterator<Copiable> childsIterator = childrens.iterator();
+		
+		if (action == ConflictAction.SKIP) {// also skips the folder
+			while (childsIterator.hasNext()) {
+				childsIterator.next().setConflictAction(action);
+			}
+		}
 	}
 	
-	/**
-	 * Skips this folder's children
-	 */
-	private void skipTree()	{
+	@Override
+	public void setConflictActionForTree(ConflictAction action)	{
+		Iterator<Copiable> childsIterator = childrens.iterator();
+		
+		while (childsIterator.hasNext()) {
+			Copiable c = childsIterator.next();
+			c.setConflictAction(action);
+			c.setConflictActionForTree(action);
+		}
+	}
+	
+	@Override
+	public void setTreeCopied()	{
 		
 		Iterator<Copiable> childsIterator = childrens.iterator();
 		
 		while (childsIterator.hasNext()) {
-			childsIterator.next().skip();
+			Copiable c = childsIterator.next();
+			c.setCopied();
+			c.setTreeCopied();
 		}
 	}
 

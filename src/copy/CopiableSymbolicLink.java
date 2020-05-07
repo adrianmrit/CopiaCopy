@@ -9,6 +9,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 
+import enums.ConflictAction;
+
 public class CopiableSymbolicLink extends CopiableAbstract{
 
 	public CopiableSymbolicLink(Path origin, Path rootOrigin, Path rootDest, SuperModel SM, Copiable parent, int mode) {
@@ -16,7 +18,7 @@ public class CopiableSymbolicLink extends CopiableAbstract{
 	}
 	
 	public void copy() throws FileNotFoundException, IOException {
-		if (!this.wasCopied()) {
+		if (!this.wasCopied() && this.getConflictAction() != ConflictAction.SKIP) {
 			Files.copy(this.getOrigin(), this.getDest(),
 					LinkOption.NOFOLLOW_LINKS,
 					StandardCopyOption.COPY_ATTRIBUTES,
@@ -48,6 +50,13 @@ public class CopiableSymbolicLink extends CopiableAbstract{
 	public void renameTreeCoreDest(String oldPath, String newPath) {
 		// TODO Auto-generated method stub
 		
+	}
+	
+	@Override
+	public void setConflictAction(ConflictAction action) {
+		if (action != ConflictAction.MERGE) { // symbolic links are not supposed to be merged
+			super.setConflictAction(action);
+		}
 	}
 
 }
