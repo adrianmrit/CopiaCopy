@@ -80,8 +80,8 @@ public class CopyGUI implements Runnable{
 			e.printStackTrace ();
 		}	
 		
-		JLabel nameLabel = new JLabel("", SwingConstants.LEFT);
-		JLabel infoLabel = new JLabel("", SwingConstants.LEFT);
+		JLabel nameLabel = new JLabel(" ", SwingConstants.LEFT);
+		JLabel infoLabel = new JLabel(" ", SwingConstants.LEFT);
 		
 		ExtendedProgressBarModel fileProgressModel = new ExtendedProgressBarModel();
 		LongProgressBarModel totalProgressModel = new LongProgressBarModel();
@@ -158,7 +158,7 @@ public class CopyGUI implements Runnable{
 		SM.setFileProgressModel(fileProgressModel);
 		SM.setTotalProgressModel(totalProgressModel);
 		SM.setInfoLabel(infoLabel);
-		SM.setFromLabel(nameLabel);
+		SM.setCurrentLabel(nameLabel);
 		SM.setFrame(frame);
 		SM.setHasGUI(true);
 		

@@ -58,7 +58,7 @@ public class CopiableFile extends CopiableAbstract{
 			double speed;
 			
 			SM.setCurrentTotalSize(this.getSize());
-			SM.setFrom(this.getOrigin().toString());
+			SM.setCurrentName(this.getOrigin().getFileName().toString());
 			
 			CopyTimer timer = new CopyTimer();
 			

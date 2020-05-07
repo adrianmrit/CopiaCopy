@@ -23,7 +23,7 @@ public class SuperModel {
 	public ExtendedProgressBarModel fileProgressModel;
 	public LongProgressBarModel totalProgressModel;
 //	public JLabel currentLabel;
-	public JLabel fromLabel;
+	public JLabel currentLabel;
 	public JLabel infoLabel;
 	public JFrame frame; // used to create windows
 
@@ -262,9 +262,9 @@ public class SuperModel {
 		this.totalProgressModel = totalProgressModel;
 	}
 	
-	public void setFrom(String path) {
+	public void setCurrentName(String name) {
 		if (hasGUI()) {
-			this.fromLabel.setText("from: " + path);
+			this.currentLabel.setText(name);
 		}
 	}
 	
@@ -272,8 +272,8 @@ public class SuperModel {
 	 * Sets the currentLabel
 	 * @param currentLabel
 	 */
-	public void setFromLabel(JLabel fromLabel) {
-		this.fromLabel = fromLabel;
+	public void setCurrentLabel(JLabel currentLabel) {
+		this.currentLabel = currentLabel;
 	}
 	
 	/**
@@ -299,17 +299,12 @@ public class SuperModel {
 		return this.hasGUI;
 	}
 	
-	public void setIndeterminate(boolean val) {
-		fileProgressModel.setIndeterminate(val);
-		totalProgressModel.setIndeterminate(val);
-	}
-	
 	public void addLoading() {
 		if (hasGUI() && this.shouldUpdate()) {
 			Logger logger = Logger.getLogger("SuperModel");
 			logger.log(Level.FINE, "loading" , copiableList.getCount());
 			String loadingText = String.format("Loading %s files", copiableList.getCount());
-			this.fromLabel.setText(loadingText);
+			this.currentLabel.setText(loadingText);
 			this.frame.setTitle(loadingText);
 		}
 	}
