@@ -24,6 +24,8 @@ public class CopiableSymbolicLink extends CopiableAbstract{
 					StandardCopyOption.COPY_ATTRIBUTES,
 					StandardCopyOption.REPLACE_EXISTING);
 			this.setCopied();
+		} else {
+			this.SM.copiableList.movePointer();
 		}
 	}
 

@@ -116,6 +116,8 @@ public class CopiableFile extends CopiableAbstract{
 		if (!this.wasCopied() && this.getConflictAction() != ConflictAction.SKIP) {
 			handleCopy();
 			this.setCopied();
+		} else {
+			this.SM.copiableList.movePointer();
 		}
 	}
 	

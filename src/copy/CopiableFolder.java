@@ -72,6 +72,8 @@ public class CopiableFolder extends CopiableAbstract{
 				// do nothing
 			}
 			this.setCopied();
+		} else {
+			this.SM.copiableList.movePointer();
 		}
 	}
 	
