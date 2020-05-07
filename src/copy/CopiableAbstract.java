@@ -14,6 +14,11 @@ import java.nio.file.StandardCopyOption;
 
 import enums.ConflictAction;
 
+/**
+ * An abstract class that implements common functions for all copiables.
+ * @author adrianmrit
+ *
+ */
 public abstract class CopiableAbstract implements Copiable{
 	private Path origin;
 	private Path rootOrigin;
@@ -54,7 +59,7 @@ public abstract class CopiableAbstract implements Copiable{
 	
 	public void register() {
 		SM.copiableList.register(this);
-		SM.addLoading();
+		SM.updateLoadingLabel();
 	}
 	
 	public int getMode() {

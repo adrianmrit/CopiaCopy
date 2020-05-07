@@ -61,6 +61,7 @@ public class CopiableFolder extends CopiableAbstract{
 		}
 		time = (System.currentTimeMillis() - time);
 	}
+
 	/**
 	 * Creates this directory and sub-directories that do not exist
 	 */
@@ -120,12 +121,16 @@ public class CopiableFolder extends CopiableAbstract{
 	
 	/**
 	 * Gets the total size of this folder content
-	 * @return size in bytes
 	 */
+	@Override
 	public long getSizeRec() {
 		return this.size;
 	}
 	
+	/**
+	 * Gets the size of the folder, without content, actually just returns 0;
+	 */
+	@Override
 	public long getSize() {
 		return 0;
 	}
@@ -133,6 +138,7 @@ public class CopiableFolder extends CopiableAbstract{
 	 * Updates this LinkedFile core destination, and updates the core destination paths in it's children if there is any.
 	 * @param newName new name for the folder or file
 	 */
+	@Override
 	public void renameCoreDest(String newName){
 		Path parent = getCoreDest().getParent();
 		Path oldPath = getCoreDest();
@@ -152,6 +158,7 @@ public class CopiableFolder extends CopiableAbstract{
 	 * @param oldPath
 	 * @param newPath
 	 */
+	@Override
 	public void renameTreeCoreDest(String oldPath, String newPath)	{
 		
 		Iterator<Copiable> childsIterator = childrens.iterator();

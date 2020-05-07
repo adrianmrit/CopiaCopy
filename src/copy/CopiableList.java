@@ -7,6 +7,7 @@ public class CopiableList {
 	private static final int DFAULT_ARRAY_CAPACITY = 1000;
 	private ArrayList<Copiable> allFiles;
 	private long totalSize = 0;
+	private int totalFiles = 0;
 	private int lineupPointer = 0;
 	
 	/**
@@ -16,34 +17,6 @@ public class CopiableList {
 		this.allFiles = new ArrayList<>(DFAULT_ARRAY_CAPACITY);
 		this.allFiles.ensureCapacity(DFAULT_ARRAY_CAPACITY);
 	}
-	
-	/**
-	 * Adds to the file count, folder count, or symbolic link count, depending on the copiable.
-	 * @param c
-	 */
-//	private void addToCount(Copiable c) {
-//		if (c.isFile()) {
-//			totalFiles++;
-//		} else if(c.isFolder()) {
-//			totalFolders++;
-//		} else if(c.isSymbolicLink()) {
-//			totalSymbolicLinks++;
-//		}
-//	}
-	
-	/**
-	 * Removes from the file count, folder count, or symbolic link count, depending on the copiable.
-	 * @param c
-	 */
-//	private void removeFromCount(Copiable c) {
-//		if (c.isFile()) {
-//			totalFiles--;
-//		} else if(c.isFolder()) {
-//			totalFolders--;
-//		} else if(c.isSymbolicLink()) {
-//			totalSymbolicLinks--;
-//		}
-//	}
 	
 	/**
 	 * Adds a copiable to the list, and updates counters.
@@ -60,7 +33,7 @@ public class CopiableList {
 	 * @param c
 	 */
 	public void remove(Copiable c) {
-//		this.allFiles.remove(c);
+//		this.allFiles.remove(c); do not remove the files, just skip them
 		this.totalSize -= c.getSize();
 	}
 	

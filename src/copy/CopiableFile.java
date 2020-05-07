@@ -42,6 +42,11 @@ public class CopiableFile extends CopiableAbstract{
 		}
 	}
 	
+	/**
+	 * Handles the actual copy
+	 * @throws FileNotFoundException
+	 * @throws IOException
+	 */
 	private void handleCopy() throws FileNotFoundException, IOException{
 		Path tempName = NameFactory.getTemp(this.getDest()); // use a temp name
 		

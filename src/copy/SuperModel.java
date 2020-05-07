@@ -18,14 +18,19 @@ import gui.LongProgressBarModel;
 import models.CopyQueueModel;
 import utils.TimerFormater;
 
+/**
+ * A model that holds the status of the copy and other info,
+ * and participates as an intermediate between the copy and the GUI
+ * @author adrianmrit
+ *
+ */
 public class SuperModel {
 	public CopiableList copiableList;
 	public Buffer buffer;
 	
 	public ExtendedProgressBarModel fileProgressModel;
 	public LongProgressBarModel totalProgressModel;
-//	public JLabel currentLabel;
-	public JLabel currentLabel;
+	public JLabel nameLabel;
 	public JLabel infoLabel;
 	public JFrame frame; // used to create windows
 
@@ -53,7 +58,6 @@ public class SuperModel {
 	 * It might take longer to update, but not less.
 	 */
 	public final int UPDATE_SPEED = 200; //Ms
-	private ConflictAction forAll = ConflictAction.DEFAULT;
 	private CopyQueueModel copyQueueModel;
 	
 	/**
@@ -66,25 +70,34 @@ public class SuperModel {
 		this.buffer = buffer;
 	}
 	
+	/**
+	 * Gets whether the copy is paused or not.
+	 * @return true if the copy is paused, false otherwise
+	 */
 	public boolean isPaused() {
 		return this.paused;
 	}
 	
+	/**
+	 * Toggles the pause status
+	 */
 	public void togglePaused() {
 		this.paused = !this.paused;
 	}
 	
+	/**
+	 * Pauses the copy
+	 */
 	public void pause() {
 		this.paused = true;
 	}
 	
+	/**
+	 * Continues the copy
+	 */
 	public void play() {
 		this.paused = false;
 	}
-	
-//	public void skipCurrent() {
-//		this.copiableList.getNext().setCheckedAction(Actiontype);
-//	}
 	
 	/**
 	 * Calculates the elapsed time from the last call of this function.
@@ -111,17 +124,33 @@ public class SuperModel {
 		this.lastGUIUpdate = System.currentTimeMillis();
 	}
 	
+	/**
+	 * Sets the table model for the copy queue table
+	 * @param copyQueueModel
+	 */
 	public void setQueueModel(TableModel copyQueueModel) {
 		this.copyQueueModel = (CopyQueueModel) copyQueueModel;
 	}
 	
+	/**
+	 * Inserts a copiable into the copy queue table
+	 * @param c
+	 */
 	public void insertCopyQueue(Copiable c) {
-		this.copyQueueModel.insert(c);
+		if (hasGUI()) {
+			this.copyQueueModel.insert(c);
+		}
 	}
 	
+	/**
+	 * Removes a copiable from the copy queue table
+	 * @param c
+	 */
 	public void removeCopyQueue(Copiable c) {
 		this.pause();
-		this.copyQueueModel.remove(c);
+		if (hasGUI()) {
+			this.copyQueueModel.remove(c);
+		}
 		this.copiableList.remove(c);
 		this.play();
 	}
@@ -138,11 +167,14 @@ public class SuperModel {
 			if (infoLabel.getText() != info) {
 				infoLabel.setText(info);
 			}
-			updateFrameLabel();
+			updateFrameTitle();
 		}
 	}
 	
-	private void updateFrameLabel() {
+	/**
+	 * Updates the frame title
+	 */
+	private void updateFrameTitle() {
 		if(this.hasGUI()) {
 			int percent = totalProgressModel.getValue();
 			String totalSizeString = FileUtils.byteCountToDisplaySize(this.copiableList.getTotalSize());
@@ -304,7 +336,7 @@ public class SuperModel {
 	
 	public void setCurrentName(String name) {
 		if (hasGUI()) {
-			this.currentLabel.setText(name);
+			this.nameLabel.setText(name);
 		}
 	}
 	
@@ -313,7 +345,7 @@ public class SuperModel {
 	 * @param currentLabel
 	 */
 	public void setCurrentLabel(JLabel currentLabel) {
-		this.currentLabel = currentLabel;
+		this.nameLabel = currentLabel;
 	}
 	
 	/**
@@ -339,20 +371,30 @@ public class SuperModel {
 		return this.hasGUI;
 	}
 	
-	public void addLoading() {
+	/**
+	 * Updates the loading label
+	 */
+	public void updateLoadingLabel() {
 		if (hasGUI() && this.shouldUpdate()) {
 			Logger logger = Logger.getLogger("SuperModel");
 			logger.log(Level.FINE, "loading" , copiableList.getCount());
 			String loadingText = String.format("Loading %s files", copiableList.getCount());
-			this.currentLabel.setText(loadingText);
+			this.nameLabel.setText(loadingText);
 			this.frame.setTitle(loadingText);
 		}
 	}
 
-	public void setForAll(ConflictAction action) {
+	/**
+	 * Sets a common conflict action for all the copiables
+	 * @param action
+	 */
+	public void setConflictActionForAll(ConflictAction action) {
 		copiableList.setForAll(action);
 	}
 	
+	/**
+	 * Skips the current copiable
+	 */
 	public void skipCurrent() {
 		this.copiableList.getNext().setConflictAction(ConflictAction.SKIP);
 	}

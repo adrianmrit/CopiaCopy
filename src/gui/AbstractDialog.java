@@ -7,6 +7,11 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 
+/**
+ * An abstract class for custom dialogs.
+ * @author adrianmrit
+ *
+ */
 public abstract class AbstractDialog {
 	private JFrame parent;
 	private String actionPerformed;

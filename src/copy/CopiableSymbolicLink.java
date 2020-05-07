@@ -17,6 +17,9 @@ public class CopiableSymbolicLink extends CopiableAbstract{
 		super(origin, rootOrigin, rootDest, SM, parent, mode);
 	}
 	
+	/**
+	 * Copies the symbolic link
+	 */
 	public void copy() throws FileNotFoundException, IOException {
 		if (!this.wasCopied() && this.getConflictAction() != ConflictAction.SKIP) {
 			Files.copy(this.getOrigin(), this.getDest(),
