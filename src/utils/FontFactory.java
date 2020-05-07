@@ -5,6 +5,7 @@ import java.awt.FontFormatException;
 import java.awt.Toolkit;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -46,7 +47,7 @@ public class FontFactory {
 		int resolution = Math.min(Toolkit.getDefaultToolkit().getScreenResolution(), 96); // as in MaterialFontFactory
         size = size * resolution / 72.0f;
 		try {
-			return Font.createFont(Font.TRUETYPE_FONT, new File(path)).deriveFont(size);
+			return Font.createFont(Font.TRUETYPE_FONT, Paths.get(path).toAbsolutePath().toFile()).deriveFont(size);
 		} catch (FontFormatException | IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
