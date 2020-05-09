@@ -261,6 +261,6 @@ public class CopyGUI implements Runnable{
 		copyThread = new Copy(SM);
 		CopiableLoader loader = new CopiableLoader(SM, this.orig, this.dest, this.mode);
 		copyThread.addToCopy(loader);
-		copyThread.doInBackground();
+		copyThread.execute();
 	}
 }
