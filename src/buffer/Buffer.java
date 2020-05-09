@@ -8,6 +8,12 @@ public interface Buffer {
 	public byte[] getBuffer();
 	
 	/**
+	 * Gets the current buffer size
+	 * @return
+	 */
+	public int getBufferSize();
+	
+	/**
 	 * Resets the time
 	 */
 	public void resetTime();

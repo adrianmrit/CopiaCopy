@@ -7,11 +7,19 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.channels.FileChannel;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
+import java.nio.file.OpenOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.nio.file.StandardOpenOption;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import javax.swing.JDialog;
+import javax.swing.JOptionPane;
 
 import org.apache.commons.io.FileUtils;
 
@@ -21,6 +29,8 @@ import utils.NameFactory;
 import utils.TimerFormater;
 
 public class CopiableFile extends CopiableAbstract{
+	private Path tempName;
+	
 	/**
 	 * {@link Copiable} file representation.
 	 * @param origin Origin file
@@ -44,75 +54,252 @@ public class CopiableFile extends CopiableAbstract{
 		}
 	}
 	
+	private FileChannel loadInputChannel(long position){
+		while (true) {
+		 try{
+//			 FileInputStream ins = new FileInputStream(this.getOrigin().toFile());
+			 FileChannel input =  FileChannel.open(this.getOrigin(), StandardOpenOption.READ);
+             try {
+				input.position(position);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			 return input;
+		 } catch (SecurityException e) {
+			 JOptionPane optionPane = new JOptionPane(
+					 String.format("<HTML>Looks like you don't have permision to read <i>%s</i>. Try again?</HTML>",
+							 this.getOrigin()
+							 ),
+						JOptionPane.ERROR_MESSAGE, JOptionPane.YES_NO_OPTION);
+						
+				JDialog dialog = optionPane.createDialog(SM.frame, "Copy error");
+						dialog.setVisible(true);
+						int value = (int) optionPane.getValue();
+						if (value == JOptionPane.NO_OPTION) {
+							this.setConflictAction(ConflictAction.SKIP);
+							break;
+						}
+		 } catch (IOException e) {
+			 JOptionPane optionPane = new JOptionPane(
+					 String.format("<HTML>The file <i>%s</i> could not be found. Try again?</HTML>", this.getOrigin()
+							 ),
+						JOptionPane.ERROR_MESSAGE, JOptionPane.YES_NO_OPTION);
+						
+				JDialog dialog = optionPane.createDialog(SM.frame, "Copy error");
+						dialog.setVisible(true);
+						int value = (int) optionPane.getValue();
+						if (value == JOptionPane.NO_OPTION) {
+							this.setConflictAction(ConflictAction.SKIP);
+							break;
+						}
+		 }
+		}
+		return null;
+	}
+	
+	private FileChannel loadOutputChannel(){
+		while (true) {
+		 try{
+//			 FileOutputStream outs = new FileOutputStream(tempName.toFile(), true);
+			 FileChannel output = FileChannel.open(tempName, StandardOpenOption.WRITE, StandardOpenOption.CREATE);
+			 return output;
+		 } catch (SecurityException e) {
+			 JOptionPane optionPane = new JOptionPane(
+					 String.format(
+							 "<HTML>Looks like you don't have permision to read <i>%s</i>. Try again?</HTML>",
+							 this.getOrigin()
+							 ),
+						JOptionPane.ERROR_MESSAGE, JOptionPane.YES_NO_OPTION);
+						
+				JDialog dialog = optionPane.createDialog(SM.frame, "Copy error");
+						dialog.setVisible(true);
+						int value = (int) optionPane.getValue();
+						if (value == JOptionPane.NO_OPTION) {
+							this.setConflictAction(ConflictAction.SKIP);
+							break;
+						}
+		 } catch (IOException e) {
+			 e.printStackTrace();
+			 JOptionPane optionPane = new JOptionPane(
+					 String.format(
+							 "<HTML>The folder <i>%s</i> could not be accessed. Try again?</HTML>",
+							 this.getOrigin()
+							 ),
+						JOptionPane.ERROR_MESSAGE, JOptionPane.YES_NO_OPTION);
+						
+				JDialog dialog = optionPane.createDialog(SM.frame, "Copy error");
+						dialog.setVisible(true);
+						int value = (int) optionPane.getValue();
+						if (value == JOptionPane.NO_OPTION) {
+							this.setConflictAction(ConflictAction.SKIP);
+							break;
+						}
+		 }
+		}
+		return null;
+	}
+	
+	private long transfer(FileChannel input, FileChannel output, long pos, long count) {
+		while (true){
+			try {
+				return output.transferFrom(input, pos, count);
+			} catch (IOException e) {
+				e.printStackTrace();
+				JOptionPane optionPane = new JOptionPane(
+						 String.format(
+								 "<HTML>There was an error while trying to write to "
+								 + "<i>%s</i>. Try again?</HTML>",
+								 this.getDest()
+								 ),
+							JOptionPane.ERROR_MESSAGE, JOptionPane.YES_NO_OPTION);
+							
+				JDialog dialog = optionPane.createDialog(SM.frame, "Copy error");
+							dialog.setVisible(true);
+							int value = (int) optionPane.getValue();
+							if (value == JOptionPane.NO_OPTION || value == JOptionPane.DEFAULT_OPTION) {
+								this.setConflictAction(ConflictAction.SKIP);
+								break;
+							}
+							try {
+								input.close();
+								output.close();
+//								input=null;
+//								output=null;
+							} catch (IOException e1) {
+								e1.printStackTrace();
+							}
+							Path newTemporal = NameFactory.getTemp(tempName);
+							try {
+								Files.move(tempName, newTemporal, StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);
+								tempName = newTemporal;
+							} catch (IOException e1) {
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
+							}
+							input = loadInputChannel(pos); // attempts to reload the chanel; TODO: Doesn't work
+							output = loadOutputChannel(); // attempts to reload the chanel; TODO: Doesn't work
+			}
+		}
+		return 0;
+	}
+	
+	private void renameTemp(Path tempName) {
+		while(true) {
+			try {
+//				Files.deleteIfExists(this.getDest());
+				Files.move(tempName, this.getDest(), StandardCopyOption.ATOMIC_MOVE,
+						StandardCopyOption.REPLACE_EXISTING);
+				return;
+			} catch (IOException e) {
+				JOptionPane optionPane = new JOptionPane(
+						 String.format(
+								 "<HTML>There was an error while trying to rename the temporal file "
+								 + "<i>%s</i> to <i>%s</i>. Try again?</HTML>",
+								 tempName, this.getDest()
+								 ),
+							JOptionPane.ERROR_MESSAGE, JOptionPane.YES_NO_OPTION);
+							
+				JDialog dialog = optionPane.createDialog(SM.frame, "Copy error");
+							dialog.setVisible(true);
+							int value = (int) optionPane.getValue();
+							if (value == JOptionPane.NO_OPTION) {
+								this.setConflictAction(ConflictAction.SKIP);
+								break;
+							}
+			}
+		}
+	}
+	
+	public void checkSameLenght() {
+		 final long srcLen = this.getOrigin().toFile().length();
+	     final long dstLen = this.getDest().toFile().length();
+	     if (srcLen != dstLen) {
+	    	 JOptionPane optionPane = new JOptionPane(
+					 String.format(
+							 "<HTML>Looks like there was an error in the copy<br> "
+							 + "<i>%s</i> <br> and <br> <i>%s</i> <br> lengths differ.</HTML>",
+							 tempName, this.getDest()
+							 ),
+						JOptionPane.WARNING_MESSAGE);
+						
+			JDialog dialog = optionPane.createDialog(SM.frame, "Copy error");
+						dialog.setVisible(true);
+	     }
+	}
+	
 	/**
 	 * Handles the actual copy
-	 * @throws FileNotFoundException
-	 * @throws IOException
 	 */
-	private void handleCopy() throws FileNotFoundException, IOException{
-		Path tempName = NameFactory.getTemp(this.getDest()); // use a temp name
+	private void handleCopy()
+            throws IOException {
+		tempName = NameFactory.getTemp(this.getDest()); // use a temp name
 		
-		InputStream is = new FileInputStream(this.getOrigin().toFile());
-		OutputStream os = new FileOutputStream(tempName.toFile());
 		if (SM.hasGUI()) {
 			resetUICopyFile();
 		}
 		
-		try {
-			byte[] buf = SM.buffer.getBuffer(); // TODO: Find optimal chunk size
-			int bytesRead;
-			long totalCopied = 0;
-			double speed;
-			
-			SM.setCurrentTotalSize(this.getSize());
-			SM.setCurrentName(this.getOrigin().getFileName().toString());
-			
-			CopyTimer timer = new CopyTimer();
-			
-			while ((bytesRead = is.read(buf)) > 0) {
-				if (this.getConflictAction() == ConflictAction.SKIP) {
+		SM.setCurrentTotalSize(this.getSize());
+		SM.setCurrentName(this.getOrigin().getFileName().toString());
+		
+		CopyTimer timer = new CopyTimer();
+		FileChannel input = loadInputChannel(0);
+		FileChannel output = loadOutputChannel();
+        try  {
+
+            final long size = input.size();
+            long pos = 0;
+            long count = 0;
+            double speed;
+            while (pos < size) {
+            	if (this.getConflictAction() == ConflictAction.SKIP) {
 					break;
 				}
 				while (SM.isPaused()) {
 					try {
 						Thread.sleep(500);
 					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 				}
 				SM.buffer.resetTime();
-				os.write(buf, 0, bytesRead);
-				if (SM.hasGUI()) {
-					totalCopied += bytesRead;
-					SM.addTotalCopiedSize(bytesRead);
+            	
+                final long remain = size - pos;
+                count = remain > SM.buffer.getBufferSize() ? SM.buffer.getBufferSize() : remain;
+                final long bytesCopied = transfer(input, output, pos, count);
+                
+                if (SM.hasGUI()) {;
+					SM.addTotalCopiedSize(bytesCopied);
 					
-					SM.setCurrentCopiedSize(bytesRead);
+					SM.setCurrentCopiedSize(bytesCopied);
 					
 					
-					speed = SM.buffer.getSpeedSeconds(bytesRead);
+					speed = SM.buffer.getSpeedSeconds(bytesCopied);
 					SM.setSpeed(speed);
 					timer.calcAvgSpeed(speed);
 					if (!timer.isCalculating()) {
 						SM.setCalculatingTimeLeft(false); //TODO: fix big buffer sizes showing no time left
-						SM.setCurrentTimeLeft(timer.getTime(this.getSize()-totalCopied));
+						SM.setCurrentTimeLeft(timer.getTime(this.getSize()-remain));
 						SM.setTotalTimeLeft(timer.getTime(SM.getTotalSizeLeft()));
 					}
 				}
-			}
-		} finally {
-			is.close();
-			os.close();
+                
+                pos += bytesCopied;
+            }
+        } finally {
+        	if (input != null) input.close();
+			if (output != null)output.close();
+        }
+        
+        if (this.getConflictAction() != ConflictAction.SKIP) {
+			renameTemp(tempName);
 			SM.addCopiedFile();
-		}
-		if (this.getConflictAction() != ConflictAction.SKIP) {
-			Files.deleteIfExists(this.getDest());
-			Files.move(tempName, this.getDest(), StandardCopyOption.ATOMIC_MOVE,
-					StandardCopyOption.REPLACE_EXISTING);
+
+	        checkSameLenght();
+	        this.getDest().toFile().setLastModified(this.getOrigin().toFile().lastModified());
 		} else {
-			tempName.toFile().delete();
-		}
-	}
+//			tempName.toFile().delete();
+		} 
+    }
 	
 	/**
 	 * Copies a file.
@@ -136,7 +323,6 @@ public class CopiableFile extends CopiableAbstract{
 		try {
 			return Files.size(this.getOrigin());
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			return 0;
 		}
 	}

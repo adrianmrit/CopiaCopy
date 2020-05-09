@@ -2,7 +2,7 @@ package buffer;
 
 import org.apache.commons.io.FileUtils;
 
-public class AbstractBuffer implements Buffer{
+public abstract class AbstractBuffer implements Buffer{
 	private byte[] buffer;
 	private long startTime;
 	

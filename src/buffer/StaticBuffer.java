@@ -25,4 +25,10 @@ public class StaticBuffer extends AbstractBuffer{
 	public StaticBuffer(int bufferSize) {
 		this.setBuffer(bufferSize);
 	}
+	
+	@Override
+	public int getBufferSize() {
+		// TODO Auto-generated method stub
+		return DEFAULT_BUFFER_SIZE;
+	}
 }

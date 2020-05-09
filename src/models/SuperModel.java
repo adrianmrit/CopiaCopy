@@ -259,7 +259,7 @@ public class SuperModel {
 	
 	/**
 	 * Sets the copied size for the current file.
-	 * @param size Size of the last chunk of data copied.
+	 * @param size Size of the data copied so far.
 	 */
 	public void setCurrentCopiedSize(long size) {
 		this.currentCopiedSize += size;
