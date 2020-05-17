@@ -115,7 +115,6 @@ public class CopyGUI implements Runnable{
 		
 		AncestorListener visibilityListener = new AncestorListener() {
 			public void ancestorAdded(AncestorEvent ancestorEvent) {
-				System.out.println ("Added");
 				skipSelected.setEnabled(true);
 			}
 			public void ancestorRemoved(AncestorEvent ancestorEvent) {
