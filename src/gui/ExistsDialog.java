@@ -30,6 +30,7 @@ import icons.ArrowIconBottom;
 import icons.ArrowIconRight;
 import icons.IcoHelpers;
 import inputFilters.FileNameInputFilter;
+import languages.LangBundle;
 import net.miginfocom.swing.MigLayout;
 import utils.SizeRep;
 
@@ -42,8 +43,6 @@ public class ExistsDialog extends AbstractDialog{
 	private JPanel replaceWithBox;
 	private JPanel originalBox;
 	private Document renamedTextDocument;
-	private final String RENAME_TOGGLE_MESSAGE = "<HTML><p><b>Select a new name for this destination</b></p></HTML>";
-	private final String RENAME_BUTTON_MESSAGE = "Rename";
 	private JButton cancelButton;
 	private JButton renameButton;
 	private JButton skipButton;
@@ -77,11 +76,11 @@ public class ExistsDialog extends AbstractDialog{
 	}
 	
 	public void setReplaceWithBox(File f) {
-		this.replaceWithBox = getFilePanel(f, "Replace with");
+		this.replaceWithBox = getFilePanel(f, LangBundle.CURRENT.getString("replace with"));
 	}
 	
 	public void setOriginalBox(File f) {
-		this.originalBox = getFilePanel(f, "Original");
+		this.originalBox = getFilePanel(f, LangBundle.CURRENT.getString("original"));
 	}
 	
 	public void setCancelButton(String name, String action) {
@@ -112,7 +111,7 @@ public class ExistsDialog extends AbstractDialog{
 			double fileSize = SizeRep.readableVal(f.length());
 			String fileSizeRep = SizeRep.readableRep(f.length());
 			
-			origSizeString = String.format("Size: %.2f%s", fileSize, fileSizeRep);
+			origSizeString = LangBundle.CURRENT.format("sizeFormat", fileSize, fileSizeRep);
 		} else {
 			String[] content = f.list();
 			int contentTotal = 0;
@@ -124,14 +123,14 @@ public class ExistsDialog extends AbstractDialog{
 				s = "s";
 			}
 			
-			origSizeString = String.format("Contains %d item%s", contentTotal, s);
+			origSizeString = LangBundle.CURRENT.format("containsFormat", contentTotal, s);
 		}
 		
 		Date lastMod = new Date(f.lastModified());
 		JLabel origLabel = new JLabel(label);
 		
 		JLabel origSizeLabel = new JLabel(origSizeString);
-		JLabel lastModLabel = new JLabel("Last modified:");
+		JLabel lastModLabel = new JLabel(LangBundle.CURRENT.getString("last modified"));
 		JLabel origModLabel = new JLabel(String.format("%1$tF %1$tr", lastMod));
 		
 		// Origin file container
@@ -209,7 +208,7 @@ public class ExistsDialog extends AbstractDialog{
 		/*************************************
 		 * Rename Section
 		 ************************************/
-		JButton renameToggleButton = new UnstyledButton(RENAME_TOGGLE_MESSAGE);
+		JButton renameToggleButton = new UnstyledButton(LangBundle.CURRENT.getString("renameToggle"));
 		
 		int icoHeight = 8;
 		int icoWidth = 5;
@@ -254,7 +253,7 @@ public class ExistsDialog extends AbstractDialog{
 		 * Buttons Section
 		 ************************************/
 		final JPanel buttonsBox = new JPanel();
-		JCheckBox forAllCheckBox = new JCheckBox("Do for all?");
+		JCheckBox forAllCheckBox = new JCheckBox(LangBundle.CURRENT.getString("do for all"));
 		forAllCheckBox.addActionListener(getCheckBoxListener());
 		buttonsBox.setLayout(new MigLayout("fill"));
 		

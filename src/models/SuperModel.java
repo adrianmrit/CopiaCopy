@@ -13,8 +13,11 @@ import org.apache.commons.lang3.StringUtils;
 
 import buffer.Buffer;
 import copy.Copiable;
+import copy.CopiableFile;
 import copy.CopiableList;
 import enums.ConflictAction;
+import languages.LangBundle;
+import utils.SizeRep;
 import utils.TimerFormater;
 
 /**
@@ -31,15 +34,14 @@ public class SuperModel {
 	public LongProgressBarModel totalProgressModel;
 	public JLabel nameLabel;
 	public JLabel infoLabel;
+	public JLabel originLabel;
+	public JLabel destinationLabel;
 	public JFrame frame; // used to create windows
 
 	private int copiedFiles;
 	
-	
-	private long totalCopiedSize=0;
-	
-	private long currentTotalSize;
-	private long currentCopiedSize = 0;
+//	private long currentTotalSize;
+//	private long currentCopiedSize = 0;
 	
 	private long totalTimeLeft;
 	private long currentTimeLeft;
@@ -58,6 +60,7 @@ public class SuperModel {
 	 */
 	public final int UPDATE_SPEED = 200; //Ms
 	private CopyQueueModel copyQueueModel;
+	private ErrorsModel errorsListModel;
 	
 	/**
 	 * Model that hold some data and updates the GUI
@@ -131,6 +134,10 @@ public class SuperModel {
 		this.copyQueueModel = (CopyQueueModel) copyQueueModel;
 	}
 	
+	public void setErrorListModel(ErrorsModel errorsListModel) {
+		this.errorsListModel = (ErrorsModel) errorsListModel;
+	}
+	
 	/**
 	 * Inserts a copiable into the copy queue table
 	 * @param c
@@ -150,8 +157,19 @@ public class SuperModel {
 		if (hasGUI()) {
 			this.copyQueueModel.remove(c);
 		}
-		this.copiableList.remove(c);
 		this.play();
+	}
+	
+	public void setOrigin(String origin) {
+		if (hasGUI()) {
+			this.originLabel.setText(LangBundle.CURRENT.format("originFormat", origin));
+		}
+	}
+	
+	public void setDestination(String destination) {
+		if (hasGUI()) {
+			this.destinationLabel.setText(LangBundle.CURRENT.format("destinationFormat", destination));
+		}
 	}
 	
 	/**
@@ -159,14 +177,23 @@ public class SuperModel {
 	 */
 	private void updateInfoLabel() {
 		if(this.hasGUI()) {
-			String totalSizeString = FileUtils.byteCountToDisplaySize(this.copiableList.getTotalSize());
-			String copiedSizeString = FileUtils.byteCountToDisplaySize(this.totalCopiedSize);
-			String formatString = "%d/%d files - %s/%s, %s, %s";
-			String info = String.format(formatString, this.copiableList.getNaturalCurrentCopy(), this.copiableList.getCount(), copiedSizeString, totalSizeString, getSpeed(), getTotalTimeLeft());
-			if (infoLabel.getText() != info) {
-				infoLabel.setText(info);
+//			this.copiableList.remove(c);
+			if (shouldUpdate()) {
+				String totalSizeString = SizeRep.readable(this.copiableList.getTotalSize());
+				String copiedSizeString = SizeRep.readable(this.totalProgressModel.getLongValue());
+				String info = LangBundle.CURRENT.format("infoFormat",
+						this.copiableList.getNaturalCurrentCopy(),
+						this.copiableList.getCount(),
+						copiedSizeString,
+						totalSizeString,
+						getSpeed(),
+						getTotalTimeLeft()
+					);
+				if (infoLabel.getText() != info) {
+					infoLabel.setText(info);
+				}
+				updateFrameTitle();
 			}
-			updateFrameTitle();
 		}
 	}
 	
@@ -176,9 +203,9 @@ public class SuperModel {
 	private void updateFrameTitle() {
 		if(this.hasGUI()) {
 			int percent = totalProgressModel.getValue();
-			String totalSizeString = FileUtils.byteCountToDisplaySize(this.copiableList.getTotalSize());
-			String copiedSizeString = FileUtils.byteCountToDisplaySize(this.totalCopiedSize);
-			String formatString = "%d%% - %d/%d - %s/%s, %s";
+			String totalSizeString = SizeRep.readable(this.copiableList.getTotalSize());
+			String copiedSizeString = SizeRep.readable(this.totalProgressModel.getLongValue());
+			String formatString = "%d%% - %d/%d - %s/%s - %s";
 			String info = String.format(formatString, percent, this.copiableList.getNaturalCurrentCopy(), this.copiableList.getCount(), copiedSizeString, totalSizeString, getTotalTimeLeft());
 			if (frame.getTitle() != info) {
 				frame.setTitle(info);
@@ -191,8 +218,8 @@ public class SuperModel {
 	 * @param speed current speed in seconds
 	 */
 	public void setSpeed(double speed) {
+		this.speed = (long) speed;
 		if (shouldUpdate()) {
-			this.speed = (long) speed;
 			updateInfoLabel();
 		}
 	}
@@ -202,7 +229,7 @@ public class SuperModel {
 	 * @return readable speed
 	 */
 	public String getSpeed() {
-		String displaySize = FileUtils.byteCountToDisplaySize(speed);
+		String displaySize = SizeRep.readable(speed);
 		return String.format("%s/s", displaySize);
 	}
 	
@@ -227,7 +254,7 @@ public class SuperModel {
 	 * @return total copied size in bytes
 	 */
 	public long getTotalCopiedSize() {
-		return this.totalCopiedSize;
+		return this.totalProgressModel.getLongValue();
 	}
 	
 	/**
@@ -242,32 +269,35 @@ public class SuperModel {
 	 * Updates total copied size.
 	 * @param size Size of last chunk of data copied
 	 */
-	public void addTotalCopiedSize(long size) {
-		this.totalCopiedSize += size;
-		this.totalProgressModel.addLongValue(size);
+	public void setTotalCopiedSize(long size) {
+		this.totalProgressModel.setLongValue(size);
 		updateInfoLabel();
 	}
 	
-	/**
-	 * Sets the current copy size, and updates the current copied size.
-	 * @param size of current copied file
-	 */
-	public void setCurrentTotalSize(long size) {
-		this.currentTotalSize = size;
-		this.currentCopiedSize = 0; // resets copied size;
+	public void addCopiedBytes(long size) {
+		if (hasGUI()) {
+			setTotalCopiedSize(this.totalProgressModel.getLongValue() + size);
+			setCurrentCopiedSize(this.fileProgressModel.getLongValue() + size);
+		}
+	}
+	
+	public void restCopiedBytes(long size) {
+		if (hasGUI()) {
+			setTotalCopiedSize(this.totalProgressModel.getLongValue() - size);
+			setCurrentCopiedSize(this.fileProgressModel.getLongValue() - size);
+		}
 	}
 	
 	/**
 	 * Sets the copied size for the current file.
 	 * @param size Size of the data copied so far.
 	 */
-	public void setCurrentCopiedSize(long size) {
-		this.currentCopiedSize += size;
+	public void setCurrentCopiedSize(long totalSize) {
 		String formatString = "%s/%s";
-		String displayCopied = FileUtils.byteCountToDisplaySize(this.currentCopiedSize);
-		String displayTotal = FileUtils.byteCountToDisplaySize(this.currentTotalSize);
+		String displayCopied = SizeRep.readable(totalSize);
+		String displayTotal = SizeRep.readable(this.fileProgressModel.getLongMaximum());
 		String sizeLeft = String.format(formatString, displayCopied, displayTotal);
-		this.fileProgressModel.setLongValue(this.currentCopiedSize);
+		this.fileProgressModel.setLongValue(totalSize);
 		this.fileProgressModel.setSizeLeft(sizeLeft);
 	}
 	
@@ -290,7 +320,7 @@ public class SuperModel {
 	 */
 	public String getTotalTimeLeft() {
 		if (calculatingTimeLeft){
-			return "calculating";
+			return LangBundle.CURRENT.getString("calculating");
 		}
 		TimerFormater tFormater = new TimerFormater(this.totalTimeLeft);
 		return tFormater.toString();
@@ -355,6 +385,14 @@ public class SuperModel {
 		this.infoLabel = label;
 	}
 	
+	public void setOriginLabel(JLabel label) {
+		this.originLabel = label;
+	}
+	
+	public void setDestinationLabel(JLabel label) {
+		this.destinationLabel = label;
+	}
+	
 	/** 
 	 * Set hasGUI. If there is GUI it will be updated.
 	 * @param b
@@ -375,9 +413,7 @@ public class SuperModel {
 	 */
 	public void updateLoadingLabel() {
 		if (hasGUI() && this.shouldUpdate()) {
-			Logger logger = Logger.getLogger("SuperModel");
-			logger.log(Level.FINE, "loading" , copiableList.getCount());
-			String loadingText = String.format("Loading %s files", copiableList.getCount());
+			String loadingText = LangBundle.CURRENT.format("loadingFormat", copiableList.getCount());
 			this.nameLabel.setText(loadingText);
 			this.frame.setTitle(loadingText);
 		}
@@ -396,5 +432,9 @@ public class SuperModel {
 	 */
 	public void skipCurrent() {
 		this.copiableList.getNext().setConflictAction(ConflictAction.SKIP);
+	}
+
+	public void addToErrorList(CopiableFile c) {
+		this.errorsListModel.insert(c);
 	}
 }

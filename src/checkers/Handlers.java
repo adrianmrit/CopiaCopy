@@ -21,6 +21,7 @@ public class Handlers implements Checker{
 		this.checkers = new Checker[] {
 				new DestEqualsOrigin(),
 				new CopyIntoItself(SM),
+				new DifferentTypeExists(SM),
 				new Exists(SM)
 		};
 	}

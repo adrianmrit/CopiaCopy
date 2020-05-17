@@ -13,6 +13,9 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 
 import enums.ConflictAction;
+import enums.CopyMode;
+import exceptions.CopyException;
+import exceptions.CopyExceptionFactory;
 import models.SuperModel;
 
 /**
@@ -30,9 +33,10 @@ public abstract class CopiableAbstract implements Copiable{
 	private boolean copied = false;
 	private boolean skipped = false;
 	private boolean overwrite = false;
-	private int mode;
+	private CopyMode mode;
 	private Copiable parent; // folder that will try to delete after moving
 	private ConflictAction onConflict = ConflictAction.DEFAULT;
+	private CopyException error;
 	
 	/**
 	 * An abstract copiable
@@ -43,7 +47,7 @@ public abstract class CopiableAbstract implements Copiable{
 	 * @param mode Copiable mode
 	 */
 	public CopiableAbstract(Path origin, Path rootOrigin,
-			Path rootDest, SuperModel SM, Copiable parent, int mode) {
+			Path rootDest, SuperModel SM, Copiable parent, CopyMode mode) {
 		this.origin = origin;
 		this.rootOrigin = rootOrigin;
 		this.rootDest = rootDest;
@@ -63,8 +67,17 @@ public abstract class CopiableAbstract implements Copiable{
 		SM.updateLoadingLabel();
 	}
 	
-	public int getMode() {
+	public CopyMode getMode() {
 		return this.mode;
+	}
+	
+	public void setError(CopyException error) {
+		this.error = error;
+		this.setConflictAction(ConflictAction.SKIP);
+	}
+	
+	public CopyException getError() {
+		return this.error;
 	}
 	
 	public Copiable getParent() {
@@ -74,12 +87,12 @@ public abstract class CopiableAbstract implements Copiable{
 	/**
 	 * Either moves or copies this {@link Copiable} according to the mode.
 	 */
-	public void paste() throws IOException {
+	public void paste() {
 		switch (getMode()) {
-		case Copiable.COPY_MODE:
+		case COPY:
 			this.copy();
 			break;
-		case Copiable.CUT_MODE:
+		case MOVE:
 			this.move();
 			break;
 		}
@@ -103,7 +116,7 @@ public abstract class CopiableAbstract implements Copiable{
 	 * Moves a {@link Copiable} from its origin to its destination.
 	 * @throws IOException
 	 */
-	public void move() throws IOException {
+	public void move() {
 		// if not able to move then copy
 		try {
 			Files.move(this.getOrigin(), this.getDest(),
@@ -114,6 +127,8 @@ public abstract class CopiableAbstract implements Copiable{
 		} catch (AtomicMoveNotSupportedException e) {
 			copy();
 			deleteThisAndParent();
+		} catch (IOException e) {
+			this.setError(CopyExceptionFactory.write());
 		}
 	}
 	
@@ -121,7 +136,7 @@ public abstract class CopiableAbstract implements Copiable{
 	 * Copies this {@link Copiable} origin into its destination.
 	 * @throws IOException
 	 */
-	public abstract void copy() throws IOException;
+	public abstract void copy();
 	
 	/**
 	 * Path that will be copied to destRoot by default, it could be changed. Example:
@@ -131,8 +146,7 @@ public abstract class CopiableAbstract implements Copiable{
 	 * @return core Path
 	 */
 	public Path getOriginCorePath() {
-		String originRootString = this.rootOrigin.toString();
-		
+		String originRootString = this.rootOrigin.toString().replace("\\", "\\\\");
 		String coreStruct = this.getOrigin().toString().replaceFirst(originRootString, "");  // removes the root
 		return Paths.get(coreStruct);
 	}
@@ -214,9 +228,9 @@ public abstract class CopiableAbstract implements Copiable{
 		this.onConflict = action;
 	}
 	
-	public void setConflictActionForTree(ConflictAction action) {
-
-	}
+//	public void setConflictActionForTree(ConflictAction action) {
+//
+//	}
 	
 	public ConflictAction getConflictAction() {
 		return this.onConflict;

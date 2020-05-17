@@ -5,6 +5,7 @@ import java.nio.file.Paths;
 
 import copy.Copiable;
 import copy.Copy;
+import enums.CopyMode;
 import gui.CopyGUI;
 
 /**
@@ -17,22 +18,18 @@ public class RunCLIArgs {
 		Path src = Paths.get(args[0]).toAbsolutePath();
 		Path dest = Paths.get(args[1]).toAbsolutePath(); // must exist
 		
-		int mode;
+		CopyMode mode;
 		switch (args[2]) {
 			case "c":
-				mode = Copiable.COPY_MODE;
-				break;
 			case "C":
-				mode = Copiable.COPY_MODE;
+				mode = CopyMode.COPY;
 				break;
 			case "m":
-				mode = Copiable.CUT_MODE;
-				break;
 			case "M":
-				mode = Copiable.CUT_MODE;
+				mode = CopyMode.MOVE;
 				break;
 			default:
-				mode = Copiable.COPY_MODE;
+				mode = CopyMode.COPY;
 				break;
 		}
 		

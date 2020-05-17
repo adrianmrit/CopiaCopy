@@ -14,6 +14,7 @@ import org.apache.commons.lang3.ArrayUtils;
 
 import copy.Copiable;
 import enums.ConflictAction;
+import languages.LangBundle;
 
 public class CopyQueueModel extends AbstractTableModel{
 	private static final long serialVersionUID = -4626313003036286748L;
@@ -70,13 +71,13 @@ public class CopyQueueModel extends AbstractTableModel{
 	public String getColumnName(int index) {
 		switch (index) {
 			case 0:
-				return "Name";
+				return LangBundle.CURRENT.getString("name");
 			case 1:
-				return "From";
+				return LangBundle.CURRENT.getString("origin");
 			case 2:
-				return "To";
+				return LangBundle.CURRENT.getString("destination");
 			default:
-				return "Size";
+				return LangBundle.CURRENT.getString("size");
 				
 		}
 	}

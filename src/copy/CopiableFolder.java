@@ -11,6 +11,9 @@ import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import enums.ConflictAction;
+import enums.CopyMode;
+import exceptions.CopyException;
+import exceptions.CopyExceptionFactory;
 import models.SuperModel;
 
 public class CopiableFolder extends CopiableAbstract{
@@ -24,7 +27,7 @@ public class CopiableFolder extends CopiableAbstract{
 	 * @param rootDest Destination root
 	 * @param SM {@link SuperModel} that contains some info
 	 */
-	public CopiableFolder(Path origin, Path rootOrigin, Path rootDest,SuperModel SM, Copiable parent, int mode) {
+	public CopiableFolder(Path origin, Path rootOrigin, Path rootDest,SuperModel SM, Copiable parent, CopyMode mode) {
 		super(origin, rootOrigin, rootDest, SM, parent, mode);
 		 
 		ArrayList<Path> folders = new ArrayList<>();
@@ -42,7 +45,7 @@ public class CopiableFolder extends CopiableAbstract{
 			fileStream.forEach(fileConsumer);
 			fileStream.close();
 		} catch (IOException e) {
-			e.printStackTrace();
+			this.setError(CopyExceptionFactory.write());
 			fileStream = null;
 		}
 		
@@ -66,12 +69,14 @@ public class CopiableFolder extends CopiableAbstract{
 	/**
 	 * Creates this directory and sub-directories that do not exist
 	 */
-	public void copy() throws IOException {
+	public void copy() {
 		if (!this.wasCopied() && this.getConflictAction() != ConflictAction.SKIP) {
 			try {
 				Files.createDirectory(getDest());
 			} catch (FileAlreadyExistsException e){
 				// do nothing
+			} catch (IOException e) {
+				this.setError(CopyExceptionFactory.write());
 			}
 			this.setCopied();
 		} else {
@@ -139,6 +144,18 @@ public class CopiableFolder extends CopiableAbstract{
 	 * Updates this LinkedFile core destination, and updates the core destination paths in it's children if there is any.
 	 * @param newName new name for the folder or file
 	 */
+	
+	@Override
+	public void setError(CopyException error) {
+		super.setError(error);
+		
+		Iterator<Copiable> childsIterator = childrens.iterator();
+		
+		while (childsIterator.hasNext()) {
+			childsIterator.next().setError(error);
+		}
+	}
+	
 	@Override
 	public void renameCoreDest(String newName){
 		Path parent = getCoreDest().getParent();
@@ -184,16 +201,16 @@ public class CopiableFolder extends CopiableAbstract{
 		}
 	}
 	
-	@Override
-	public void setConflictActionForTree(ConflictAction action)	{
-		Iterator<Copiable> childsIterator = childrens.iterator();
-		
-		while (childsIterator.hasNext()) {
-			Copiable c = childsIterator.next();
-			c.setConflictAction(action);
-			c.setConflictActionForTree(action);
-		}
-	}
+//	@Override
+//	public void setConflictActionForTree(ConflictAction action)	{
+//		Iterator<Copiable> childsIterator = childrens.iterator();
+//		
+//		while (childsIterator.hasNext()) {
+//			Copiable c = childsIterator.next();
+//			c.setConflictAction(action);
+//			c.setConflictActionForTree(action);
+//		}
+//	}
 	
 	@Override
 	public void setTreeCopied()	{

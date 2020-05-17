@@ -24,7 +24,7 @@ public class LongProgressBarModel implements BoundedRangeModel{
 	private int extent;
 	private EventListenerList listenerList;
 	private ChangeEvent changeEvent;
-	private boolean indeterminate = true;
+	private boolean indeterminate = false;
 	private boolean stringPainted = true;
 	
 	/** An extended <b>javax.swing.JProgressBar</b>.
@@ -72,13 +72,6 @@ public class LongProgressBarModel implements BoundedRangeModel{
 	public int getConvertedValue() {
 		int converted = (int) (((double) this.valueLong / (double) this.maxLong) * this.max);
 		return converted;
-	}
-	
-	/** Adds to the current value. Calls setValue(long newVal) with the resulting value
-	 * @param newVal value to be added to current value
-	 */
-	public void addLongValue(long newVal) {
-		this.setLongValue(this.valueLong + newVal);
 	}
 	
 	/** Sets a new long value, calculates percent,

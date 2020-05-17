@@ -30,10 +30,10 @@ public class FileFactory {
 	public static final Path FILE_2 = Paths.get(SUB_FOLDER.toString(), "/TestFile2");
 	public static final Path DEST_FILE_2 = Paths.get(DEST_SUB_FOLDER.toString(), "/TestFile2");
 	
-	public static final Path SYMBOLIC_LINK = Paths.get(TEST_FOLDER.toString(), "/SymbolicLink");
-	public static final Path DEST_SYMBOLIC_LINK = Paths.get(TEST_DEST_FOLDER.toString(), "/SymbolicLink");
-	
-	public static final Path SYMBOLIC_LINK_ADDRESS = Paths.get("").toAbsolutePath();
+//	public static final Path SYMBOLIC_LINK = Paths.get(TEST_FOLDER.toString(), "/SymbolicLink");
+//	public static final Path DEST_SYMBOLIC_LINK = Paths.get(TEST_DEST_FOLDER.toString(), "/SymbolicLink");
+//	
+//	public static final Path SYMBOLIC_LINK_ADDRESS = Paths.get("").toAbsolutePath();
 	
 	private final static long FILE_SIZE = (int) FileUtils.ONE_MB*30;
 	
@@ -88,9 +88,9 @@ public class FileFactory {
 			Files.createDirectory(SUB_FOLDER);
 		}
 		
-		if (!Files.exists(SYMBOLIC_LINK)) {
-			Files.createSymbolicLink(SYMBOLIC_LINK, SYMBOLIC_LINK_ADDRESS);
-		}
+//		if (!Files.exists(SYMBOLIC_LINK)) {
+//			Files.createSymbolicLink(SYMBOLIC_LINK, SYMBOLIC_LINK_ADDRESS);
+//		}
 		
 		if (!Files.exists(FILE_1)) {
 			FileFactory.createRandomFile(FILE_SIZE, FILE_1);

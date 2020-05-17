@@ -1,5 +1,7 @@
 package themes;
 
+import java.awt.Insets;
+
 import javax.swing.UIManager;
 
 import mdlaf.themes.JMarsDarkTheme;
@@ -15,6 +17,7 @@ public class JMarsDarkCustom extends JMarsDarkTheme{
 	     this.foregroundProgressBar = MaterialColors.GREEN_400;
 	     UIManager.put("ProgressBar.selectionForeground", MaterialColors.BLACK);
 	     UIManager.put("ProgressBar.selectionBackground", MaterialColors.BLACK);
+	     UIManager.put("TabbedPane.contentBorderInsets", new Insets(0,0,0,0));
 	}
 	
 	@Override

@@ -6,32 +6,26 @@ import java.io.IOException;
 import java.nio.file.Path;
 
 import enums.ConflictAction;
+import enums.CopyMode;
+import exceptions.CopyException;
 
 /**
  * Abstract interface that represents a file or folder,
  * with an origin and a destination where it will be copied
  */
 public interface Copiable extends Comparable<Copiable>{
-	public static int COPY_MODE = 1;
-	public static int CUT_MODE = 2;
 	/** 
 	 * Copies the origin file to the destination
 	 * @throws FileNotFoundException if the origin file doesn't exist
 	 * @throws IOException
 	 */
-	void paste() throws FileNotFoundException, IOException;
+	void paste();
 	
 	/**
 	 * Sets what to do by default in case a file exists
 	 * @param action
 	 */
 	public void setConflictAction(ConflictAction action);
-	
-	/**
-	 * Calls {@link setConflictAction} on all the tree of a {@link CopiableFolder}
-	 * @param Actiontype
-	 */
-	public void setConflictActionForTree(ConflictAction Actiontype);
 	
 	/**
 	 * Gets what to do by default in case a file exists
@@ -48,7 +42,15 @@ public interface Copiable extends Comparable<Copiable>{
 	 * Gets the mode, {@link #COPY_MODE} or {@link #CUT_MODE}.
 	 * @return The copiable mode
 	 */
-	int getMode();
+	CopyMode getMode();
+	
+	/**
+	 * Sets the error for the copy
+	 * @param exception
+	 */
+	void setError(CopyException exception);
+	
+	CopyException getError();
 	
 	/**
 	 * Adds this file to the {@link CopiableList}

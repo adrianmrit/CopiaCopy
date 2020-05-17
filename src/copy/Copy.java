@@ -72,12 +72,6 @@ public class Copy extends SwingWorker<Object, Object>{
 	 */
 	public void doTheCopy() {
 		loader.load();
-		if (SM.hasGUI()) {
-			this.SM.fileProgressModel.setIndeterminate(false);
-			this.SM.totalProgressModel.setIndeterminate(false);
-			this.SM.fileProgressModel.setStringPainted(true);
-			this.SM.totalProgressModel.setStringPainted(true);
-		}
 		int exitStatus = 0;
 		
 		try {

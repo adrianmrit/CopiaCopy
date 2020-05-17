@@ -7,6 +7,9 @@ import javax.swing.JOptionPane;
 
 import copy.Copiable;
 import enums.ConflictAction;
+import exceptions.CopyException;
+import exceptions.CopyExceptionFactory;
+import languages.LangBundle;
 import models.SuperModel;
 
 public class CopyIntoItself implements Checker{
@@ -26,12 +29,12 @@ public class CopyIntoItself implements Checker{
 			
 			if (dest.startsWith(orig)) { // checks if dest is sub-folder of orig
 				
-				JOptionPane optionPane = new JOptionPane("You can't copy a folder into itself",
-						JOptionPane.ERROR_MESSAGE, JOptionPane.DEFAULT_OPTION);
-						
-				JDialog dialog = optionPane.createDialog(SM.frame, "Copy error");
-						dialog.setVisible(true);
-
+				JOptionPane.showMessageDialog(SM.frame,
+				LangBundle.CURRENT.getString("CopyIntoItselfError"),
+				LangBundle.CURRENT.getString("CopyError"),
+				JOptionPane.ERROR_MESSAGE);
+				
+				c.setError(CopyExceptionFactory.copyIntoItself());
 				c.setConflictAction(ConflictAction.SKIP); // skips the tree
 				
 				return false;

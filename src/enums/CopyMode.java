@@ -5,6 +5,6 @@ package enums;
  * @author adrianmrit
  *
  */
-public enum CopyAction {
+public enum CopyMode {
 	COPY, MOVE 
 }

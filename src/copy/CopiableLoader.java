@@ -8,6 +8,7 @@ import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import enums.CopyMode;
 import models.SuperModel;
 
 /**
@@ -18,7 +19,7 @@ import models.SuperModel;
 public class CopiableLoader implements Runnable{
 	private Path orig;
 	private Path dest;
-	private int mode;
+	private CopyMode mode;
 	private SuperModel SM;
 	
 	/**
@@ -26,9 +27,9 @@ public class CopiableLoader implements Runnable{
 	 * @param SM
 	 * @param orig Origin copiable
 	 * @param dest Destination path
-	 * @param mode {@link Copiable#COPY_MODE} or {@link Copiable#CUT_MODE}
+	 * @param mode see {@link CopyMode}
 	 */
-	public CopiableLoader(SuperModel SM, Path orig, Path dest, int mode){
+	public CopiableLoader(SuperModel SM, Path orig, Path dest, CopyMode mode){
 		this.SM = SM;
 		this.orig = orig;
 		this.dest = dest;
@@ -42,7 +43,7 @@ public class CopiableLoader implements Runnable{
 	 * @param dest Destination path
 	 * @param mode {@link Copiable#COPY_MODE} or {@link Copiable#CUT_MODE}
 	 */
-	public CopiableLoader(SuperModel SM, String orig, String dest, int mode){
+	public CopiableLoader(SuperModel SM, String orig, String dest, CopyMode mode){
 		this(SM, Paths.get(orig), Paths.get(dest), mode);
 	}
 	

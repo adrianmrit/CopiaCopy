@@ -11,11 +11,11 @@ public class SizeRep {
 	public static final double GBSize = FileUtils.ONE_GB;
 	public static final double TBSize = FileUtils.ONE_TB;
 	
-	public static final String BRep = "b";
-	public static final String KBRep = "kb";
-	public static final String MBRep = "mb";
-	public static final String GBRep = "gb";
-	public static final String TBRep = "tb";
+	public static final String BRep = "bytes";
+	public static final String KBRep = "KB";
+	public static final String MBRep = "MB";
+	public static final String GBRep = "GB";
+	public static final String TBRep = "TB";
 	
 	
 	/**
@@ -121,5 +121,9 @@ public class SizeRep {
 		} else{
 			return toTB(b);
 		}
+	}
+	
+	public static String readable(long b) {
+		return String.format("%.2f %s", readableVal(b), readableRep(b));
 	}
 }

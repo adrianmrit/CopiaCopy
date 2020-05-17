@@ -4,6 +4,8 @@ import java.awt.LayoutManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
+import java.util.Locale;
+import java.util.concurrent.ExecutionException;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -12,6 +14,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JToggleButton;
 import javax.swing.SwingConstants;
@@ -20,20 +23,26 @@ import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.event.ChangeListener;
 import javax.swing.table.TableModel;
 
+import org.apache.commons.lang3.StringUtils;
+
 import buffer.Buffer;
 import buffer.StaticBuffer;
 import components.DefaultButton;
 import components.ExtendedProgressBar;
 import components.ExtendedProgressBarUI;
+import components.JTableWithToolTips;
 import copy.CopiableList;
 import copy.CopiableLoader;
 import copy.Copy;
+import enums.CopyMode;
+import languages.LangBundle;
 import listeners.ExtendedProgressBarListener;
 import listeners.LongProgressBarListener;
 import mdlaf.MaterialLookAndFeel;
 import mdlaf.components.progressbar.MaterialProgressBarUI;
 import mdlaf.themes.MaterialTheme;
 import models.CopyQueueModel;
+import models.ErrorsModel;
 import models.ExtendedProgressBarModel;
 import models.LongProgressBarModel;
 import models.SuperModel;
@@ -44,15 +53,15 @@ import themes.LiteCustom;
 public class CopyGUI implements Runnable{
 	private static boolean DEBUG = false;
 	
-	private static final int WINDOWS_HEIGHT = 180;
+	private static final int WINDOWS_HEIGHT = 190;
 	private static final int WINDOWS_WIDTH = 500;
 	private static final int MORE_INFO_HEIGHT = 250;
 	
 	private final String orig;
 	private final String dest;
-	private final int mode;
+	private final CopyMode mode;
 	
-	public CopyGUI(String orig, String dest, int mode) {
+	public CopyGUI(String orig, String dest, CopyMode mode) {
 		this.orig = orig;
 		this.dest = dest;
 		this.mode = mode;
@@ -66,7 +75,8 @@ public class CopyGUI implements Runnable{
 	}
 	
 	public void run() {
-		final JFrame frame = new JFrame("Copy");
+		LangBundle.load(Locale.forLanguageTag("es-ES"));
+		final JFrame frame = new JFrame();
 		final JPanel content = new JPanel();
 		LayoutManager layout = new MigLayout("gap 0 0 0 0, fill, hidemode 3");
 		content.setLayout(layout);
@@ -88,10 +98,12 @@ public class CopyGUI implements Runnable{
 		}
 		catch (UnsupportedLookAndFeelException e) {
 			e.printStackTrace ();
-		}	
+		}
 		
 		JLabel nameLabel = new JLabel(" ", SwingConstants.LEFT);
 		JLabel infoLabel = new JLabel(" ", SwingConstants.LEFT);
+		JLabel originLabel = new JLabel(" ", SwingConstants.LEFT);
+		JLabel destinationLabel = new JLabel(" ", SwingConstants.LEFT);
 		
 		ExtendedProgressBarModel fileProgressModel = new ExtendedProgressBarModel();
 		LongProgressBarModel totalProgressModel = new LongProgressBarModel();
@@ -130,16 +142,18 @@ public class CopyGUI implements Runnable{
 		fileCopyProgressBar.setStringPainted(true);
 		totalCopyProgressBar.setStringPainted(true);
 		
-		JToggleButton moreButton = new JToggleButton("More");
-		JButton pauseButton = new DefaultButton("Pause");
-		JButton skipButton = new DefaultButton("Skip");
-		JButton cancelButton = new DefaultButton("Cancel");
+		JToggleButton moreButton = new JToggleButton( LangBundle.CURRENT.getString("more") );
+		JButton pauseButton = new DefaultButton( LangBundle.CURRENT.getString("pause") );
+		JButton skipButton = new DefaultButton( LangBundle.CURRENT.getString("skip") );
+		JButton cancelButton = new DefaultButton( LangBundle.CURRENT.getString("cancel") );
 
 		final JPanel rightContent = new JPanel();
-		rightContent.setLayout(new MigLayout());
+		rightContent.setLayout(new MigLayout("gap 0 0 0 0, fill"));
 		rightContent.add(nameLabel, "span");
-		rightContent.add(fileCopyProgressBar, "span, width 100%-6!, height 40px!");
+		rightContent.add(fileCopyProgressBar, "span, width 100%-5!, pad 0 -5 0 0, gapx 0 0, height 30px!");
 		rightContent.add(infoLabel, "span");
+		rightContent.add(originLabel, "span");
+		rightContent.add(destinationLabel, "span");
 		
 		final JPanel bottomContent = new JPanel();
 		bottomContent.setLayout(new MigLayout("fill"));
@@ -148,40 +162,52 @@ public class CopyGUI implements Runnable{
 		bottomContent.add(skipButton, "");
 		bottomContent.add(cancelButton, "");
 		
-		final JPanel tableContent = new JPanel();
-		tableContent.setLayout(new MigLayout("fill"));
+		/**
+		 * Queue Table Section 
+		 **/
+		
+		final JPanel queueContent = new JPanel();
+		queueContent.setLayout(new MigLayout("fill, gap 0 0 0 0"));
 		CopyQueueModel copyQueueModel = new CopyQueueModel();
 		
-		JTable fileQueueTable = new JTable(copyQueueModel) {
-			public String getToolTipText(MouseEvent e) {
-				String tip = null;
-				java.awt.Point p = e.getPoint();
-				int rowIndex = rowAtPoint(p);
-				int colIndex = columnAtPoint(p);
-				try {
-					tip = getValueAt(rowIndex, colIndex).toString();
-				} catch (RuntimeException exception) {
-					// catch null pointer exception
-				}
-				
-				return tip;
-			}
-		};
-		
+		JTable fileQueueTable = new JTableWithToolTips(copyQueueModel);
 		JScrollPane fileQueueScrollPane = new JScrollPane(fileQueueTable);
-		JButton skipSelected = new DefaultButton("skip selected");
+		JButton skipSelected = new DefaultButton( LangBundle.CURRENT.getString("skip selected") );
 		
-		tableContent.add(fileQueueScrollPane, "span, width 100%-11!");
-		tableContent.add(skipSelected, "gapleft push");
+		queueContent.add(fileQueueScrollPane, "span, width 100%-14!");
+		queueContent.add(skipSelected, "gapleft push, gaptop 5");
+		
+		/**
+		 * Queue Table Section END
+		 **/
+		
+		/**
+		 * Errors Table Section 
+		 **/
+		
+		final JPanel errorsContent = new JPanel();
+		errorsContent.setLayout(new MigLayout("fill, gap 0 0 0 0"));
+		ErrorsModel errorsListModel = new ErrorsModel();
+		JTable fileErrorsTable = new JTableWithToolTips(errorsListModel);
+		
+		JScrollPane errorsContentScrollPane = new JScrollPane(fileErrorsTable);
+		errorsContent.add(errorsContentScrollPane, "span, width 100%-14!");
+		
+		/**
+		 * Errors Table Section END
+		 **/
 		
 		
-		content.add(tableContent, "dock south, width 100%!");
+		JTabbedPane bottomTabs = new JTabbedPane();
+		bottomTabs.add(LangBundle.CURRENT.getString("queueTab"), queueContent);
+		bottomTabs.add(LangBundle.CURRENT.getString("errorsTab"), errorsContent);
+		
+		
+		content.add(bottomTabs, "dock south, width 100%!");
 		content.add(bottomContent, "dock south, width 100%!");
-		content.add(totalCopyProgressBar, "dock west, gapx 6 0, gapy 6 push, height 100px!");
-		content.add(rightContent, "dock north, width 80%+7!, gapx 0 0");
+		content.add(totalCopyProgressBar, "dock west, width 17%, gapx 3 0, gapy 3 push, height 100px!");
+		content.add(rightContent, "dock north, width 83%!, gapx 0 3");
 		
-		
-		totalCopyProgressBar.setPreferredSize(new Dimension(WINDOWS_WIDTH/6, 0));
 		totalCopyProgressBar.setUI(new MaterialProgressBarUI());
 		
 		
@@ -196,8 +222,11 @@ public class CopyGUI implements Runnable{
 		SM.setFileProgressModel(fileProgressModel);
 		SM.setTotalProgressModel(totalProgressModel);
 		SM.setInfoLabel(infoLabel);
+		SM.setOriginLabel(originLabel);
+		SM.setDestinationLabel(destinationLabel);
 		SM.setCurrentLabel(nameLabel);
 		SM.setQueueModel(copyQueueModel);
+		SM.setErrorListModel(errorsListModel);
 		SM.setFrame(frame);
 		SM.setHasGUI(true);
 		
@@ -205,9 +234,9 @@ public class CopyGUI implements Runnable{
 			public void actionPerformed(ActionEvent actionEvent) {
 				SM.togglePaused();
 				if (SM.isPaused()) {
-					pauseButton.setText("Resume");
+					pauseButton.setText(LangBundle.CURRENT.getString("resume"));
 				} else {
-					pauseButton.setText("Pause");
+					pauseButton.setText(LangBundle.CURRENT.getString("pause"));
 				}
 			}
 		};
@@ -238,11 +267,11 @@ public class CopyGUI implements Runnable{
 			public void actionPerformed(ActionEvent actionEvent) {
 				JToggleButton toggleButton = (JToggleButton) actionEvent.getSource();
 				if (toggleButton.isSelected()) {
-					tableContent.setVisible(true);
+					bottomTabs.setVisible(true);
 					skipSelected.setEnabled(true);
 					frame.setSize(new Dimension(WINDOWS_WIDTH, WINDOWS_HEIGHT + MORE_INFO_HEIGHT));
 				} else {
-					tableContent.setVisible(false);
+					bottomTabs.setVisible(false);
 					skipSelected.setEnabled(false);
 					frame.setSize(new Dimension(WINDOWS_WIDTH, WINDOWS_HEIGHT));
 				}
@@ -250,7 +279,7 @@ public class CopyGUI implements Runnable{
 			}
 		};
 		
-		tableContent.setVisible(false);
+		queueContent.setVisible(false);
 		
 		moreButton.addActionListener(moreListener);
 		pauseButton.addActionListener(pauseListener);
@@ -262,5 +291,11 @@ public class CopyGUI implements Runnable{
 		CopiableLoader loader = new CopiableLoader(SM, this.orig, this.dest, this.mode);
 		copyThread.addToCopy(loader);
 		copyThread.execute();
+		try {
+			copyThread.get();
+		} catch (InterruptedException | ExecutionException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 	}
 }

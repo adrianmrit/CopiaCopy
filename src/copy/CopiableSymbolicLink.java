@@ -10,23 +10,30 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 
 import enums.ConflictAction;
+import enums.CopyMode;
+import exceptions.CopyExceptionFactory;
 import models.SuperModel;
 
 public class CopiableSymbolicLink extends CopiableAbstract{
 
-	public CopiableSymbolicLink(Path origin, Path rootOrigin, Path rootDest, SuperModel SM, Copiable parent, int mode) {
+	public CopiableSymbolicLink(Path origin, Path rootOrigin, Path rootDest, SuperModel SM, Copiable parent, CopyMode mode) {
 		super(origin, rootOrigin, rootDest, SM, parent, mode);
 	}
 	
 	/**
 	 * Copies the symbolic link
 	 */
-	public void copy() throws FileNotFoundException, IOException {
+	public void copy() {
 		if (!this.wasCopied() && this.getConflictAction() != ConflictAction.SKIP) {
-			Files.copy(this.getOrigin(), this.getDest(),
-					LinkOption.NOFOLLOW_LINKS,
-					StandardCopyOption.COPY_ATTRIBUTES,
-					StandardCopyOption.REPLACE_EXISTING);
+			try {
+				Files.copy(this.getOrigin(), this.getDest(),
+						LinkOption.NOFOLLOW_LINKS,
+						StandardCopyOption.COPY_ATTRIBUTES,
+						StandardCopyOption.REPLACE_EXISTING);
+			} catch (IOException e) {
+				this.setError(CopyExceptionFactory.write());
+				e.printStackTrace();
+			}
 			this.setCopied();
 		} else {
 			this.SM.copiableList.movePointer();

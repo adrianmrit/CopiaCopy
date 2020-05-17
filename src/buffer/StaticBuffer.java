@@ -7,9 +7,9 @@ import org.apache.commons.io.FileUtils;
  */
 public class StaticBuffer extends AbstractBuffer{
 	/**
-	 * Default buffer size of 30 MB;
+	 * Default buffer size;
 	 */
-	public static final int DEFAULT_BUFFER_SIZE = (int) FileUtils.ONE_MB*10;
+	public static final int DEFAULT_BUFFER_SIZE = (int) FileUtils.ONE_MB*2;
 	
 	/**
 	 * Initializes the buffer with a default size equal to {@link StaticBuffer#DEFAULT_BUFFER_SIZE }.

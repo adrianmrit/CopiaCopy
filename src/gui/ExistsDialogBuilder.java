@@ -4,6 +4,8 @@ import java.io.File;
 
 import javax.swing.JFrame;
 
+import languages.LangBundle;
+
 public final class ExistsDialogBuilder {
 	public static final String CANCEL  = "cancel";
 	public static final String SKIP  = "skip";
@@ -22,41 +24,39 @@ public final class ExistsDialogBuilder {
 	}
 	
 	private static String getSymbolicLinkExistsTitle(File dest) {
-		return toHTMLTitle("Replace symbolic link \"" + dest.getName() + "\"?");
+		return toHTMLTitle(LangBundle.CURRENT.format("replaceShortcutTitleFormat", dest.getName()));
 	}
 	
 	private static String getFileExistsTitle(File dest) {
-		return toHTMLTitle("Replace file \"" + dest.getName() + "\"?");
+		return toHTMLTitle(LangBundle.CURRENT.format("replaceFileTitleFormat", dest.getName()));
 	}
 	
 	private static String getFolderExistsTitle(File dest) {
-		return toHTMLTitle("Replace folder \"" + dest.getName() + "\"?");
+		return toHTMLTitle(LangBundle.CURRENT.format("mergeFolderTitleFormat", dest.getName()));
 	}
 	
 	private static String getSymbolicLinkExistsMessage(File dest) {
 		String parentFolderName = dest.getParentFile().getName();
-		String message = "Anoter symbolic link with the same name already exists in \"" + parentFolderName +  "\".";
+		String message = LangBundle.CURRENT.format("existsShortcutFormat", parentFolderName);
 		return toHTMLParagraph(message);
 	}
 	
 	private static String getFileExistsMessage(File dest) {
 		String parentFolderName = dest.getParentFile().getName();
-		String message = "Anoter file with the same name already exists in \"" + parentFolderName +  "\"."
-				+ "Replacing will overwrite its content";
+		String message = LangBundle.CURRENT.format("existsFileFormat", parentFolderName);
 		return toHTMLParagraph(message);
 	}
 	
 	private static String getFolderExistsMessage(File dest) {
 		String parentFolderName = dest.getParentFile().getName();
-		String message = "Anoter folder with the same name already exists in \"" + parentFolderName +  "\"."
-				+ "Mergin will ask for confirmation if further files exist";
+		String message = LangBundle.CURRENT.format("existsFolderFormat", parentFolderName);
 		return toHTMLParagraph(message);
 	}
 	
 	public static void setCommons(ExistsDialog dialog) {
-		dialog.setCancelButton("Cancel", CANCEL);
-		dialog.setSkipButton("Skip", SKIP);
-		dialog.setRenameButton("Rename", RENAME);
+		dialog.setCancelButton(LangBundle.CURRENT.getString("cancel"), CANCEL);
+		dialog.setSkipButton(LangBundle.CURRENT.getString("skip"), SKIP);
+		dialog.setRenameButton(LangBundle.CURRENT.getString("rename"), RENAME);
 	}
 	
 	public static ExistsDialog getFileExistsDialog(JFrame parent, File origin, File dest) {
@@ -65,7 +65,7 @@ public final class ExistsDialogBuilder {
 		String title = getFileExistsTitle(dest);
 		String message = getFileExistsMessage(dest);
 		
-		dialog.setWindowsTitle("Replace file");
+		dialog.setWindowsTitle(LangBundle.CURRENT.getString("existsFileWindowsTitle"));
 		dialog.setTitle(title);
 		dialog.setMessage(message);
 		dialog.setReplaceWithBox(origin);
@@ -74,7 +74,7 @@ public final class ExistsDialogBuilder {
 		
 		setCommons(dialog);
 		
-		dialog.setMRButton("Replace", REPLACE);
+		dialog.setMRButton(LangBundle.CURRENT.getString("replace"), REPLACE);
 
 		return dialog;
 	}
@@ -85,7 +85,7 @@ public final class ExistsDialogBuilder {
 		String title = getFolderExistsTitle(dest);
 		String message = getFolderExistsMessage(dest);
 		
-		dialog.setWindowsTitle("Merge folders");
+		dialog.setWindowsTitle(LangBundle.CURRENT.getString("existsFolderWindowsTitle"));
 		dialog.setTitle(title);
 		dialog.setMessage(message);
 		dialog.setReplaceWithBox(origin);
@@ -94,7 +94,7 @@ public final class ExistsDialogBuilder {
 		
 		setCommons(dialog);
 		
-		dialog.setMRButton("Merge", MERGE);
+		dialog.setMRButton(LangBundle.CURRENT.getString("merge"), MERGE);
 
 		return dialog;
 	}
@@ -105,7 +105,7 @@ public final class ExistsDialogBuilder {
 		String title = getSymbolicLinkExistsTitle(dest);
 		String message = getSymbolicLinkExistsMessage(dest);
 		
-		dialog.setWindowsTitle("Replace");
+		dialog.setWindowsTitle(LangBundle.CURRENT.getString("existsShortcutWindowsTitle"));
 		dialog.setTitle(title);
 		dialog.setMessage(message);
 		dialog.setReplaceWithBox(origin);
@@ -114,7 +114,7 @@ public final class ExistsDialogBuilder {
 		
 		setCommons(dialog);
 		
-		dialog.setMRButton("Replace", REPLACE);
+		dialog.setMRButton(LangBundle.CURRENT.getString("replace"), REPLACE);
 
 		return dialog;
 	}

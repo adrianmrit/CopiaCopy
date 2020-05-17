@@ -13,6 +13,7 @@ import javax.swing.text.DocumentFilter;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 
+import languages.LangBundle;
 import utils.FileTools;
 
 public class FileNameInputFilter extends DocumentFilter {
@@ -67,7 +68,7 @@ public class FileNameInputFilter extends DocumentFilter {
 	}
 	
 	private void handleInvalid(String proposedValue) {
-		this.errorLabel.setText(String.format("%s is not a valid name", proposedValue));
+		this.errorLabel.setText(LangBundle.CURRENT.format("invalidNameFormat", proposedValue));
 		this.errorLabel.setVisible(true);
 		this.submitButton.setEnabled(false);
 		

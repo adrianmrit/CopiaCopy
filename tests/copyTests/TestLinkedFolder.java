@@ -17,6 +17,7 @@ import org.junit.jupiter.api.Test;
 
 import copy.Copiable;
 import copy.CopiableList;
+import enums.CopyMode;
 import models.SuperModel;
 import copy.CopiableFolder;
 import testFiles.FileFactory;
@@ -41,7 +42,7 @@ class TestLinkedFolder {
 	void test() {
 		Copiable copiable = new CopiableFolder(FileFactory.TEST_FOLDER,
 				FileFactory.TEST_DEST_FOLDER_PARENT, FileFactory.TEST_DEST_FOLDER,
-				null, null, Copiable.COPY_MODE);
+				null, null, CopyMode.COPY);
 		
 		Iterator<Path> it = null;
 		try {
@@ -67,7 +68,7 @@ class TestLinkedFolder {
 	void testEmpty() {
 		Copiable copiable = new CopiableFolder(FileFactory.TEST_DEST_FOLDER_PARENT,
 				FileFactory.TEST_DEST_FOLDER_PARENT.getParent(), FileFactory.TEST_FOLDER,
-				null, null, Copiable.COPY_MODE);
+				null, null, CopyMode.COPY);
 		
 		Iterator<Path> it = null;
 		try {
