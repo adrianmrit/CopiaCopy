@@ -100,7 +100,6 @@ public class CopiableFile extends CopiableAbstract{
 	}
 	
 	public void handleCopy() {
-		System.out.println("handled");
 		FileWriter writter = new FileWriter(this, SM);
 		writter.execute();
 		boolean copied = false;
