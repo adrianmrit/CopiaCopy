@@ -153,11 +153,20 @@ public class SuperModel {
 	 * @param c
 	 */
 	public void removeCopyQueue(Copiable c) {
-		this.pause();
+		boolean wasPaused = false;
+		if (this.isPaused()) {
+			wasPaused = true;
+		}
+		
+		this.pause(); // pause to avoid adding to the copy before removing
+		
 		if (hasGUI()) {
 			this.copyQueueModel.remove(c);
 		}
-		this.play();
+		
+		if (wasPaused != true) { // avoids to continue the copy if the pause button was pressed
+			this.play();
+		}
 	}
 	
 	public void setOrigin(String origin) {
