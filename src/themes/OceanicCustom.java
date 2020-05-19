@@ -8,6 +8,8 @@ import mdlaf.utils.MaterialColors;
 import utils.FontFactory;
 
 public class OceanicCustom extends JMarsDarkTheme{
+	public static String NAME = "Oceanic";
+	
 	@Override
     protected void installColor() {
 			super.installColor();

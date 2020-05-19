@@ -10,6 +10,8 @@ import mdlaf.utils.MaterialColors;
 import utils.FontFactory;
 
 public class JMarsDarkCustom extends JMarsDarkTheme{
+	public static String NAME = "JMarsDark";
+	
 	@Override
     protected void installColor() {
 			super.installColor();

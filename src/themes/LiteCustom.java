@@ -11,6 +11,8 @@ import mdlaf.utils.MaterialFontFactory;
 import utils.FontFactory;
 
 public class LiteCustom extends MaterialLiteTheme{
+	public static String NAME = "MaterialLite";
+	
 	@Override
     protected void installColor() {
 			super.installColor();

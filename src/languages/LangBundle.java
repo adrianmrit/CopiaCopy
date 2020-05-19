@@ -7,10 +7,10 @@ import javax.swing.UIManager;
 import mdlaf.utils.MaterialColors;
 
 public class LangBundle {
-	private static final Locale ES_LOCALE = Locale.forLanguageTag("es-ES");
-	private static final Locale EN_LOCALE = Locale.ENGLISH;
+	public static final Locale ES_LOCALE = Locale.forLanguageTag("es");
+	public static final Locale EN_LOCALE = Locale.ENGLISH;
 	public static ExtendedListResourceBundle CURRENT;
-	public static Locale[] AVAILABLE_LANGUAGES = new Locale[] {ES_LOCALE, EN_LOCALE};
+	public static String[] INSTALLED = new String[] {"spanish", "english"};
 	
 	public static void load(Locale lang) {
 		if (lang.equals(ES_LOCALE)) {

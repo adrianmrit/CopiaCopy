@@ -27,7 +27,7 @@ public class SettingsGUI {
 		langPanel.setLayout(new MigLayout("gap 0 0 0 0"));
 		
 		final JLabel langPickerLabel = new JLabel(LangBundle.CURRENT.getString("langPickerLabel"));
-		final JComboBox<Locale> langPicker = new JComboBox<Locale>(LangBundle.AVAILABLE_LANGUAGES);
+		final JComboBox<String> langPicker = new JComboBox<String>(LangBundle.INSTALLED);
 		langPickerLabel.setLabelFor(langPicker);
 		langPanel.add(langPickerLabel, "gap 10 10 10 10");
 		langPanel.add(langPicker, "wrap, gap 10 10 10 10");
@@ -57,7 +57,7 @@ public class SettingsGUI {
 	}
 	
 	public static void main(String[] args) {
-		LangBundle.load(LangBundle.AVAILABLE_LANGUAGES[0]);
+		LangBundle.load(LangBundle.ES_LOCALE);
 		final JFrame frame = new JFrame();
 		final JPanel content = new JPanel();
 		LayoutManager layout = new MigLayout("gap 0 0 0 0, fill, hidemode 3");
